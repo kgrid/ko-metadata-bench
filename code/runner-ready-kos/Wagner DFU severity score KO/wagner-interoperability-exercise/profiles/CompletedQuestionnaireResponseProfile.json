@@ -1,0 +1,45 @@
+{
+  "artifactType": "object-profile",
+  "profile": "CompletedQuestionnaireResponseProfile",
+  "semanticType": "CompletedQuestionnaireResponse",
+  "type": "object",
+  "required": [
+    "specification_iri",
+    "response_model_iri",
+    "question_ids",
+    "responses"
+  ],
+  "properties": {
+    "specification_iri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "response_model_iri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "question_ids": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "string"
+      }
+    },
+    "responses": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": ["string", "number"],
+        "enum": ["0", "1", "X", "i", 0, 1]
+      }
+    }
+  },
+  "example": {
+    "specification_iri": "https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0",
+    "response_model_iri": "https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse",
+    "question_ids": ["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10"],
+    "responses": ["0", "0", "0", "0", "0", "1", "1", "X", "0", "0"]
+  }
+}

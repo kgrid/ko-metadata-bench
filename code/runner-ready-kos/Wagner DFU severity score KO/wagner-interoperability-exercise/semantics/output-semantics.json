@@ -1,0 +1,198 @@
+{
+  "artifactType": "semantic-boundary-view",
+  "role": "output",
+  "concept": "WagnerClassificationResult",
+  "identifier": "https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerClassificationResult",
+  "meaning": "The classification result produced by analysis of a completed questionnaire response.",
+  "elements": [
+    {
+      "name": "question_ids",
+      "meaning": "The canonical ordered identifiers of the ten questions represented in the classification result.",
+      "cardinality": 10,
+      "members": [
+        {
+          "position": 1,
+          "id": "Q01",
+          "text": "Is extensive gangrene present involving most or all of the foot?",
+          "meaning": "Determines whether gangrene is extensive and involves most or all of the assessed foot."
+        },
+        {
+          "position": 2,
+          "id": "Q02",
+          "text": "Is localized gangrene present involving only part of the foot?",
+          "meaning": "Determines whether gangrene is localized to a limited portion of the assessed foot."
+        },
+        {
+          "position": 3,
+          "id": "Q03",
+          "text": "Is a deep abscess present?",
+          "meaning": "Determines whether an abscess is present in a deep tissue compartment or anatomical structure."
+        },
+        {
+          "position": 4,
+          "id": "Q04",
+          "text": "Is osteomyelitis present?",
+          "meaning": "Determines whether infection and inflammation involving bone or bone marrow is present."
+        },
+        {
+          "position": 5,
+          "id": "Q05",
+          "text": "Is comparably deep infection present?",
+          "meaning": "Determines whether a deep infection comparable in significance to a deep abscess or osteomyelitis is present."
+        },
+        {
+          "position": 6,
+          "id": "Q06",
+          "text": "Is an open ulcer present?",
+          "meaning": "Determines whether the assessed site has an ulcer with a break in the skin surface."
+        },
+        {
+          "position": 7,
+          "id": "Q07",
+          "text": "Does the ulcer extend into a deep anatomical structure such as tendon, joint capsule, muscle, joint, or bone?",
+          "meaning": "Determines whether the ulcer extends beyond skin and superficial subcutaneous tissue into a deeper anatomical structure."
+        },
+        {
+          "position": 8,
+          "id": "Q08",
+          "text": "Is the ulcer limited to skin or superficial subcutaneous tissue?",
+          "meaning": "Determines whether the ulcer remains superficial and does not extend into deeper anatomical structures."
+        },
+        {
+          "position": 9,
+          "id": "Q09",
+          "text": "Is the skin intact?",
+          "meaning": "Determines whether the skin at the assessed site is continuous and unbroken."
+        },
+        {
+          "position": 10,
+          "id": "Q10",
+          "text": "Does this assessment site represent an at-risk or previously ulcerated site with intact skin and no current open ulcer or higher-grade lesion?",
+          "meaning": "Determines whether the assessed site represents the Wagner Grade 0 at-risk state rather than an active ulcerative, infectious, or gangrenous lesion."
+        }
+      ]
+    },
+    {
+      "name": "responses",
+      "meaning": "The normalized ordered response values used to produce the classification result.",
+      "cardinality": 10,
+      "alignedWith": "question_ids",
+      "alignmentRule": "For every array position n, responses[n] is the normalized response to question_ids[n].",
+      "values": [
+        {
+          "value": "0",
+          "meaning": "The condition stated by the corresponding question is absent."
+        },
+        {
+          "value": "1",
+          "meaning": "The condition stated by the corresponding question is present."
+        },
+        {
+          "value": "X",
+          "meaning": "The corresponding question was not applicable or was not asked because of the questionnaire's adaptive logic."
+        },
+        {
+          "value": "i",
+          "meaning": "The response required for the corresponding question is incomplete."
+        }
+      ]
+    },
+    {
+      "name": "analysis_status",
+      "meaning": "States whether the supplied response set supported a classification and describes the result of the analysis.",
+      "values": [
+        {
+          "value": "grade_computed",
+          "meaning": "The response set satisfies exactly one Wagner grade definition, and a single score and grade label were produced."
+        },
+        {
+          "value": "indeterminate",
+          "meaning": "The response set does not supply enough applicable findings to support a Wagner grade."
+        },
+        {
+          "value": "ambiguous",
+          "meaning": "The response set supports more than one Wagner grade definition, so a single grade cannot be selected."
+        },
+        {
+          "value": "incomplete_response",
+          "meaning": "At least one response required to complete the classification is marked as incomplete."
+        },
+        {
+          "value": "conflicting_response",
+          "meaning": "The response set contains an internally inconsistent or logically incompatible combination of findings."
+        }
+      ]
+    },
+    {
+      "name": "wagner_score",
+      "meaning": "The computed Wagner classification grade represented as an array containing one integer from 0 through 5 when a grade is computed, or an empty array when no single grade is produced.",
+      "minimumCardinality": 0,
+      "maximumCardinality": 1,
+      "values": [
+        {
+          "value": 0,
+          "meaning": "At-risk or previously ulcerated site with intact skin and no current open ulcer or higher-grade lesion."
+        },
+        {
+          "value": 1,
+          "meaning": "Superficial ulcer limited to skin or superficial subcutaneous tissue."
+        },
+        {
+          "value": 2,
+          "meaning": "Deep ulcer extending into a deeper anatomical structure without established deep abscess, osteomyelitis, comparable deep infection, or gangrene."
+        },
+        {
+          "value": 3,
+          "meaning": "Deep ulcer with deep abscess, osteomyelitis, or a comparably deep infection."
+        },
+        {
+          "value": 4,
+          "meaning": "Localized gangrene involving only part of the foot."
+        },
+        {
+          "value": 5,
+          "meaning": "Extensive gangrene involving most or all of the foot."
+        }
+      ]
+    },
+    {
+      "name": "grade_label",
+      "meaning": "The human-readable label corresponding to the computed Wagner score, represented as a one-element array when a grade is computed or an empty array when no single grade is produced.",
+      "minimumCardinality": 0,
+      "maximumCardinality": 1,
+      "alignedWith": "wagner_score",
+      "values": [
+        {
+          "value": "At-risk foot without an open ulcer",
+          "correspondingScore": 0,
+          "meaning": "Label for Wagner Grade 0."
+        },
+        {
+          "value": "Superficial ulcer",
+          "correspondingScore": 1,
+          "meaning": "Label for Wagner Grade 1."
+        },
+        {
+          "value": "Deep ulcer",
+          "correspondingScore": 2,
+          "meaning": "Label for Wagner Grade 2."
+        },
+        {
+          "value": "Deep ulcer with abscess or osteomyelitis",
+          "correspondingScore": 3,
+          "meaning": "Label for Wagner Grade 3."
+        },
+        {
+          "value": "Localized gangrene",
+          "correspondingScore": 4,
+          "meaning": "Label for Wagner Grade 4."
+        },
+        {
+          "value": "Extensive gangrene",
+          "correspondingScore": 5,
+          "meaning": "Label for Wagner Grade 5."
+        }
+      ]
+    }
+  ]
+}

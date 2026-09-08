@@ -1,0 +1,33 @@
+{
+  "name": "@dfu-hbot/bounded-regimen-and-execution-burden",
+  "version": "1.0.0",
+  "description": "DFU HBOT burden package implementing regimen range, questionnaire logic, and burden response analysis",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "bin": {
+    "dfu-hbot-burden": "bin/dfu-hbot-burden.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./regimen-range": "./src/regimen-range.js",
+    "./questionnaire": "./src/questionnaire-logic.js",
+    "./analysis": "./src/burden-response-analysis.js"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "scripts": {
+    "test": "node --test",
+    "spec:audit": "node scripts/spec-audit.js",
+    "spec:audit:strict": "node scripts/spec-audit.js --strict"
+  },
+  "keywords": [
+    "dfu",
+    "hbot",
+    "burden",
+    "questionnaire",
+    "analysis"
+  ],
+  "license": "MIT"
+}

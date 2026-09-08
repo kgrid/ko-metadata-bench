@@ -1,0 +1,114 @@
+{
+  "fixture_id": "TC-28",
+  "capability": "burden_analysis",
+  "operation": "analyze",
+  "input": {
+    "request_type": "calculate_burden_range",
+    "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+    "questionnaire_response": {
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "questionnaire_status": "completed",
+      "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0-wrong",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "response_projection": {
+        "hyperbaric_oxygen_therapy_location": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+        "one_way_miles": -1,
+        "one_way_travel_minutes": 22,
+        "weekday_attendance_difficulty": "some"
+      },
+      "confirmed": true
+    },
+    "fixed_regimen_range_response": {
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "response_type": "fixed_regimen_range_response",
+      "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+      "status": "completed",
+      "knowledge_package_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+      "knowledge_scope": "general_not_patient_specific",
+      "indication": "diabetes_related_foot_ulcer",
+      "shorter_regimen_scenario": {
+        "episodes": 30,
+        "sessions_per_week": 5,
+        "course_weeks": 6.0
+      },
+      "longer_regimen_scenario": {
+        "episodes": 40,
+        "sessions_per_week": 5,
+        "course_weeks": 8.0
+      },
+      "combined_range": {
+        "episodes": [
+          30,
+          40
+        ],
+        "sessions_per_week": 5,
+        "course_weeks": [
+          6.0,
+          8.0
+        ]
+      },
+      "scheduled_facility_hours_per_episode": {
+        "value": 3.0,
+        "unit": "h"
+      },
+      "tailored_to_patient": false,
+      "display_label": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+    }
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/082b5982-67e2-428e-9aac-b4d75bf05277",
+    "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+    "result_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "provenance": {
+      "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+      "engine_implementation_version": "1.0.0-fixture",
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+      "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+      "identifier_dependency_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "input_received_at": "2026-07-31T14:25:36.100Z",
+      "input_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "RFC8785",
+        "value": "35e1c474138f683e7ee8967fdeb0fcfa3c9708f267368faaa757ac77e20c6ce8"
+      },
+      "provider_roster_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "none",
+        "value": null
+      },
+      "deterministic_result_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "RFC8785",
+        "value": "fd93881f36f66bf4c8416dff9335fe8cd309bc7904f84ed4900f801a1556a8d2"
+      }
+    },
+    "status": "error",
+    "result_code": "ERR-05",
+    "objective_burden": null,
+    "weekday_attendance_feasibility": null,
+    "execution_burden_level": null,
+    "sensitivity": null,
+    "assumptions": [],
+    "evidence_sources": [],
+    "error": {
+      "code": "ERR-05",
+      "status": "error",
+      "error_field": "response_model_iri",
+      "message": "Input artifact identity, status, or version is invalid."
+    },
+    "warnings": []
+  },
+  "execution_context": {
+    "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+    "engine_implementation_version": "1.0.0-fixture",
+    "input_received_at": "2026-07-31T14:25:36.100Z",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/082b5982-67e2-428e-9aac-b4d75bf05277"
+  }
+}

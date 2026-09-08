@@ -1,0 +1,56 @@
+{
+  "fixture_id": "QT-01",
+  "capability": "burden_questionnaire",
+  "operation": "apply_events",
+  "input": [
+    {
+      "event": "confirm_provider",
+      "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001"
+    },
+    {
+      "event": "answer",
+      "question": "Q02",
+      "value": 12.5
+    },
+    {
+      "event": "answer",
+      "question": "Q03",
+      "value": 22
+    },
+    {
+      "event": "answer",
+      "question": "Q04",
+      "value": "some"
+    },
+    {
+      "event": "confirm_review"
+    }
+  ],
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "state": "QTS-COMPLETED",
+    "answers": {
+      "Q01": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+      "Q02": 12.5,
+      "Q03": 22,
+      "Q04": "some"
+    },
+    "registered_response": {
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "questionnaire_status": "completed",
+      "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "response_projection": {
+        "hyperbaric_oxygen_therapy_location": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+        "one_way_miles": 12.5,
+        "one_way_travel_minutes": 22,
+        "weekday_attendance_difficulty": "some"
+      },
+      "confirmed": true
+    },
+    "analysis_invoked": false,
+    "display_requirements": []
+  }
+}

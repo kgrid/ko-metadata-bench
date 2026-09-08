@@ -1,0 +1,25 @@
+{
+  "fixture_id": "QT-20",
+  "capability": "burden_questionnaire",
+  "operation": "apply_events",
+  "input": [
+    {
+      "event": "abandon"
+    }
+  ],
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "state": "QTS-ABANDONED",
+    "answers": {
+      "Q01": null,
+      "Q02": null,
+      "Q03": null,
+      "Q04": null
+    },
+    "registered_response": null,
+    "analysis_invoked": false,
+    "display_requirements": []
+  }
+}

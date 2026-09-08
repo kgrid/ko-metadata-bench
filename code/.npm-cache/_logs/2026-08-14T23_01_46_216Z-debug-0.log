@@ -1,0 +1,38 @@
+0 verbose cli /opt/homebrew/Cellar/node@22/22.23.1/bin/node /Users/ajf/node_modules/.bin/npm
+1 info using npm@9.1.3
+2 info using node@v22.23.1
+3 timing npm:load:whichnode Completed in 0ms
+4 timing config:load:defaults Completed in 0ms
+5 timing config:load:file:/Users/ajf/node_modules/npm/npmrc Completed in 1ms
+6 timing config:load:builtin Completed in 1ms
+7 timing config:load:cli Completed in 0ms
+8 timing config:load:env Completed in 1ms
+9 timing config:load:file:/Users/ajf/Documents/Codex/2026-08-03/t/.npmrc Completed in 0ms
+10 timing config:load:project Completed in 75ms
+11 timing config:load:file:/Users/ajf/.npmrc Completed in 0ms
+12 timing config:load:user Completed in 0ms
+13 timing config:load:file:/opt/homebrew/etc/npmrc Completed in 0ms
+14 timing config:load:global Completed in 0ms
+15 timing config:load:setEnvs Completed in 1ms
+16 timing config:load Completed in 78ms
+17 timing npm:load:configload Completed in 78ms
+18 timing npm:load:mkdirpcache Completed in 0ms
+19 timing npm:load:mkdirplogs Completed in 0ms
+20 verbose title npm run build
+21 verbose argv "run" "build"
+22 timing npm:load:setTitle Completed in 0ms
+23 timing config:load:flatten Completed in 1ms
+24 timing npm:load:display Completed in 1ms
+25 verbose logfile logs-max:10 dir:/Users/ajf/Documents/Codex/2026-08-03/t/.npm-cache/_logs/2026-08-14T23_01_46_216Z-
+26 verbose logfile /Users/ajf/Documents/Codex/2026-08-03/t/.npm-cache/_logs/2026-08-14T23_01_46_216Z-debug-0.log
+27 timing npm:load:logFile Completed in 2ms
+28 timing npm:load:timers Completed in 0ms
+29 timing npm:load:configScope Completed in 0ms
+30 timing npm:load Completed in 81ms
+31 silly logfile start cleaning logs, removing 1 files
+32 timing config:load:flatten Completed in 0ms
+33 silly logfile done cleaning log files
+34 timing command:run Completed in 4577ms
+35 verbose exit 0
+36 timing npm Completed in 4666ms
+37 info ok

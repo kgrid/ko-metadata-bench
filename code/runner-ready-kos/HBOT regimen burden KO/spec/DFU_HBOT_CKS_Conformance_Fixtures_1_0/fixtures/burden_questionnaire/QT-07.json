@@ -1,0 +1,30 @@
+{
+  "fixture_id": "QT-07",
+  "capability": "burden_questionnaire",
+  "operation": "render_question",
+  "input": {
+    "question": "Q04",
+    "answers": {
+      "Q01": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+      "Q02": 12.5,
+      "Q03": 22
+    }
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "question_id": "Q04",
+    "required_phrases": [
+      "confirmed hyperbaric oxygen therapy location",
+      "five weekdays per week",
+      "6–8 weeks",
+      "exclude miles and travel time"
+    ],
+    "allowed_values": [
+      "none",
+      "some",
+      "major"
+    ]
+  }
+}

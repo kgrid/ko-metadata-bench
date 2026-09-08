@@ -1,0 +1,351 @@
+{
+  "coverage_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+  "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+  "status": "final",
+  "record_count": 24,
+  "coverage_scope": "all_normative_rule_families_in_this_cks_version",
+  "records": [
+    {
+      "coverage_id": "COV-01",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Scope, DFU-only use, U.S.-only use, and nonprescription boundaries",
+      "normative_sections": "1.1–1.6",
+      "verification_mechanism": "document_inspection",
+      "evidence_ids": []
+    },
+    {
+      "coverage_id": "COV-02",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Versioned KGrid IRIs, compact aliases, and capability-boundary identity",
+      "normative_sections": "1.2; Appendix A.3",
+      "verification_mechanism": "schema_and_manifest",
+      "evidence_ids": []
+    },
+    {
+      "coverage_id": "COV-03",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "General DFU regimen knowledge, evidence stack, and package validation",
+      "normative_sections": "2.1–2.4; Appendices D–F",
+      "verification_mechanism": "document_and_dependency_validation",
+      "evidence_ids": [
+        "RR-05",
+        "RR-06"
+      ]
+    },
+    {
+      "coverage_id": "COV-04",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Closed Regimen Range request and fixed response",
+      "normative_sections": "3.1–3.2",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "RR-01",
+        "RR-02",
+        "RR-03",
+        "RR-04"
+      ]
+    },
+    {
+      "coverage_id": "COV-05",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Regimen invariants, facility-time value, and non-tailoring",
+      "normative_sections": "3.3–3.4",
+      "verification_mechanism": "executable_fixtures_and_presentation_checks",
+      "evidence_ids": [
+        "RR-05",
+        "RR-06",
+        "RR-07",
+        "RR-08",
+        "PRES-02",
+        "PRES-04"
+      ]
+    },
+    {
+      "coverage_id": "COV-06",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Sparse Q01–Q04 wording, coding, ranges, and question order",
+      "normative_sections": "4.1–4.2",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "QT-01",
+        "QT-05",
+        "QT-07",
+        "QT-13",
+        "QT-14",
+        "QT-15",
+        "QT-16",
+        "QT-17",
+        "QT-18"
+      ]
+    },
+    {
+      "coverage_id": "COV-07",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Questionnaire states, review, revision, abandonment, and provider changes",
+      "normative_sections": "4.3–4.4",
+      "verification_mechanism": "executable_fixtures",
+      "evidence_ids": [
+        "QT-02",
+        "QT-04",
+        "QT-06",
+        "QT-08",
+        "QT-09",
+        "QT-10",
+        "QT-11",
+        "QT-12",
+        "QT-19",
+        "QT-20"
+      ]
+    },
+    {
+      "coverage_id": "COV-08",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Completed sparse response and exact questionnaire-to-analysis handoff",
+      "normative_sections": "4.5–5.2",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "QT-01",
+        "TC-23",
+        "TC-24",
+        "TC-31"
+      ]
+    },
+    {
+      "coverage_id": "COV-09",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Closed analytical input, type/value rules, and unknown-property behavior",
+      "normative_sections": "5.2–5.3; 9.1–9.3",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "TC-09",
+        "TC-10",
+        "TC-11",
+        "TC-12",
+        "TC-13",
+        "TC-14",
+        "TC-15",
+        "TC-16",
+        "TC-17",
+        "TC-26",
+        "TC-27"
+      ]
+    },
+    {
+      "coverage_id": "COV-10",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Roster-version compatibility, dependency loading, and provider lookup",
+      "normative_sections": "5.4; 9.4",
+      "verification_mechanism": "executable_fixtures",
+      "evidence_ids": [
+        "TC-31",
+        "TC-32",
+        "TC-35",
+        "TC-36",
+        "TC-37",
+        "TC-38",
+        "TC-39"
+      ]
+    },
+    {
+      "coverage_id": "COV-11",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Burden arithmetic, exact decimals, exclusive IN-03-derived hour uses, endpoint rounding, and invariants",
+      "normative_sections": "6.1–6.5; 7.1; 7.5",
+      "verification_mechanism": "executable_fixtures",
+      "evidence_ids": [
+        "TC-01",
+        "TC-02",
+        "TC-03",
+        "TC-04",
+        "TC-08",
+        "TC-18",
+        "TC-19",
+        "TC-20"
+      ]
+    },
+    {
+      "coverage_id": "COV-12",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Objective burden and travel-band classification",
+      "normative_sections": "7.1",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "TC-01",
+        "TC-02",
+        "TC-03",
+        "TC-04",
+        "TC-18",
+        "TC-19",
+        "TC-20"
+      ]
+    },
+    {
+      "coverage_id": "COV-13",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Reported attendance feasibility, five-level execution burden, and driver precedence",
+      "normative_sections": "7.2–7.5; 8.3",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "TC-51–TC-62"
+      ]
+    },
+    {
+      "coverage_id": "COV-14",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Fixed-shape completed/error results and substantive null behavior",
+      "normative_sections": "8.1–8.2; 9",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "TC-01",
+        "TC-09",
+        "TC-12",
+        "TC-13",
+        "TC-14"
+      ]
+    },
+    {
+      "coverage_id": "COV-15",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Result identity, provenance, timestamps, fingerprints, and replay",
+      "normative_sections": "8.2.1–8.2.6",
+      "verification_mechanism": "schema_executable_fixtures_and_audit",
+      "evidence_ids": [
+        "TC-40",
+        "TC-41",
+        "TC-42",
+        "TC-43",
+        "TC-44",
+        "TC-45",
+        "TC-46"
+      ]
+    },
+    {
+      "coverage_id": "COV-16",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Human-readable output presentation and noncompletion display",
+      "normative_sections": "8.6",
+      "verification_mechanism": "presentation_conformance_inspection",
+      "evidence_ids": [
+        "PRES-01",
+        "PRES-02",
+        "PRES-03",
+        "PRES-04",
+        "PRES-05",
+        "PRES-06",
+        "PRES-07",
+        "PRES-08"
+      ]
+    },
+    {
+      "coverage_id": "COV-17",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Total analysis-error precedence and exact error mapping",
+      "normative_sections": "9.1–9.5",
+      "verification_mechanism": "executable_fixtures",
+      "evidence_ids": [
+        "TC-15",
+        "TC-26",
+        "TC-27",
+        "TC-28",
+        "TC-29",
+        "TC-31",
+        "TC-35",
+        "TC-36",
+        "TC-37",
+        "TC-38",
+        "TC-47",
+        "TC-48",
+        "TC-49",
+        "TC-50"
+      ]
+    },
+    {
+      "coverage_id": "COV-18",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Safety, privacy, clinical-use, and planning-only safeguards",
+      "normative_sections": "10",
+      "verification_mechanism": "document_and_presentation_inspection",
+      "evidence_ids": [
+        "PRES-04",
+        "PRES-06",
+        "PRES-08"
+      ]
+    },
+    {
+      "coverage_id": "COV-19",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Conformance claims, profiles, required demonstrations, and prohibited transformations",
+      "normative_sections": "11",
+      "verification_mechanism": "conformance_dossier_inspection",
+      "evidence_ids": []
+    },
+    {
+      "coverage_id": "COV-20",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Executable fixture identity, bundle integrity, and exact comparison",
+      "normative_sections": "Appendix C",
+      "verification_mechanism": "bundle_validator",
+      "evidence_ids": [
+        "RR-01",
+        "QT-01",
+        "TC-01",
+        "RT-01"
+      ]
+    },
+    {
+      "coverage_id": "COV-21",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Clinical evidence values, qualifications, strength ratings, and source roles",
+      "normative_sections": "Appendices D–F",
+      "verification_mechanism": "source_table_inspection",
+      "evidence_ids": []
+    },
+    {
+      "coverage_id": "COV-22",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "Provider-roster snapshot identity, versioning, records, and selectability",
+      "normative_sections": "Appendix E.1–E.3; Appendix G",
+      "verification_mechanism": "schema_and_executable_fixtures",
+      "evidence_ids": [
+        "RT-01",
+        "RT-02",
+        "RT-03",
+        "RT-04",
+        "RT-05",
+        "RT-06",
+        "RT-07",
+        "RT-08",
+        "RT-09",
+        "RT-10",
+        "RT-11",
+        "RT-12",
+        "RT-13",
+        "RT-14",
+        "RT-15",
+        "RT-16",
+        "RT-17",
+        "RT-18"
+      ]
+    },
+    {
+      "coverage_id": "COV-23",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "U.S. provider directory content, addresses, organization, and noncomputational vetting markers",
+      "normative_sections": "Appendix E.4",
+      "verification_mechanism": "roster_snapshot_and_document_inspection",
+      "evidence_ids": []
+    },
+    {
+      "coverage_id": "COV-24",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "rule_family": "JSON Schemas, cardinality, closed objects, cross-field rules, and dependency manifest",
+      "normative_sections": "Appendix G; Appendix A.3–A.4",
+      "verification_mechanism": "schema_validation_and_manifest_inspection",
+      "evidence_ids": [
+        "TC-15",
+        "TC-26",
+        "RT-18"
+      ]
+    }
+  ]
+}

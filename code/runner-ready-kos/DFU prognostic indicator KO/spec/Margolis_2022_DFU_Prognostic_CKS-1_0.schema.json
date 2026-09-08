@@ -1,0 +1,1379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uhms:cks:margolis-dfu-prognosis:1.0:schema",
+  "title": "Margolis 2022 DFU Prognostic CKS-1.0 Canonical JSON Binding",
+  "description": "Normative canonical JSON binding for implementations claiming the CKS-1.0 Canonical JSON Binding Profile; paired with the profile-scoped executable fixture suite.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/input"
+    },
+    {
+      "$ref": "#/$defs/successOutput"
+    },
+    {
+      "$ref": "#/$defs/failureOutput"
+    }
+  ],
+  "$defs": {
+    "areaInputQuantity": {
+      "type": "object",
+      "required": [
+        "value",
+        "ucum_code"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "ucum_code": {
+          "enum": [
+            "cm2",
+            "mm2"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Minimal closed area input with an exact value and case-sensitive UCUM code."
+    },
+    "durationInputQuantity": {
+      "type": "object",
+      "required": [
+        "value",
+        "ucum_code"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ucum_code": {
+          "enum": [
+            "wk",
+            "d"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Minimal closed duration input with an exact value and case-sensitive UCUM code. Duration uncertainty is not accepted."
+    },
+    "normalizedAreaQuantity": {
+      "type": "object",
+      "required": [
+        "value",
+        "ucum_code"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "ucum_code": {
+          "const": "cm2"
+        }
+      },
+      "additionalProperties": false
+    },
+    "normalizedDurationQuantity": {
+      "type": "object",
+      "required": [
+        "exact_value",
+        "ucum_code"
+      ],
+      "properties": {
+        "exact_value": {
+          "$ref": "#/$defs/exactRational"
+        },
+        "ucum_code": {
+          "const": "wk"
+        }
+      },
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "wound_area",
+        "wound_duration"
+      ],
+      "properties": {
+        "wound_area": {
+          "$ref": "#/$defs/areaInputQuantity"
+        },
+        "wound_duration": {
+          "$ref": "#/$defs/durationInputQuantity"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Minimal closed Core Calculation Input. Host context and provenance remain outside this payload."
+    },
+    "areaBasis": {
+      "type": "object",
+      "description": "Exact unit-native area comparison. The comparison value and unit code SHALL equal the original area input.",
+      "required": [
+        "input",
+        "comparison_value",
+        "ucum_code",
+        "operator",
+        "threshold",
+        "category",
+        "classification_basis"
+      ],
+      "properties": {
+        "input": {
+          "const": "wound_area"
+        },
+        "comparison_value": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "operator": {
+          "enum": [
+            "<",
+            ">="
+          ]
+        },
+        "threshold": {
+          "enum": [
+            2,
+            200
+          ]
+        },
+        "category": {
+          "enum": [
+            "AREA-LT-2",
+            "AREA-GE-2"
+          ]
+        },
+        "classification_basis": {
+          "const": "point"
+        },
+        "ucum_code": {
+          "enum": [
+            "cm2",
+            "mm2"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "exclusiveMaximum": 2
+            },
+            "operator": {
+              "const": "<"
+            },
+            "threshold": {
+              "const": 2
+            },
+            "category": {
+              "const": "AREA-LT-2"
+            },
+            "ucum_code": {
+              "const": "cm2"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 2
+            },
+            "operator": {
+              "const": ">="
+            },
+            "threshold": {
+              "const": 2
+            },
+            "category": {
+              "const": "AREA-GE-2"
+            },
+            "ucum_code": {
+              "const": "cm2"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "exclusiveMaximum": 200
+            },
+            "operator": {
+              "const": "<"
+            },
+            "threshold": {
+              "const": 200
+            },
+            "category": {
+              "const": "AREA-LT-2"
+            },
+            "ucum_code": {
+              "const": "mm2"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 200
+            },
+            "operator": {
+              "const": ">="
+            },
+            "threshold": {
+              "const": 200
+            },
+            "category": {
+              "const": "AREA-GE-2"
+            },
+            "ucum_code": {
+              "const": "mm2"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "uncertainty_interval"
+            ]
+          }
+        }
+      ]
+    },
+    "durationBasis": {
+      "type": "object",
+      "description": "Exact unit-native duration comparison. The comparison value and unit code SHALL equal the original duration input.",
+      "required": [
+        "input",
+        "comparison_value",
+        "ucum_code",
+        "operator",
+        "threshold",
+        "category",
+        "classification_basis"
+      ],
+      "properties": {
+        "input": {
+          "const": "wound_duration"
+        },
+        "comparison_value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "operator": {
+          "enum": [
+            "<",
+            ">="
+          ]
+        },
+        "threshold": {
+          "enum": [
+            8,
+            56
+          ]
+        },
+        "category": {
+          "enum": [
+            "DUR-LT-8",
+            "DUR-GE-8"
+          ]
+        },
+        "classification_basis": {
+          "const": "point"
+        },
+        "ucum_code": {
+          "enum": [
+            "wk",
+            "d"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMaximum": 8
+            },
+            "operator": {
+              "const": "<"
+            },
+            "threshold": {
+              "const": 8
+            },
+            "category": {
+              "const": "DUR-LT-8"
+            },
+            "ucum_code": {
+              "const": "wk"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 8
+            },
+            "operator": {
+              "const": ">="
+            },
+            "threshold": {
+              "const": 8
+            },
+            "category": {
+              "const": "DUR-GE-8"
+            },
+            "ucum_code": {
+              "const": "wk"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMaximum": 56
+            },
+            "operator": {
+              "const": "<"
+            },
+            "threshold": {
+              "const": 56
+            },
+            "category": {
+              "const": "DUR-LT-8"
+            },
+            "ucum_code": {
+              "const": "d"
+            }
+          }
+        },
+        {
+          "properties": {
+            "comparison_value": {
+              "type": "number",
+              "minimum": 56
+            },
+            "operator": {
+              "const": ">="
+            },
+            "threshold": {
+              "const": 56
+            },
+            "category": {
+              "const": "DUR-GE-8"
+            },
+            "ucum_code": {
+              "const": "d"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "classification_basis": {
+                "const": "entire-interval"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "uncertainty_interval"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "uncertainty_interval"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "successOutput": {
+      "type": "object",
+      "required": [
+        "status",
+        "specification_id",
+        "specification_version",
+        "result_id",
+        "prognostic_group",
+        "healing_probability_16_weeks",
+        "display_probability_percent",
+        "area_category",
+        "duration_category",
+        "normalized_inputs",
+        "basis",
+        "source_reference",
+        "specification_notes"
+      ],
+      "properties": {
+        "status": {
+          "const": "success"
+        },
+        "specification_id": {
+          "const": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0"
+        },
+        "specification_version": {
+          "const": "1.0"
+        },
+        "result_id": {
+          "enum": [
+            "ALG-01",
+            "ALG-02",
+            "ALG-03",
+            "ALG-04"
+          ]
+        },
+        "prognostic_group": {
+          "enum": [
+            "AREA_GE_2__DURATION_GE_8",
+            "AREA_GE_2__DURATION_LT_8",
+            "AREA_LT_2__DURATION_GE_8",
+            "AREA_LT_2__DURATION_LT_8"
+          ]
+        },
+        "healing_probability_16_weeks": {
+          "enum": [
+            0.203,
+            0.304,
+            0.448,
+            0.631
+          ]
+        },
+        "display_probability_percent": {
+          "enum": [
+            "20.3%",
+            "30.4%",
+            "44.8%",
+            "63.1%"
+          ]
+        },
+        "area_category": {
+          "enum": [
+            "AREA-GE-2",
+            "AREA-LT-2"
+          ]
+        },
+        "duration_category": {
+          "enum": [
+            "DUR-GE-8",
+            "DUR-LT-8"
+          ]
+        },
+        "normalized_inputs": {
+          "type": "object",
+          "required": [
+            "wound_area",
+            "wound_duration"
+          ],
+          "properties": {
+            "wound_area": {
+              "$ref": "#/$defs/normalizedAreaQuantity"
+            },
+            "wound_duration": {
+              "$ref": "#/$defs/normalizedDurationQuantity"
+            }
+          },
+          "additionalProperties": false
+        },
+        "basis": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "$ref": "#/$defs/areaBasis"
+            },
+            {
+              "$ref": "#/$defs/durationBasis"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "source_reference": {
+          "const": "Margolis et al. 2022, supplementary Table 3"
+        },
+        "specification_notes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Area equality assigned to AREA-GE-2 by CKS specification decision.",
+              "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+            ]
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "result_id": {
+              "const": "ALG-01"
+            },
+            "prognostic_group": {
+              "const": "AREA_GE_2__DURATION_GE_8"
+            },
+            "healing_probability_16_weeks": {
+              "const": 0.203
+            },
+            "display_probability_percent": {
+              "const": "20.3%"
+            },
+            "area_category": {
+              "const": "AREA-GE-2"
+            },
+            "duration_category": {
+              "const": "DUR-GE-8"
+            }
+          }
+        },
+        {
+          "properties": {
+            "result_id": {
+              "const": "ALG-02"
+            },
+            "prognostic_group": {
+              "const": "AREA_GE_2__DURATION_LT_8"
+            },
+            "healing_probability_16_weeks": {
+              "const": 0.304
+            },
+            "display_probability_percent": {
+              "const": "30.4%"
+            },
+            "area_category": {
+              "const": "AREA-GE-2"
+            },
+            "duration_category": {
+              "const": "DUR-LT-8"
+            }
+          }
+        },
+        {
+          "properties": {
+            "result_id": {
+              "const": "ALG-03"
+            },
+            "prognostic_group": {
+              "const": "AREA_LT_2__DURATION_GE_8"
+            },
+            "healing_probability_16_weeks": {
+              "const": 0.448
+            },
+            "display_probability_percent": {
+              "const": "44.8%"
+            },
+            "area_category": {
+              "const": "AREA-LT-2"
+            },
+            "duration_category": {
+              "const": "DUR-GE-8"
+            }
+          }
+        },
+        {
+          "properties": {
+            "result_id": {
+              "const": "ALG-04"
+            },
+            "prognostic_group": {
+              "const": "AREA_LT_2__DURATION_LT_8"
+            },
+            "healing_probability_16_weeks": {
+              "const": 0.631
+            },
+            "display_probability_percent": {
+              "const": "63.1%"
+            },
+            "area_category": {
+              "const": "AREA-LT-2"
+            },
+            "duration_category": {
+              "const": "DUR-LT-8"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "properties": {
+                    "basis": {
+                      "prefixItems": [
+                        {
+                          "anyOf": [
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 2
+                                },
+                                "ucum_code": {
+                                  "const": "cm2"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            },
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 200
+                                },
+                                "ucum_code": {
+                                  "const": "mm2"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "basis"
+                  ]
+                },
+                {
+                  "properties": {
+                    "basis": {
+                      "prefixItems": [
+                        {},
+                        {
+                          "anyOf": [
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 8
+                                },
+                                "ucum_code": {
+                                  "const": "wk"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            },
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 56
+                                },
+                                "ucum_code": {
+                                  "const": "d"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "basis"
+                  ]
+                },
+                {
+                  "properties": {
+                    "specification_notes": {
+                      "const": [
+                        "Area equality assigned to AREA-GE-2 by CKS specification decision.",
+                        "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "properties": {
+                    "basis": {
+                      "prefixItems": [
+                        {
+                          "anyOf": [
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 2
+                                },
+                                "ucum_code": {
+                                  "const": "cm2"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            },
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 200
+                                },
+                                "ucum_code": {
+                                  "const": "mm2"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "basis"
+                  ]
+                },
+                {
+                  "not": {
+                    "properties": {
+                      "basis": {
+                        "prefixItems": [
+                          {},
+                          {
+                            "anyOf": [
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 8
+                                  },
+                                  "ucum_code": {
+                                    "const": "wk"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              },
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 56
+                                  },
+                                  "ucum_code": {
+                                    "const": "d"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "basis"
+                    ]
+                  }
+                },
+                {
+                  "properties": {
+                    "specification_notes": {
+                      "const": [
+                        "Area equality assigned to AREA-GE-2 by CKS specification decision."
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "not": {
+                    "properties": {
+                      "basis": {
+                        "prefixItems": [
+                          {
+                            "anyOf": [
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 2
+                                  },
+                                  "ucum_code": {
+                                    "const": "cm2"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              },
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 200
+                                  },
+                                  "ucum_code": {
+                                    "const": "mm2"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "basis"
+                    ]
+                  }
+                },
+                {
+                  "properties": {
+                    "basis": {
+                      "prefixItems": [
+                        {},
+                        {
+                          "anyOf": [
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 8
+                                },
+                                "ucum_code": {
+                                  "const": "wk"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            },
+                            {
+                              "properties": {
+                                "comparison_value": {
+                                  "const": 56
+                                },
+                                "ucum_code": {
+                                  "const": "d"
+                                }
+                              },
+                              "required": [
+                                "comparison_value",
+                                "ucum_code"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "basis"
+                  ]
+                },
+                {
+                  "properties": {
+                    "specification_notes": {
+                      "const": [
+                        "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "not": {
+                    "properties": {
+                      "basis": {
+                        "prefixItems": [
+                          {
+                            "anyOf": [
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 2
+                                  },
+                                  "ucum_code": {
+                                    "const": "cm2"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              },
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 200
+                                  },
+                                  "ucum_code": {
+                                    "const": "mm2"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "basis"
+                    ]
+                  }
+                },
+                {
+                  "not": {
+                    "properties": {
+                      "basis": {
+                        "prefixItems": [
+                          {},
+                          {
+                            "anyOf": [
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 8
+                                  },
+                                  "ucum_code": {
+                                    "const": "wk"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              },
+                              {
+                                "properties": {
+                                  "comparison_value": {
+                                    "const": 56
+                                  },
+                                  "ucum_code": {
+                                    "const": "d"
+                                  }
+                                },
+                                "required": [
+                                  "comparison_value",
+                                  "ucum_code"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "basis"
+                    ]
+                  }
+                },
+                {
+                  "properties": {
+                    "specification_notes": {
+                      "const": []
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "path",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "enum": [
+            "ERR-01",
+            "ERR-02",
+            "ERR-03",
+            "ERR-04",
+            "ERR-05",
+            "ERR-08",
+            "ERR-14"
+          ]
+        },
+        "path": {
+          "enum": [
+            "$",
+            "wound_area",
+            "wound_duration",
+            "internal"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-01"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "wound_area",
+                  "wound_duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-02"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "wound_area",
+                  "wound_duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-03"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "wound_area"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-04"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "wound_duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-05"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "wound_area",
+                  "wound_duration"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-08"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "internal"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "const": "ERR-14"
+              }
+            },
+            "required": [
+              "code"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "enum": [
+                  "$"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "failureOutput": {
+      "type": "object",
+      "required": [
+        "status",
+        "specification_id",
+        "specification_version",
+        "errors",
+        "specification_notes"
+      ],
+      "properties": {
+        "status": {
+          "const": "failure"
+        },
+        "specification_id": {
+          "const": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0"
+        },
+        "specification_version": {
+          "const": "1.0"
+        },
+        "errors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/error"
+          },
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "specification_notes": {
+          "type": "array",
+          "maxItems": 0
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "errors": {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "const": "ERR-08"
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errors": {
+                "maxItems": 1
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "errors": {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "const": "$"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "errors": {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "const": "wound_area"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "errors": {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "const": "wound_duration"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "errors": {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "const": "internal"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              },
+              "minContains": 0,
+              "maxContains": 1
+            }
+          }
+        }
+      ]
+    },
+    "exactRational": {
+      "type": "object",
+      "description": "Exact reduced rational using losslessly decoded arbitrary-precision integers. Denominator is positive; numerator and denominator are coprime; zero is 0/1.",
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "type": "integer"
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$comment": "KGrid specification family IRI: https://kgrid.org/cks/margolis-dfu-prognosis. Canonical version IRI: https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0. Input model: https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model. Output model: https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0. Fixtures: https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/test-vectors. Normative fixture file: Margolis_2022_DFU_Prognostic_CKS-1_0.fixtures.json; fixture schema: Margolis_2022_DFU_Prognostic_CKS-1_0.fixtures.schema.json. The minimal closed core input contains only wound_area and wound_duration, each with exactly value and ucum_code. Duration uncertainty is prohibited by closure. Equality disclosures are schema-enforced in specification_notes with area-before-duration ordering.",
+  "x-kgrid-identifiers": {
+    "specification_family": "https://kgrid.org/cks/margolis-dfu-prognosis",
+    "cks": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0",
+    "input_model": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model",
+    "output_model": "https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0",
+    "fixtures": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/test-vectors"
+  }
+}

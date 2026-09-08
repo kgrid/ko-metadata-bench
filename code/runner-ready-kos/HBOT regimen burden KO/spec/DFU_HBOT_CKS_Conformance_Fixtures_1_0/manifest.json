@@ -1,0 +1,1132 @@
+{
+  "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+  "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+  "schema_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+  "comparison": "exact_structural_json_object_order_insensitive_array_order_sensitive",
+  "fixture_count": 108,
+  "counts_by_capability": {
+    "regimen_range": 8,
+    "burden_questionnaire": 20,
+    "burden_analysis": 62,
+    "provider_roster": 18
+  },
+  "fixtures": [
+    {
+      "fixture_id": "RR-01",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-01.json"
+    },
+    {
+      "fixture_id": "RR-02",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-02.json"
+    },
+    {
+      "fixture_id": "RR-03",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-03.json"
+    },
+    {
+      "fixture_id": "RR-04",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-04.json"
+    },
+    {
+      "fixture_id": "RR-05",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-05.json"
+    },
+    {
+      "fixture_id": "RR-06",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-06.json"
+    },
+    {
+      "fixture_id": "RR-07",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-07.json"
+    },
+    {
+      "fixture_id": "RR-08",
+      "capability": "regimen_range",
+      "path": "fixtures/regimen_range/RR-08.json"
+    },
+    {
+      "fixture_id": "QT-01",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-01.json"
+    },
+    {
+      "fixture_id": "QT-02",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-02.json"
+    },
+    {
+      "fixture_id": "QT-03",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-03.json"
+    },
+    {
+      "fixture_id": "QT-04",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-04.json"
+    },
+    {
+      "fixture_id": "QT-05",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-05.json"
+    },
+    {
+      "fixture_id": "QT-06",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-06.json"
+    },
+    {
+      "fixture_id": "QT-07",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-07.json"
+    },
+    {
+      "fixture_id": "QT-08",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-08.json"
+    },
+    {
+      "fixture_id": "QT-09",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-09.json"
+    },
+    {
+      "fixture_id": "QT-10",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-10.json"
+    },
+    {
+      "fixture_id": "QT-11",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-11.json"
+    },
+    {
+      "fixture_id": "QT-12",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-12.json"
+    },
+    {
+      "fixture_id": "QT-13",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-13.json"
+    },
+    {
+      "fixture_id": "QT-14",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-14.json"
+    },
+    {
+      "fixture_id": "QT-15",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-15.json"
+    },
+    {
+      "fixture_id": "QT-16",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-16.json"
+    },
+    {
+      "fixture_id": "QT-17",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-17.json"
+    },
+    {
+      "fixture_id": "QT-18",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-18.json"
+    },
+    {
+      "fixture_id": "QT-19",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-19.json"
+    },
+    {
+      "fixture_id": "QT-20",
+      "capability": "burden_questionnaire",
+      "path": "fixtures/burden_questionnaire/QT-20.json"
+    },
+    {
+      "fixture_id": "TC-01",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-01.json"
+    },
+    {
+      "fixture_id": "TC-02",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-02.json"
+    },
+    {
+      "fixture_id": "TC-03",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-03.json"
+    },
+    {
+      "fixture_id": "TC-04",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-04.json"
+    },
+    {
+      "fixture_id": "TC-05",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-05.json"
+    },
+    {
+      "fixture_id": "TC-06",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-06.json"
+    },
+    {
+      "fixture_id": "TC-07",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-07.json"
+    },
+    {
+      "fixture_id": "TC-08",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-08.json"
+    },
+    {
+      "fixture_id": "TC-09",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-09.json"
+    },
+    {
+      "fixture_id": "TC-10",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-10.json"
+    },
+    {
+      "fixture_id": "TC-11",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-11.json"
+    },
+    {
+      "fixture_id": "TC-12",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-12.json"
+    },
+    {
+      "fixture_id": "TC-13",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-13.json"
+    },
+    {
+      "fixture_id": "TC-14",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-14.json"
+    },
+    {
+      "fixture_id": "TC-15",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-15.json"
+    },
+    {
+      "fixture_id": "TC-16",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-16.json"
+    },
+    {
+      "fixture_id": "TC-17",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-17.json"
+    },
+    {
+      "fixture_id": "TC-18",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-18.json"
+    },
+    {
+      "fixture_id": "TC-19",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-19.json"
+    },
+    {
+      "fixture_id": "TC-20",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-20.json"
+    },
+    {
+      "fixture_id": "TC-21",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-21.json"
+    },
+    {
+      "fixture_id": "TC-22",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-22.json"
+    },
+    {
+      "fixture_id": "TC-23",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-23.json"
+    },
+    {
+      "fixture_id": "TC-24",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-24.json"
+    },
+    {
+      "fixture_id": "TC-25",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-25.json"
+    },
+    {
+      "fixture_id": "TC-26",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-26.json"
+    },
+    {
+      "fixture_id": "TC-27",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-27.json"
+    },
+    {
+      "fixture_id": "TC-28",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-28.json"
+    },
+    {
+      "fixture_id": "TC-29",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-29.json"
+    },
+    {
+      "fixture_id": "TC-30",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-30.json"
+    },
+    {
+      "fixture_id": "TC-31",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-31.json"
+    },
+    {
+      "fixture_id": "TC-32",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-32.json"
+    },
+    {
+      "fixture_id": "TC-33",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-33.json"
+    },
+    {
+      "fixture_id": "TC-34",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-34.json"
+    },
+    {
+      "fixture_id": "TC-35",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-35.json"
+    },
+    {
+      "fixture_id": "TC-36",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-36.json"
+    },
+    {
+      "fixture_id": "TC-37",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-37.json"
+    },
+    {
+      "fixture_id": "TC-38",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-38.json"
+    },
+    {
+      "fixture_id": "TC-39",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-39.json"
+    },
+    {
+      "fixture_id": "TC-40",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-40.json"
+    },
+    {
+      "fixture_id": "TC-41",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-41.json"
+    },
+    {
+      "fixture_id": "TC-42",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-42.json"
+    },
+    {
+      "fixture_id": "TC-43",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-43.json"
+    },
+    {
+      "fixture_id": "TC-44",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-44.json"
+    },
+    {
+      "fixture_id": "TC-45",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-45.json"
+    },
+    {
+      "fixture_id": "TC-46",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-46.json"
+    },
+    {
+      "fixture_id": "TC-47",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-47.json"
+    },
+    {
+      "fixture_id": "TC-48",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-48.json"
+    },
+    {
+      "fixture_id": "TC-49",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-49.json"
+    },
+    {
+      "fixture_id": "TC-50",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-50.json"
+    },
+    {
+      "fixture_id": "TC-51",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-51.json"
+    },
+    {
+      "fixture_id": "TC-52",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-52.json"
+    },
+    {
+      "fixture_id": "TC-53",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-53.json"
+    },
+    {
+      "fixture_id": "TC-54",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-54.json"
+    },
+    {
+      "fixture_id": "TC-55",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-55.json"
+    },
+    {
+      "fixture_id": "TC-56",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-56.json"
+    },
+    {
+      "fixture_id": "TC-57",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-57.json"
+    },
+    {
+      "fixture_id": "TC-58",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-58.json"
+    },
+    {
+      "fixture_id": "TC-59",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-59.json"
+    },
+    {
+      "fixture_id": "TC-60",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-60.json"
+    },
+    {
+      "fixture_id": "TC-61",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-61.json"
+    },
+    {
+      "fixture_id": "TC-62",
+      "capability": "burden_analysis",
+      "path": "fixtures/burden_analysis/TC-62.json"
+    },
+    {
+      "fixture_id": "RT-01",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-01.json"
+    },
+    {
+      "fixture_id": "RT-02",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-02.json"
+    },
+    {
+      "fixture_id": "RT-03",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-03.json"
+    },
+    {
+      "fixture_id": "RT-04",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-04.json"
+    },
+    {
+      "fixture_id": "RT-05",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-05.json"
+    },
+    {
+      "fixture_id": "RT-06",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-06.json"
+    },
+    {
+      "fixture_id": "RT-07",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-07.json"
+    },
+    {
+      "fixture_id": "RT-08",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-08.json"
+    },
+    {
+      "fixture_id": "RT-09",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-09.json"
+    },
+    {
+      "fixture_id": "RT-10",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-10.json"
+    },
+    {
+      "fixture_id": "RT-11",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-11.json"
+    },
+    {
+      "fixture_id": "RT-12",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-12.json"
+    },
+    {
+      "fixture_id": "RT-13",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-13.json"
+    },
+    {
+      "fixture_id": "RT-14",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-14.json"
+    },
+    {
+      "fixture_id": "RT-15",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-15.json"
+    },
+    {
+      "fixture_id": "RT-16",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-16.json"
+    },
+    {
+      "fixture_id": "RT-17",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-17.json"
+    },
+    {
+      "fixture_id": "RT-18",
+      "capability": "provider_roster",
+      "path": "fixtures/provider_roster/RT-18.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "ed7f29318c24693abbe88bc5dc7faddade4024eaf86849dc468d784343f3e4e3",
+      "bytes": 645
+    },
+    {
+      "path": "fixture-schema.json",
+      "sha256": "e12e231ad0bdd3fc9fbf573a3cfd5187b804a99aa133fb67514bc45cc9d75354",
+      "bytes": 883
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-01.json",
+      "sha256": "1e20a54580fe7641a53bfbbc2820592faa5395ea8dcb29cad872e3f27aabcf11",
+      "bytes": 9089
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-02.json",
+      "sha256": "93681157574a88ece9c25eb42bab3ddc07668a41e4032ab14449dfc1856261c0",
+      "bytes": 9139
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-03.json",
+      "sha256": "0dc52917011395684b60e274001bb3f7071a4d0bb0a770eba99810790a018a0b",
+      "bytes": 9148
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-04.json",
+      "sha256": "3c2a0eec596754869a313f0418551f83d2ffe25e8b0b4ce78ec72b42f9799450",
+      "bytes": 9152
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-05.json",
+      "sha256": "96811ad9f707688bd82437fda6473876242727db1e4bc33633af062ac35de2f0",
+      "bytes": 9145
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-06.json",
+      "sha256": "1dd6064cfa4ec89f11559e9c8237123587a3ae37dcd4945e0b7f7b96cee7ba94",
+      "bytes": 9089
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-07.json",
+      "sha256": "7cf65c62ada68bf77dd28b00d74a96999b1e1185e46e62b64cc7a1ed8cc4bde2",
+      "bytes": 9139
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-08.json",
+      "sha256": "eec2825794c9675a688635f90d4467c7083b6ebd45e5d902988ae5d3ab764f29",
+      "bytes": 9071
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-09.json",
+      "sha256": "5e9b33ff10ad76ecffa857971105b8313410cc5e4bdfe804a3e1f54597ec1481",
+      "bytes": 4795
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-10.json",
+      "sha256": "601dcaccd43f2f1b30ebeaef1b5f67edd106811cae3338fc87f865b47d32ad6e",
+      "bytes": 4728
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-11.json",
+      "sha256": "d7ce066932a3a525af45ee92fef9d5526693d2f069763dd73e205feb8bf4ae30",
+      "bytes": 4791
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-12.json",
+      "sha256": "39a11bacb67a7028f14ea725a75dc576ee7c98d7ecedd05d231f0a317b8b2d54",
+      "bytes": 4649
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-13.json",
+      "sha256": "7b6acecf377282aa4ec61490ecff92c1df41f3e1f5fc171996a5e272617e3603",
+      "bytes": 4706
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-14.json",
+      "sha256": "5866ba687e65a1c45336d62ea78c01182e6049269e3f279ccea96a923d3dbdab",
+      "bytes": 4735
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-15.json",
+      "sha256": "f5517859b5b9e7c8f52ef45165bc626aad0ce4b5084f0870dafcc4c1ea7b139b",
+      "bytes": 3088
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-16.json",
+      "sha256": "a89e6f54cc3afebd4881b9759de187ffff7f5e1e082cb031540d3ecbd19a382a",
+      "bytes": 4756
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-17.json",
+      "sha256": "cfc7676c3f9dfd96506e9a773db69441969a855dcfc45b642522b0a16df63cd2",
+      "bytes": 4792
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-18.json",
+      "sha256": "7a437e81bc0265d76cf9edb8e4c32349ae8fe8cadb79b49e39064713a84e987f",
+      "bytes": 9160
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-19.json",
+      "sha256": "3043417ad38cd36840d2026015d94e93b54ff205ae7924ede6f64ca5fcc9caa5",
+      "bytes": 9144
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-20.json",
+      "sha256": "ddd11a7ce9127acd27bf73e34119b1d068fa2678b3bd87a3bf8c02959d7edadf",
+      "bytes": 9171
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-21.json",
+      "sha256": "43007d0263230aba66f337a1d422caaf35a6b20117bd101c00d8c3b3b3fc0c6d",
+      "bytes": 18809
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-22.json",
+      "sha256": "b2300c0f7e1af2e0b4d67559dc8301093c6614cc8d322c653c3152f0e0c270d4",
+      "bytes": 16782
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-23.json",
+      "sha256": "44e4979ad310499b286aef0de16fd239501ce94b613a5d5532f5ec3a1f98bfcf",
+      "bytes": 9148
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-24.json",
+      "sha256": "9eaf816daeae145ccdf2e69af65ac42d9baa637c88e0cf7e7df3d4f17618020f",
+      "bytes": 2891
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-25.json",
+      "sha256": "06175649f09ac9343e3c70252b567d7e2afc5a5d809cc469b923766e12b0bd67",
+      "bytes": 4630
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-26.json",
+      "sha256": "3b747fbbb82bd18799a7e42bce2a2ed38af431cac95bc6c25a5d2a4425b7412f",
+      "bytes": 4682
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-27.json",
+      "sha256": "f2b7bbfedfcf46ab8bfa38f70d56275ad22636058033a69f1d393ff36dd45160",
+      "bytes": 4669
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-28.json",
+      "sha256": "6c10f2714371fdee7b1f2196b2c1e00abb27c73d54ee6c72ea6e9534542724c9",
+      "bytes": 4744
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-29.json",
+      "sha256": "79a9f78e0e10793633f58e4098f575e7f815d0c569523b523db50a297d22841f",
+      "bytes": 4747
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-30.json",
+      "sha256": "2e485fede1e1318256847c31739561b1fffd631d8f586bd3bd303c1b7620104d",
+      "bytes": 9426
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-31.json",
+      "sha256": "1b0b0114bffd29b8b0098003f040c67eef612ff9c206153281e4db7b74a06e24",
+      "bytes": 4778
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-32.json",
+      "sha256": "305b4adbda3ba850c78e33092307d951797b4119f06de7dc9f76379c6a1656a5",
+      "bytes": 4747
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-33.json",
+      "sha256": "f8d289280b37868504567d1c590267308d0e93d0bcac4fac02c3f5d506764734",
+      "bytes": 4901
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-34.json",
+      "sha256": "c8bea67d1f96e2b1bd2f8817861d579a3cfcff62696c13c0882dd526ce468dcc",
+      "bytes": 5072
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-35.json",
+      "sha256": "ffd4a75ef5ff9227183d54686f763a7c006ad0af0a2cd8f4ca68811d0a015056",
+      "bytes": 4755
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-36.json",
+      "sha256": "7bb3fa0313d507b6b2351b673355c11d07ac5577d5136348cd22730aa10c86ea",
+      "bytes": 4740
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-37.json",
+      "sha256": "0afac691cd064ef8fa1e8e5f88daef16f1614d68b7610fa810563f9fcdb84e08",
+      "bytes": 4825
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-38.json",
+      "sha256": "3888219ccbf037c851eecd3926757e9a6ac9d60c055aad5cb5460deedfdc70ca",
+      "bytes": 4830
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-39.json",
+      "sha256": "e3e8a32eb6185e98dfcc87eeb68c50036330add9264aba0e98560dd6ebe81179",
+      "bytes": 4724
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-40.json",
+      "sha256": "80025b11f350c0fd2c4a941f11fbfeb814489e608bf304c164c10aa861b7af98",
+      "bytes": 9842
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-41.json",
+      "sha256": "d469e95f2495d1a617caaa25f06c86a6f6b3bb4fa51ee62d378a9be073f23b53",
+      "bytes": 9863
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-42.json",
+      "sha256": "25c628e4433bc71ce82cce1e08bfa83a0ea1750fed87b7de00b167821b2f9a14",
+      "bytes": 9876
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-43.json",
+      "sha256": "d54f0ea202022ef998a8840bed26d405524678eb7ce60061a8b49768bc7ebfc7",
+      "bytes": 9870
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-44.json",
+      "sha256": "e4d8347d12ad5e4f55f46deb417a692d3bde0154f62d29ccd57522c053a1b740",
+      "bytes": 9880
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-45.json",
+      "sha256": "52b7510bf595a280632fa3a8818007ce7d12e5d726fadb533d9ed7a83d7d7b4e",
+      "bytes": 9873
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-46.json",
+      "sha256": "09768597b3e5808e46578c68f36f1747958152e630cedfc39549c9af044f8a4f",
+      "bytes": 16837
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-47.json",
+      "sha256": "ac66a8697dc0e9500b313a561fc7e1c8d64bfa9c45d94d0337471f1efcdf1540",
+      "bytes": 2543
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-48.json",
+      "sha256": "f273a24dba5785b78de53535418ea6469758156d38ab0e9ab12f50d627e16818",
+      "bytes": 2615
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-49.json",
+      "sha256": "7acbb95bb87a9e902961cdf782cf3114a41b31948738968533a35802dbdb3463",
+      "bytes": 4705
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-50.json",
+      "sha256": "f4552bf05c34b50d4cdbf8696318de05a7f833ad55c353d2855eafc6984e5cb1",
+      "bytes": 4710
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-51.json",
+      "sha256": "73ba8b262c4e66cf83b0ed7115ea0cd9b072c660221c35d5b13634a43bcff6df",
+      "bytes": 9091
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-52.json",
+      "sha256": "5653bbc9d178665acc50ae3078b1bc852223ddea24bad0395985727a1a328ba7",
+      "bytes": 9140
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-53.json",
+      "sha256": "2d4b024577bb12614135bdf36874a978a8ecfc8d31144dcdfec255e8781e0794",
+      "bytes": 9147
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-54.json",
+      "sha256": "8bba88a05062e5454f20d8cecd584e7e7578d17cd25bfda3bd221fcfda578414",
+      "bytes": 9162
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-55.json",
+      "sha256": "ee16f8eb3438b8819c6c27f1d461a20db366eab47f2036de39e2be25848426c0",
+      "bytes": 9133
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-56.json",
+      "sha256": "2f80af4be50f30054cf14439789193611d8c4aeb1af4a1740814071c2ad285bf",
+      "bytes": 9152
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-57.json",
+      "sha256": "2f73e1499303cee69846f534ac3aae43bc3dc95ba0981a7ed90f03b8685d6f1a",
+      "bytes": 9144
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-58.json",
+      "sha256": "bcb84b484e03075b79021cc50e2a4d4a098c772d973698bef3a25d9a6c016da6",
+      "bytes": 9142
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-59.json",
+      "sha256": "268d4f597463f7f837e71e591d90c7f3998b014669c8c74c98091c5910f5f0fd",
+      "bytes": 9140
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-60.json",
+      "sha256": "d275b2472b5ee466da117c35ca7389a4ce78d95332221fb0ea986c310524d813",
+      "bytes": 9167
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-61.json",
+      "sha256": "f0c21a4e46dd62a38a1ef8003f9c8154de5cd88b4a6f4875847c154c513a3c84",
+      "bytes": 9144
+    },
+    {
+      "path": "fixtures/burden_analysis/TC-62.json",
+      "sha256": "c4abc7bfb1fa37e2c7eba7187a51eaa1b07693007fc3fc4fecbb4ea97233dfae",
+      "bytes": 9148
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-01.json",
+      "sha256": "4071763e115687dce8c77e1020a4862bfe3e284fcf097e24f3f820e34e9a5056",
+      "bytes": 1525
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-02.json",
+      "sha256": "eb8eaeca48bcc7ac95605116c74224796e4f0b2207395b412fc6d79536030dc7",
+      "bytes": 844
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-03.json",
+      "sha256": "47a4ffc0d22be8ca8762083e033c281ef17daf634749574564cbf368df98f59c",
+      "bytes": 773
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-04.json",
+      "sha256": "5d2838c0d8873b2055a7baf972bfe6ef547497cc7e77aa9fb570032cf8c09f67",
+      "bytes": 1605
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-05.json",
+      "sha256": "57e3bc975c98d99771e74125599fc0e06939d607adb26b8414633e674fd5f979",
+      "bytes": 722
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-06.json",
+      "sha256": "39ab991b842953d3dc14c948bd8e0bdec42830449649d230b53994c8b8990676",
+      "bytes": 835
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-07.json",
+      "sha256": "d98ac2927248104e7c5c1c19172424da1f7d8483fd563403430d3121e131cba1",
+      "bytes": 638
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-08.json",
+      "sha256": "253895cc368848f62b3779fc1d5ac4e8ee4bfb4dfbac86ef07dfb77fa129445c",
+      "bytes": 892
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-09.json",
+      "sha256": "4a0431f7bf09d028b712df0cf109633d55093f290265d02b85c2fe97337206f2",
+      "bytes": 958
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-10.json",
+      "sha256": "2118ceded152be07987ae8f450896533b71520bfb9427d25e1b76b3f6bd43124",
+      "bytes": 1504
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-11.json",
+      "sha256": "45d469e30b6ce49308477dfa81e4f25c11ddf9d495a2127db00c10e55aac726b",
+      "bytes": 850
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-12.json",
+      "sha256": "79584ac4dbf5454e1475d8d92dcdd395f7dff349810a009dcc6371296c6c249d",
+      "bytes": 588
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-13.json",
+      "sha256": "13ee9cfa64ee1150ae3fac4eb4e9443e547d7698e01cca52f7188475646d304f",
+      "bytes": 714
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-14.json",
+      "sha256": "872f40d932fec5723b29a83b9c0d57006fd6ab8766d359c085f6bbec6861139d",
+      "bytes": 715
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-15.json",
+      "sha256": "c4c9e824eaa485a9d03d4679ee02847c49738769c9d8148056eaab37d56c5e35",
+      "bytes": 800
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-16.json",
+      "sha256": "38e8347f6c23347a1450c2f825bca8b76c04365d49341cdd3283fb5aa9009e6a",
+      "bytes": 894
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-17.json",
+      "sha256": "f6d7aadbb397df66c9ba6fb4795b6958a8afea8d328a77abd9e181cf33aab01f",
+      "bytes": 720
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-18.json",
+      "sha256": "1260e00c326984f0953fdd013b24f80ffc0bdd5db667f741de9b4f8e15281733",
+      "bytes": 830
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-19.json",
+      "sha256": "407a0ccabf5aae186fc392f4b1f05b8228ea63cc46b430d794ef68129babc5b5",
+      "bytes": 965
+    },
+    {
+      "path": "fixtures/burden_questionnaire/QT-20.json",
+      "sha256": "ef556c58ff948d6fa16812ac0dd1b0c6da1dcdd6915c19fd406155947e0a68b5",
+      "bytes": 469
+    },
+    {
+      "path": "fixtures/provider_roster/RT-01.json",
+      "sha256": "291140590b0263413d2ec6debec8d98a37f0efef90104a3192148430801f751b",
+      "bytes": 1156
+    },
+    {
+      "path": "fixtures/provider_roster/RT-02.json",
+      "sha256": "4e9274efda3272da2dd2ee8ba9c12279df28d8b11c50f79164ce659715089798",
+      "bytes": 1338
+    },
+    {
+      "path": "fixtures/provider_roster/RT-03.json",
+      "sha256": "f6893416c3a5faef06013b2d02936628fc71a7847e2ea03bd5af7de9b7bf9b22",
+      "bytes": 1332
+    },
+    {
+      "path": "fixtures/provider_roster/RT-04.json",
+      "sha256": "26a569c54bcf76621bf74a8d3feb54fa0973d656d15512bc8ee931c37bb654be",
+      "bytes": 1332
+    },
+    {
+      "path": "fixtures/provider_roster/RT-05.json",
+      "sha256": "a02bd0cbf151de80a0c04cc0f7b3f87144b0567e0c3ef8108ac93c74e04f5757",
+      "bytes": 1159
+    },
+    {
+      "path": "fixtures/provider_roster/RT-06.json",
+      "sha256": "5174254914e299c898b425dfbc18e91e29cf1d32b5d46d839bc9d94280b42902",
+      "bytes": 1157
+    },
+    {
+      "path": "fixtures/provider_roster/RT-07.json",
+      "sha256": "cf9eac8c9651b2f0b22c5cd69e9ae22680f7cfad090402f8f549f3e635bf5167",
+      "bytes": 1159
+    },
+    {
+      "path": "fixtures/provider_roster/RT-08.json",
+      "sha256": "37b15d021eae1d6f33241ce1d23a1b55b49b72a1c50e761525eeed5c81f485be",
+      "bytes": 1333
+    },
+    {
+      "path": "fixtures/provider_roster/RT-09.json",
+      "sha256": "dbc230cca8c966581afce6932c73a2adaa11c61a588a4dd6b0844949fdfc2e2c",
+      "bytes": 2310
+    },
+    {
+      "path": "fixtures/provider_roster/RT-10.json",
+      "sha256": "eee436d376ea49adee231a903144eb4efab428abc5a6c3435b7a269528e4772b",
+      "bytes": 1273
+    },
+    {
+      "path": "fixtures/provider_roster/RT-11.json",
+      "sha256": "d4e0d0e81eea2019ffe4a32f148086e9e642a59f8219c7cab8ebfde555b973e3",
+      "bytes": 1332
+    },
+    {
+      "path": "fixtures/provider_roster/RT-12.json",
+      "sha256": "c9250a19db6c8f84ad73289e8b8cb1ca4aeca114ac7db6f1726836b9377485fe",
+      "bytes": 1333
+    },
+    {
+      "path": "fixtures/provider_roster/RT-13.json",
+      "sha256": "a6fd53dbfb2a93ce21ab8188f2859835c1834b942af4500d090c81a16116f3e6",
+      "bytes": 1312
+    },
+    {
+      "path": "fixtures/provider_roster/RT-14.json",
+      "sha256": "546967ceda4ed487a2a4ed17c0fb17d35652189d00284ca2fa0e0ad8686ba2a8",
+      "bytes": 1401
+    },
+    {
+      "path": "fixtures/provider_roster/RT-15.json",
+      "sha256": "3313e7a57de766433f2881eb7a625bdf051deb25ac9ca6fbe1e801146d86158d",
+      "bytes": 1399
+    },
+    {
+      "path": "fixtures/provider_roster/RT-16.json",
+      "sha256": "134dc6c5cc2ea4ec41569dd276826516006d362ff98938ae16e22b244153d74e",
+      "bytes": 1333
+    },
+    {
+      "path": "fixtures/provider_roster/RT-17.json",
+      "sha256": "5b0fbfac78d552a093b9b98c974b0986c4a048661547ac0e8ee339ead25454a3",
+      "bytes": 1285
+    },
+    {
+      "path": "fixtures/provider_roster/RT-18.json",
+      "sha256": "932f844a68774d333fd38abac2f716101d7595fb2a4d66bc2472f257ed78b387",
+      "bytes": 138694
+    },
+    {
+      "path": "fixtures/regimen_range/RR-01.json",
+      "sha256": "f30ae1b30f2a33e743c5c10dc90b6cdd26ccfc4eba8418cad6ca6601e62351f8",
+      "bytes": 1508
+    },
+    {
+      "path": "fixtures/regimen_range/RR-02.json",
+      "sha256": "f6084699f26a0bd3d4e376a0a1111591d8cc685c2e16649c5f068ac592cd1b71",
+      "bytes": 1612
+    },
+    {
+      "path": "fixtures/regimen_range/RR-03.json",
+      "sha256": "72d1a7d19116f7f5a95b28d6fe2144f8f29fe8a7fac2214264dd6a3cb79b18db",
+      "bytes": 501
+    },
+    {
+      "path": "fixtures/regimen_range/RR-04.json",
+      "sha256": "597390938eaf336f10964ca0b935603954e71a54656cfa415fda6bddcaa8e61d",
+      "bytes": 464
+    },
+    {
+      "path": "fixtures/regimen_range/RR-05.json",
+      "sha256": "0b7806c6e447ff674a1fcba293f964312746912b4e140abc2f2308f825c1c666",
+      "bytes": 1600
+    },
+    {
+      "path": "fixtures/regimen_range/RR-06.json",
+      "sha256": "ffd2e026cd4e167c3e9c62ee3ef441c050459f5849038982f6cf743282a6b3f4",
+      "bytes": 1613
+    },
+    {
+      "path": "fixtures/regimen_range/RR-07.json",
+      "sha256": "e37c4c7e43f96702ab642df2115b3833a94d3ed0772e5f804a44e8e028326980",
+      "bytes": 1618
+    },
+    {
+      "path": "fixtures/regimen_range/RR-08.json",
+      "sha256": "7dd92671b37303aa5a587838bba093cd5ce2e2525f0aed9f024c4f6817a1d3b0",
+      "bytes": 1619
+    },
+    {
+      "path": "identifier-dependency-manifest.json",
+      "sha256": "ae0e4f384191b5aa50a78a1960a7da2284952e195d74bdbe53c45550813d0710",
+      "bytes": 11210
+    },
+    {
+      "path": "normative-rule-coverage-manifest.json",
+      "sha256": "450ab0be6a63279437eeed1c0292f22a7e89179e288aab1a1502c1f8cf58768b",
+      "bytes": 11812
+    },
+    {
+      "path": "normative-schema.json",
+      "sha256": "68c030b528d0fd9d32f565175990293a1667d03371ffce0eefa0a267a16c4a95",
+      "bytes": 62420
+    },
+    {
+      "path": "provider-roster-snapshot.json",
+      "sha256": "0724f35d346e02605492c9d989304bf873c7ceb9fd0f89055c5ee4cf34b7b6e7",
+      "bytes": 133449
+    },
+    {
+      "path": "run_fixtures.py",
+      "sha256": "2f46c21c3e45475032e99a7e0cc6c029e3ae81142dd286cac8b889a5999050a6",
+      "bytes": 3206
+    }
+  ]
+}

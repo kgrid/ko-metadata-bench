@@ -1,0 +1,101 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    schema:name "Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object" ;
+
+    schema:identifier "workshop-ko-2" ;
+
+    schema:version "1.0" ;
+
+    schema:abstract "A clinical guideline-based knowledge object that converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy." ;
+
+    schema:alternateName "DFU HBO2 Treatment Decision" ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D017719> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D006931> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D017410> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D020000> ;
+
+    schema:additionalType <https://kgrid.org/koio#KnowledgeObject> ;
+
+    schema:isPartOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection> ;
+
+    schema:subjectOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/metadata.json> ;
+
+    schema:keywords "diabetic foot ulcer" ;
+
+    schema:keywords "hyperbaric oxygen therapy" ;
+
+    schema:keywords "HBO2" ;
+
+    schema:keywords "clinical practice guideline" ;
+
+    schema:keywords "treatment decision" ;
+
+    schema:keywords "Wagner grade" ;
+
+    schema:keywords "Undersea and Hyperbaric Medical Society Guideline Figure 6" ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Computational method" ;
+        schema:value "Deterministic ordered clinical guideline decision tree with fail-fast validation"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Programming language" ;
+        schema:value "JavaScript"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "CommonJS Node.js package"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "Canonical JSON test vectors with JSON Schema"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "Knowledge Object Implementation Ontology 2.1"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "JSON Schema Draft 7"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Interface style" ;
+        schema:value "Command-line interface and JavaScript library API"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Package name" ;
+        schema:value "@kgrid/dfu-hbo2-treatment-decision"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Output classification" ;
+        schema:value "Four guideline-branch outcomes, one out-of-scope result, and deterministic validation-error results"
+    ] .
+
+# Identification, description, subject, type, technical characteristics, and indexing only.
+# Purpose, scope, inputs, outputs, access, licensing, provenance, tests, and evidence belong to other FAIR profiles.
+# These are profile conventions and do not redefine Schema.org or PROV-O.

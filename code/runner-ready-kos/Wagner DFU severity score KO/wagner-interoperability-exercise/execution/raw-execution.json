@@ -1,0 +1,8 @@
+{
+  "executionMode": "raw",
+  "publishedBoundary": false,
+  "entryPoint": "execution/raw-harness.js#execute",
+  "executorBinding": "host-supplied-private-function",
+  "inputExample": "examples/raw-input.json",
+  "expectedOutput": "examples/raw-output.json"
+}

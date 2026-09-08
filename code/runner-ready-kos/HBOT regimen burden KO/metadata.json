@@ -1,0 +1,292 @@
+{
+    "@context": "https://kgrid.org/koio/2.1/context.jsonld",
+    "@id": "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbot-bounded-regimen-and-execution-burden",
+    "versionInfo": "2.1",
+    "@type": "KnowledgeObject",
+    "dc:title": "DFU HBOT Bounded Regimen and Execution Burden",
+    "dc:identifier": [
+        "workshop-ko-3",
+        "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbot-bounded-regimen-and-execution-burden"
+    ],
+    "dc:version": "1.0",
+    "dc:date": "2026-08-12",
+    "dc:source": [
+        {
+            "@id": "1E41C3D7-66F4-C168-3A91-D951BE77CBAF.pdf",
+            "dc:bibliographicCitation": "Huang ET, Mansouri J, Murad MH, Joseph WS, Strauss MB, Tettelbach W, Worth ER. A clinical practice guideline for the use of hyperbaric oxygen therapy in the treatment of diabetic foot ulcers. Undersea & Hyperbaric Medicine. 2015;42(3):205-247. UHMS DFU guideline."
+        },
+        {
+            "@id": "https://pubmed.ncbi.nlm.nih.gov/26152105/",
+            "dc:bibliographicCitation": "Huang ET, Mansouri J, Murad MH, Joseph WS, Strauss MB, Tettelbach W, Worth ER. A clinical practice guideline for the use of hyperbaric oxygen therapy in the treatment of diabetic foot ulcers. Undersea & Hyperbaric Medicine. 2015;42(3):205-247. UHMS DFU guideline."
+        },
+        {
+            "@id": "https://iwgdfguidelines.org/wp-content/uploads/2023/07/IWGDF-Guidelines-2023.pdf",
+            "dc:bibliographicCitation": "International Working Group on the Diabetic Foot. Guidelines on interventions to enhance healing of foot ulcers in people with diabetes: IWGDF 2023 update. Recommendation 12 and rationale."
+        }
+    ],
+    "dc:isReferencedBy": [],
+    "dc:description": "This knowledge object estimates the execution burden of a contemplated outpatient HBOT course. It combines a fixed population-level regimen range with one selected facility, patient-reported travel distance and duration, and reported weekday-attendance difficulty.",
+    "schema:creator": [
+        {
+            "@id": "https://kgrid.org",
+            "@type": "schema:Organization",
+            "schema:name": "Knowledge Systems Lab",
+            "schema:affiliation": "Knowledge Systems Lab, University of Michigan Medical School",
+            "schema:email": "kgrid-developers@umich.edu"
+        }
+    ],
+    "koio:hasKnowledge": [
+        {
+            "@id": "Regimen_Range",
+            "dc:title": "Regimen Range",
+            "dc:identifier": "1",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-12",
+            "dc:description": "Return the governed Fixed Regimen Range Response containing the shorter and longer general scenarios",
+            "dc:purpose": "Regimen Range provides the fixed, general 30-40-session HBOT planning scenarios that are used to calculate patient burden without selecting or personalizing a regimen for the patient.",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/regimen-range.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            }
+        },
+        {
+            "@id": "Burden_Questionnaire_Logic",
+            "dc:title": "Burden Questionnaire Logic",
+            "dc:identifier": "2",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-12",
+            "dc:description": "Burden Questionnaire Logic interactively collects and confirms the patient's selected treatment location, travel distance and time, and expected weekday-attendance difficulty.",
+            "dc:purpose": "Its purpose is to produce one confirmed, standardized patient response that can be used by Burden Response Analysis to calculate execution burden.",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/questionnaire-logic.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            }
+        },
+        {
+            "@id": "Burden_Response_Analysis",
+            "dc:title": "Burden Response Analysis",
+            "dc:identifier": "3",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-12",
+            "dc:description": "Burden Response Analysis computes the execution burden of a contemplated outpatient HBOT course by combining the fixed population-level regimen envelope with one selected facility, patient-reported travel, and reported weekday-attendance difficulty.",
+            "dc:purpose": "Its purpose is to produce a standardized execution burden response that can be used to inform patient and clinician decision-making.",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/burden-response-analysis.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            }
+        }
+    ],
+    "koio:hasService": [
+        {
+            "@id": "CLI_Service",
+            "@type": [
+                "Service",
+                "cli"
+            ],
+            "dc:description": "interactively collects the four required HBOT burden questionnaire inputs, generates the fixed regimen range artifact, runs the burden analysis, and prints all three spec-aligned JSON outputs.",
+            "hasInterface": "README.md",
+            "implementedBy": {
+                "@id": "bin/dfu-hbot-burden.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Regimen_Range",
+                "Burden_Questionnaire_Logic",
+                "Burden_Response_Analysis"
+            ]
+        },
+        {
+            "@id": "Service_for_Regimen_Range",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the generateRegimenRange software function",
+            "hasInterface": "spec/DFU_HBOT_Bounded_Regimen_and_Execution_Burden_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/regimen-range.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Regimen_Range"
+            ]
+        },
+        {
+            "@id": "Service_for_Burden_Questionnaire_Logic",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the collectBurdenQuestionnaireResponse software function",
+            "hasInterface": "spec/DFU_HBOT_Bounded_Regimen_and_Execution_Burden_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/questionnaire-logic.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Burden_Questionnaire_Logic"
+            ]
+        },
+        {
+            "@id": "Service_for_Burden_Response_Analysis",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the analyzeBurdenResponse software function",
+            "hasInterface": "spec/DFU_HBOT_Bounded_Regimen_and_Execution_Burden_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/burden-response-analysis.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Burden_Response_Analysis"
+            ]
+        }
+    ],
+    "koio:hasTest": [
+        {
+            "@id": "DFU_HBOT_Architecture_Test",
+            "@type": "koio:Test",
+            "dc:title": "DFU HBOT Architecture Test",
+            "dc:description": "This software behavior test file validates the package's end-to-end architecture by checking fixed regimen output, questionnaire completion, successful burden analysis behavior, and representative error paths for invalid request type and unresolved provider location.",
+            "implementedBy": {
+                "@id": "test/architecture.test.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            }
+        },
+        {
+            "@id": "DFU_HBOT_Conformance_Test",
+            "@type": "koio:Test",
+            "dc:title": "DFU HBOT Conformance Test",
+            "dc:description": "This software schema test file verifies schema conformance across regimen-range requests/responses, completed questionnaire payloads, analysis request and completed result objects, and the ERR-07 error-result contract for missing required analysis input.",
+            "implementedBy": {
+                "@id": "test/conformance.test.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            }
+        },
+        {
+            "@id": "Spec_Conformance_Fixture_Audit_Runner",
+            "@type": "koio:Test",
+            "dc:title": "Spec Conformance Fixture Audit Runner",
+            "dc:description": "This script executes the full DFU HBOT conformance fixture bundle across regimen-range, questionnaire, provider-roster, burden-analysis, and audit/replay scenarios, then performs exact expected-vs-actual structural JSON comparisons and reports pass/fail (with strict nonzero exit on mismatch).",
+            "implementedBy": {
+                "@id": "scripts/spec-audit.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            }
+        }
+    ],
+    "koio:hasDocumentation": [
+        {
+            "@id": "spec/DFU_HBOT_Bounded_Regimen_and_Execution_Burden_CKS_Version_1_0.docx",
+            "@type": [
+                "InformationArtifact",
+                "Specification Document"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden",
+            "dc:description": "Interactive burden questionnaire, general DFU regimen knowledge, objective-burden calculations, reported weekday-attendance feasibility, five-level execution-burden logic, output contracts, and conformance tests"
+        },
+        {
+            "@id": "spec/DFU_HBOT_Bounded_Regimen_and_Execution_Burden_CKS_One-Page_Summary.docx",
+            "@type": [
+                "InformationArtifact",
+                "Summary"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden CKS Summary",
+            "dc:description": "A one-page clinical knowledge summary for the DFU HBOT Bounded Regimen and Execution Burden CKS"
+        },
+        {
+            "@id": "README.md",
+            "@type": [
+                "InformationArtifact",
+                "Markdown Document"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden README",
+            "dc:description": "Technical documentation."
+        },
+        {
+            "@id": "dfu-hbot_binder.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Binder Notebook"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden Binder Jupyter Notebook Demo",
+            "dc:description": "A Binder Jupyter Notebook for viewing how to compute with the DFU HBOT Bounded Regimen and Execution Burden"
+        },
+        {
+            "@id": "dfu-hbot_colab.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Google Colab Notebook"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden Google Colab Jupyter Notebook Demo",
+            "dc:description": "A Google Colab Jupyter Notebook for viewing how to compute with the DFU HBOT Bounded Regimen and Execution Burden"
+        },
+        {
+            "@id": "dfu-hbot_scribbler.jsnb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Scribbler Notebook"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden Scribbler Notebook Demo",
+            "dc:description": "A Scribbler notebook for viewing how to compute with the DFU HBOT Bounded Regimen and Execution Burden"
+        },
+        {
+            "@id": "index.html",
+            "@type": [
+                "InformationArtifact",
+                "Information Page"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden Information Page",
+            "dc:description": "An information page for viewing the contents of the DFU HBOT Bounded Regimen and Execution Burden Knowledge Object"
+        },
+        {
+            "@id": "spec/DFU_HBOT_CKS_Conformance_Fixtures_1_0",
+            "@type": [
+                "InformationArtifact",
+                "Conformance Fixture Bundle"
+            ],
+            "dc:title": "DFU HBOT Bounded Regimen and Execution Burden Conformance Fixtures",
+            "dc:description": "A collection of conformance fixtures for the DFU HBOT Bounded Regimen and Execution Burden Knowledge Object"
+        }
+    ]
+}

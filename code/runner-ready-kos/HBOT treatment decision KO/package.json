@@ -1,0 +1,25 @@
+{
+  "name": "@kgrid/dfu-hbo2-treatment-decision",
+  "version": "1.0.0",
+  "description": "UHMS Figure 6 DFU/HBO2 treatment decision logic",
+  "main": "src/decision.js",
+  "exports": {
+    ".": "./src/decision.js",
+    "./decision": "./src/decision.js"
+  },
+  "bin": {
+    "dfu-hbo2": "bin/dfu-hbo2.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test",
+    "cli": "node bin/dfu-hbo2.js"
+  },
+  "keywords": [
+    "dfu",
+    "hbo2",
+    "uhms",
+    "clinical-decision-support"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,28 @@
+{
+  "specification_iri": "https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0",
+  "response_model_iri": "https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse",
+  "question_ids": [
+    "Q01",
+    "Q02",
+    "Q03",
+    "Q04",
+    "Q05",
+    "Q06",
+    "Q07",
+    "Q08",
+    "Q09",
+    "Q10"
+  ],
+  "responses": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "1",
+    "1",
+    "X",
+    "0",
+    "0"
+  ]
+}

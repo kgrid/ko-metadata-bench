@@ -1,0 +1,2444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+  "title": "DFU HBOT Burden CKS Version 1.0 normative schemas",
+  "$defs": {
+    "regimenRangeRequest": {
+      "$anchor": "regimenRangeRequest",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_type"
+      ],
+      "properties": {
+        "request_type": {
+          "const": "show_regimen_range"
+        }
+      }
+    },
+    "fixedRegimenRangeResponse": {
+      "$anchor": "fixedRegimenRangeResponse",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification_iri",
+        "response_type",
+        "response_model_iri",
+        "status",
+        "knowledge_package_iri",
+        "knowledge_scope",
+        "indication",
+        "shorter_regimen_scenario",
+        "longer_regimen_scenario",
+        "combined_range",
+        "scheduled_facility_hours_per_episode",
+        "tailored_to_patient",
+        "display_label"
+      ],
+      "properties": {
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "response_type": {
+          "const": "fixed_regimen_range_response"
+        },
+        "response_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0"
+        },
+        "status": {
+          "const": "completed"
+        },
+        "knowledge_package_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0"
+        },
+        "knowledge_scope": {
+          "const": "general_not_patient_specific"
+        },
+        "indication": {
+          "const": "diabetes_related_foot_ulcer"
+        },
+        "shorter_regimen_scenario": {
+          "$ref": "#/$defs/shorterRegimenScenario"
+        },
+        "longer_regimen_scenario": {
+          "$ref": "#/$defs/longerRegimenScenario"
+        },
+        "combined_range": {
+          "$ref": "#/$defs/combinedRegimenRange"
+        },
+        "scheduled_facility_hours_per_episode": {
+          "$ref": "#/$defs/facilityTimePerEpisode"
+        },
+        "tailored_to_patient": {
+          "const": false
+        },
+        "display_label": {
+          "const": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+        }
+      }
+    },
+    "shorterRegimenScenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episodes",
+        "sessions_per_week",
+        "course_weeks"
+      ],
+      "properties": {
+        "episodes": {
+          "const": 30
+        },
+        "sessions_per_week": {
+          "const": 5
+        },
+        "course_weeks": {
+          "const": 6.0
+        }
+      }
+    },
+    "longerRegimenScenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episodes",
+        "sessions_per_week",
+        "course_weeks"
+      ],
+      "properties": {
+        "episodes": {
+          "const": 40
+        },
+        "sessions_per_week": {
+          "const": 5
+        },
+        "course_weeks": {
+          "const": 8.0
+        }
+      }
+    },
+    "combinedRegimenRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episodes",
+        "sessions_per_week",
+        "course_weeks"
+      ],
+      "properties": {
+        "episodes": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": 30
+            },
+            {
+              "const": 40
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "sessions_per_week": {
+          "const": 5
+        },
+        "course_weeks": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": 6.0
+            },
+            {
+              "const": 8.0
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "facilityTimePerEpisode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "const": 3.0
+        },
+        "unit": {
+          "const": "h"
+        }
+      }
+    },
+    "completedQuestionnaireResponse": {
+      "$anchor": "completedQuestionnaireResponse",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification_iri",
+        "questionnaire_status",
+        "response_model_iri",
+        "provider_roster_version_iri",
+        "response_projection",
+        "confirmed"
+      ],
+      "properties": {
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "questionnaire_status": {
+          "const": "completed"
+        },
+        "response_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0"
+        },
+        "provider_roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "response_projection": {
+          "$ref": "#/$defs/responseProjection"
+        },
+        "confirmed": {
+          "const": true
+        }
+      }
+    },
+    "analysisQuestionnaireResponse": {
+      "description": "Analysis-ingress form of the completed response. Structure and all non-roster identity fields remain exact; provider_roster_version_iri is admitted as an absolute HTTPS IRI so Section 9.2 can deterministically classify cross-artifact compatibility at stage 9.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification_iri",
+        "questionnaire_status",
+        "response_model_iri",
+        "provider_roster_version_iri",
+        "response_projection",
+        "confirmed"
+      ],
+      "properties": {
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "questionnaire_status": {
+          "const": "completed"
+        },
+        "response_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0"
+        },
+        "provider_roster_version_iri": {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        },
+        "response_projection": {
+          "$ref": "#/$defs/responseProjection"
+        },
+        "confirmed": {
+          "const": true
+        }
+      }
+    },
+    "responseProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hyperbaric_oxygen_therapy_location",
+        "one_way_miles",
+        "one_way_travel_minutes",
+        "weekday_attendance_difficulty"
+      ],
+      "properties": {
+        "hyperbaric_oxygen_therapy_location": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/providers/e-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "one_way_miles": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "one_way_travel_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1440
+        },
+        "weekday_attendance_difficulty": {
+          "enum": [
+            "none",
+            "some",
+            "major"
+          ],
+          "description": "Subjective ordinal report of anticipated non-travel difficulty attending the scheduled HBOT course at the confirmed location, using the Q04 anchors in Section 4.2."
+        }
+      }
+    },
+    "analysisRequest": {
+      "$anchor": "analysisRequest",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_type",
+        "provider_roster_version_iri",
+        "questionnaire_response",
+        "fixed_regimen_range_response"
+      ],
+      "properties": {
+        "request_type": {
+          "const": "calculate_burden_range"
+        },
+        "provider_roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "questionnaire_response": {
+          "$ref": "#/$defs/analysisQuestionnaireResponse"
+        },
+        "fixed_regimen_range_response": {
+          "$ref": "#/$defs/fixedRegimenRangeResponse"
+        }
+      }
+    },
+    "hyperbaricOxygenTherapyLocationRecord": {
+      "$anchor": "hyperbaricOxygenTherapyLocationRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roster_version_iri",
+        "roster_record_iri",
+        "provider_iri",
+        "compact_id",
+        "record_status",
+        "selectable",
+        "successor_provider_iris",
+        "address_verification_required",
+        "facility_listing",
+        "jurisdiction",
+        "normalized_address_candidate",
+        "address_status",
+        "uhms_distinction",
+        "joint_commission_mark",
+        "address_source"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_status": {
+                "const": "listed"
+              }
+            },
+            "required": [
+              "record_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "successor_provider_iris": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "record_status": {
+                "enum": [
+                  "retired",
+                  "superseded",
+                  "unresolved"
+                ]
+              }
+            },
+            "required": [
+              "record_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selectable": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "address_status": {
+                "enum": [
+                  "incomplete",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "address_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selectable": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "address_verification_required": {
+                "const": true
+              }
+            },
+            "required": [
+              "address_verification_required"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selectable": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "selectable": {
+                "const": true
+              }
+            },
+            "required": [
+              "selectable"
+            ]
+          },
+          "then": {
+            "properties": {
+              "record_status": {
+                "const": "listed"
+              },
+              "address_status": {
+                "const": "candidate"
+              },
+              "address_verification_required": {
+                "const": false
+              },
+              "normalized_address_candidate": {
+                "not": {
+                  "const": "No matched live-directory address"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "record_status": {
+                "const": "listed"
+              },
+              "address_status": {
+                "const": "candidate"
+              },
+              "address_verification_required": {
+                "const": false
+              }
+            },
+            "required": [
+              "record_status",
+              "address_status",
+              "address_verification_required"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selectable": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "address_status": {
+                "const": "unavailable"
+              }
+            },
+            "required": [
+              "address_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "normalized_address_candidate": {
+                "const": "No matched live-directory address"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "roster_record_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1\\.0/records/e-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "provider_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/providers/e-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "compact_id": {
+          "type": "string",
+          "pattern": "^E-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "record_status": {
+          "enum": [
+            "listed",
+            "retired",
+            "superseded",
+            "unresolved"
+          ]
+        },
+        "selectable": {
+          "type": "boolean"
+        },
+        "address_verification_required": {
+          "type": "boolean"
+        },
+        "successor_provider_iris": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/providers/e-[0-9]{3,}$"
+          }
+        },
+        "facility_listing": {
+          "type": "string",
+          "pattern": "^(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "pattern": "^(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$"
+        },
+        "normalized_address_candidate": {
+          "type": "string",
+          "pattern": "^(?!\\s)(?!.*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$"
+        },
+        "address_status": {
+          "enum": [
+            "candidate",
+            "incomplete",
+            "unavailable"
+          ]
+        },
+        "uhms_distinction": {
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "joint_commission_mark": {
+          "enum": [
+            "Yes",
+            "No"
+          ]
+        },
+        "address_source": {
+          "oneOf": [
+            {
+              "const": "Unavailable"
+            },
+            {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://"
+            }
+          ]
+        }
+      }
+    },
+    "providerRosterSnapshot": {
+      "$anchor": "providerRosterSnapshot",
+      "title": "Canonical provider-roster snapshot",
+      "description": "The complete, closed, versioned JSON value used as the provider-roster dependency for identification, validation, RFC 8785 canonical-content fingerprinting, audit, and reproducible replay. It is not a source document, working file, database representation, selected record, or formatted JSON file's raw bytes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roster_version_iri",
+        "record_count",
+        "record_order",
+        "records"
+      ],
+      "properties": {
+        "roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+          "description": "Exact immutable roster-version IRI represented by this snapshot."
+        },
+        "record_count": {
+          "const": 141,
+          "description": "Must equal both 141 and the actual records-array length."
+        },
+        "record_order": {
+          "const": "ascending_compact_id",
+          "description": "Records must occur in ascending compact_id order, E-001 through E-141."
+        },
+        "records": {
+          "description": "Every complete roster record exactly once, ordered by ascending compact_id.",
+          "type": "array",
+          "minItems": 141,
+          "maxItems": 141,
+          "items": {
+            "$ref": "#/$defs/hyperbaricOxygenTherapyLocationRecord"
+          }
+        }
+      }
+    },
+    "errorObject": {
+      "$anchor": "errorObject",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/error01"
+        },
+        {
+          "$ref": "#/$defs/error02"
+        },
+        {
+          "$ref": "#/$defs/error03"
+        },
+        {
+          "$ref": "#/$defs/error04"
+        },
+        {
+          "$ref": "#/$defs/error05"
+        },
+        {
+          "$ref": "#/$defs/error06"
+        },
+        {
+          "$ref": "#/$defs/error07"
+        },
+        {
+          "$ref": "#/$defs/error08"
+        },
+        {
+          "$ref": "#/$defs/error09"
+        },
+        {
+          "$ref": "#/$defs/error10"
+        }
+      ]
+    },
+    "error01": {
+      "$ref": "#/$defs/error01Object"
+    },
+    "error02": {
+      "$ref": "#/$defs/error02Object"
+    },
+    "error03": {
+      "$ref": "#/$defs/error03Object"
+    },
+    "error04": {
+      "$ref": "#/$defs/error04Object"
+    },
+    "error05": {
+      "$ref": "#/$defs/error05Object"
+    },
+    "error06": {
+      "$ref": "#/$defs/error06Object"
+    },
+    "error07": {
+      "$ref": "#/$defs/error07Object"
+    },
+    "error08": {
+      "$ref": "#/$defs/error08Object"
+    },
+    "error09": {
+      "$ref": "#/$defs/error09Object"
+    },
+    "error10": {
+      "$ref": "#/$defs/error10Object"
+    },
+    "error01Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-01"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "null"
+        },
+        "message": {
+          "const": "Input object is required."
+        }
+      }
+    },
+    "error02Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-02"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "null"
+        },
+        "message": {
+          "const": "Top-level input must be an object."
+        }
+      }
+    },
+    "error03Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-03"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Input has an invalid data type."
+        }
+      }
+    },
+    "error04Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-04"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Unexpected input property is not permitted."
+        }
+      }
+    },
+    "error05Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-05"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Input artifact identity, status, or version is invalid."
+        }
+      }
+    },
+    "error06Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-06"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Duplicate property name is not permitted."
+        }
+      }
+    },
+    "error07Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-07"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Required input is missing."
+        }
+      }
+    },
+    "error08Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-08"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Required input must not be null."
+        }
+      }
+    },
+    "error09Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-09"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "const": "Input value is outside the closed value set or constraint."
+        }
+      }
+    },
+    "error10Object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "status",
+        "error_field",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "const": "ERR-10"
+        },
+        "status": {
+          "const": "error"
+        },
+        "error_field": {
+          "const": "provider_roster_dependency"
+        },
+        "message": {
+          "const": "Required provider roster is unavailable or invalid."
+        }
+      }
+    },
+    "numberRange": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "integerRange": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "scenarioBurden": {
+      "description": "Presentation-ready scenario values. Shorter-scenario travel, total, and distance use Section 6.3 lower_endpoint serialization; longer-scenario values use upper_endpoint serialization. Facility hours are exact.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episodes",
+        "course_weeks",
+        "travel_hours",
+        "facility_hours",
+        "total_patient_hours",
+        "course_miles"
+      ],
+      "properties": {
+        "episodes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "course_weeks": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "travel_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "facility_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "total_patient_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "course_miles": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "locationReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_roster_version_iri",
+        "roster_record_iri",
+        "provider_iri",
+        "compact_id",
+        "facility_listing",
+        "jurisdiction",
+        "address_status",
+        "normalized_address_candidate"
+      ],
+      "properties": {
+        "provider_roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "roster_record_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1\\.0/records/e-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "provider_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/providers/e-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "compact_id": {
+          "type": "string",
+          "pattern": "^E-(00[1-9]|0[1-9][0-9]|1[0-3][0-9]|14[01])$"
+        },
+        "facility_listing": {
+          "type": "string",
+          "minLength": 1
+        },
+        "jurisdiction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "address_status": {
+          "enum": [
+            "candidate",
+            "incomplete",
+            "unavailable"
+          ]
+        },
+        "normalized_address_candidate": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "objectiveBurden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixed_regimen_range_response",
+        "hyperbaric_oxygen_therapy_location_reference",
+        "reported_one_way_travel",
+        "burden_by_regimen_scenario",
+        "overall_burden_range",
+        "travel_band"
+      ],
+      "properties": {
+        "fixed_regimen_range_response": {
+          "$ref": "#/$defs/fixedRegimenRangeResponse"
+        },
+        "hyperbaric_oxygen_therapy_location_reference": {
+          "$ref": "#/$defs/locationReference"
+        },
+        "reported_one_way_travel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "miles",
+            "minutes"
+          ],
+          "properties": {
+            "miles": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "minutes": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1440
+            }
+          }
+        },
+        "burden_by_regimen_scenario": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "shorter_regimen",
+            "longer_regimen"
+          ],
+          "properties": {
+            "shorter_regimen": {
+              "$ref": "#/$defs/scenarioBurden"
+            },
+            "longer_regimen": {
+              "$ref": "#/$defs/scenarioBurden"
+            }
+          }
+        },
+        "overall_burden_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "episodes",
+            "travel_hours",
+            "facility_hours",
+            "total_patient_hours",
+            "course_miles"
+          ],
+          "properties": {
+            "episodes": {
+              "$ref": "#/$defs/integerRange"
+            },
+            "travel_hours": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "facility_hours": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "total_patient_hours": {
+              "$ref": "#/$defs/numberRange"
+            },
+            "course_miles": {
+              "$ref": "#/$defs/numberRange"
+            }
+          }
+        },
+        "travel_band": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "enum": [
+                "low",
+                "moderate",
+                "high",
+                "very_high"
+              ]
+            },
+            "basis": {
+              "const": "reported_one_way_minutes_doubled"
+            }
+          }
+        }
+      }
+    },
+    "weekdayAttendanceFeasibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_value",
+        "display_text"
+      ],
+      "properties": {
+        "reported_value": {
+          "enum": [
+            "none",
+            "some",
+            "major"
+          ]
+        },
+        "display_text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reported_value": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "reported_value"
+            ]
+          },
+          "then": {
+            "properties": {
+              "display_text": {
+                "const": "No weekday-attendance difficulty reported"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reported_value": {
+                "const": "some"
+              }
+            },
+            "required": [
+              "reported_value"
+            ]
+          },
+          "then": {
+            "properties": {
+              "display_text": {
+                "const": "Some weekday-attendance difficulty reported"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reported_value": {
+                "const": "major"
+              }
+            },
+            "required": [
+              "reported_value"
+            ]
+          },
+          "then": {
+            "properties": {
+              "display_text": {
+                "const": "Major weekday-attendance difficulty reported"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "executionBurdenLevel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "category",
+        "primary_driver",
+        "secondary_driver",
+        "display_text"
+      ],
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "category": {
+          "enum": [
+            "low_execution_burden",
+            "moderate_execution_burden",
+            "high_execution_burden",
+            "very_high_execution_burden",
+            "extreme_execution_burden"
+          ]
+        },
+        "primary_driver": {
+          "type": "string",
+          "minLength": 1
+        },
+        "secondary_driver": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "display_text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "const": "low_execution_burden"
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 1
+              },
+              "display_text": {
+                "const": "Low execution burden"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "const": "moderate_execution_burden"
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 2
+              },
+              "display_text": {
+                "const": "Moderate execution burden"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "const": "high_execution_burden"
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 3
+              },
+              "display_text": {
+                "const": "High execution burden"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "const": "very_high_execution_burden"
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 4
+              },
+              "display_text": {
+                "const": "Very high execution burden"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "const": "extreme_execution_burden"
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "properties": {
+              "score": {
+                "const": 5
+              },
+              "display_text": {
+                "const": "Extreme execution burden"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sensitivity": {
+      "description": "Presentation-ready difference values. Incremental travel hours, total hours, and miles use Section 6.3 nearest_value half-up serialization; facility hours and weeks are exact.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "longer_minus_shorter_episodes",
+        "incremental_travel_hours",
+        "incremental_facility_hours",
+        "incremental_total_hours",
+        "incremental_miles",
+        "incremental_weeks"
+      ],
+      "properties": {
+        "longer_minus_shorter_episodes": {
+          "const": 10
+        },
+        "incremental_travel_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "incremental_facility_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "incremental_total_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "incremental_miles": {
+          "type": "number",
+          "minimum": 0
+        },
+        "incremental_weeks": {
+          "const": 2.0
+        }
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "text"
+      ],
+      "properties": {
+        "code": {
+          "enum": [
+            "ASM-01",
+            "ASM-02",
+            "ASM-03",
+            "ASM-04"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "completedAssumptions": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "text"
+          ],
+          "properties": {
+            "code": {
+              "const": "ASM-01"
+            },
+            "text": {
+              "const": "General DFU planning regimen range of 30–40 episodes at five sessions per week is used; it was not selected or calculated for the patient."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "text"
+          ],
+          "properties": {
+            "code": {
+              "const": "ASM-02"
+            },
+            "text": {
+              "const": "A single fixed three-hour scheduled facility block per treatment episode is used as a conservative, realistic worst-case planning assumption. It is not a validated DFU-specific door-to-door elapsed-time estimate."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "text"
+          ],
+          "properties": {
+            "code": {
+              "const": "ASM-03"
+            },
+            "text": {
+              "const": "Round trip is estimated as two times the patient-reported usual one-way miles and minutes."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "text"
+          ],
+          "properties": {
+            "code": {
+              "const": "ASM-04"
+            },
+            "text": {
+              "const": "Reported travel values are planning estimates and are not independently verified by the engine."
+            }
+          }
+        }
+      ],
+      "items": false
+    },
+    "evidenceSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_iri",
+        "citation"
+      ],
+      "properties": {
+        "source_iri": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "citation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "canonicalization",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "SHA-256"
+        },
+        "canonicalization": {
+          "enum": [
+            "RFC8785",
+            "raw-octets",
+            "none"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "canonicalization": {
+                "const": "none"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "canonicalization": {
+                "enum": [
+                  "RFC8785",
+                  "raw-octets"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "nonNullRfc8785Fingerprint": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fingerprint"
+        },
+        {
+          "properties": {
+            "canonicalization": {
+              "const": "RFC8785"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      ]
+    },
+    "resultProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine_implementation_iri",
+        "engine_implementation_version",
+        "specification_iri",
+        "schema_bundle_iri",
+        "fixture_bundle_iri",
+        "identifier_dependency_manifest_iri",
+        "provider_roster_version_iri",
+        "input_received_at",
+        "input_fingerprint",
+        "provider_roster_fingerprint",
+        "deterministic_result_fingerprint"
+      ],
+      "properties": {
+        "engine_implementation_iri": {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        },
+        "engine_implementation_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "schema_bundle_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0"
+        },
+        "fixture_bundle_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0"
+        },
+        "identifier_dependency_manifest_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0"
+        },
+        "provider_roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "input_received_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+        },
+        "input_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "provider_roster_fingerprint": {
+          "$ref": "#/$defs/fingerprint"
+        },
+        "deterministic_result_fingerprint": {
+          "$ref": "#/$defs/nonNullRfc8785Fingerprint"
+        }
+      }
+    },
+    "auditValidationOutcome": {
+      "$anchor": "auditValidationOutcome",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "failure_code",
+            "message"
+          ],
+          "properties": {
+            "status": {
+              "const": "audit_valid"
+            },
+            "failure_code": {
+              "type": "null"
+            },
+            "message": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "failure_code",
+            "message"
+          ],
+          "properties": {
+            "status": {
+              "const": "audit_invalid"
+            },
+            "failure_code": {
+              "enum": [
+                "AUDIT-01",
+                "AUDIT-02",
+                "AUDIT-03",
+                "AUDIT-04",
+                "AUDIT-05",
+                "AUDIT-06",
+                "AUDIT-07"
+              ]
+            },
+            "message": {
+              "enum": [
+                "Result-instance identity is invalid.",
+                "Result timestamps are invalid.",
+                "Result provenance identity is invalid.",
+                "Input fingerprint verification failed.",
+                "Provider-roster fingerprint verification failed.",
+                "Deterministic result verification failed.",
+                "Exact replay dependency is unavailable."
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-01"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Result-instance identity is invalid."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-02"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Result timestamps are invalid."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-03"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Result provenance identity is invalid."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-04"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Input fingerprint verification failed."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-05"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Provider-roster fingerprint verification failed."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-06"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Deterministic result verification failed."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "failure_code": {
+                    "const": "AUDIT-07"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "message": {
+                    "const": "Exact replay dependency is unavailable."
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "completedAnalysisResult": {
+      "$anchor": "completedAnalysisResult",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_instance_iri",
+        "specification_iri",
+        "result_model_iri",
+        "issued_at",
+        "provenance",
+        "status",
+        "result_code",
+        "objective_burden",
+        "weekday_attendance_feasibility",
+        "execution_burden_level",
+        "sensitivity",
+        "assumptions",
+        "evidence_sources",
+        "error",
+        "warnings"
+      ],
+      "properties": {
+        "result_instance_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/result-instances/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "result_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0"
+        },
+        "issued_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+        },
+        "provenance": {
+          "$ref": "#/$defs/resultProvenance"
+        },
+        "status": {
+          "const": "completed"
+        },
+        "result_code": {
+          "type": "string",
+          "pattern": "^RESULT-[A-Z0-9_-]+$"
+        },
+        "objective_burden": {
+          "$ref": "#/$defs/objectiveBurden"
+        },
+        "weekday_attendance_feasibility": {
+          "$ref": "#/$defs/weekdayAttendanceFeasibility"
+        },
+        "execution_burden_level": {
+          "$ref": "#/$defs/executionBurdenLevel"
+        },
+        "sensitivity": {
+          "$ref": "#/$defs/sensitivity"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/completedAssumptions"
+        },
+        "evidence_sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceSource"
+          }
+        },
+        "error": {
+          "type": "null"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          }
+        }
+      }
+    },
+    "errorAnalysisResult": {
+      "$anchor": "errorAnalysisResult",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_instance_iri",
+        "specification_iri",
+        "result_model_iri",
+        "issued_at",
+        "provenance",
+        "status",
+        "result_code",
+        "objective_burden",
+        "weekday_attendance_feasibility",
+        "execution_burden_level",
+        "sensitivity",
+        "assumptions",
+        "evidence_sources",
+        "error",
+        "warnings"
+      ],
+      "properties": {
+        "result_instance_iri": {
+          "type": "string",
+          "pattern": "^https://kgrid\\.org/cks/dfu-hbot-burden/result-instances/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "result_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0"
+        },
+        "issued_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+        },
+        "provenance": {
+          "$ref": "#/$defs/resultProvenance"
+        },
+        "status": {
+          "const": "error"
+        },
+        "result_code": {
+          "enum": [
+            "ERR-01",
+            "ERR-02",
+            "ERR-03",
+            "ERR-04",
+            "ERR-05",
+            "ERR-06",
+            "ERR-07",
+            "ERR-08",
+            "ERR-09",
+            "ERR-10"
+          ]
+        },
+        "objective_burden": {
+          "type": "null"
+        },
+        "weekday_attendance_feasibility": {
+          "type": "null"
+        },
+        "execution_burden_level": {
+          "type": "null"
+        },
+        "sensitivity": {
+          "type": "null"
+        },
+        "assumptions": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "evidence_sources": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "error": {
+          "$ref": "#/$defs/errorObject"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-01"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error01Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-02"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error02Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-03"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error03Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-04"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error04Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-05"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error05Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-06"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error06Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-07"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error07Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-08"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error08Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-09"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error09Object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "result_code": {
+                "const": "ERR-10"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error": {
+                "$ref": "#/$defs/error10Object"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "analysisResult": {
+      "$anchor": "analysisResult",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/completedAnalysisResult"
+        },
+        {
+          "$ref": "#/$defs/errorAnalysisResult"
+        }
+      ]
+    },
+    "identifierFamilyRule": {
+      "$anchor": "identifierFamilyRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family_id",
+        "identifier_kind",
+        "governing_scope_iri",
+        "local_pattern",
+        "boundary_rule",
+        "item_iri_policy"
+      ],
+      "properties": {
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identifier_kind": {
+          "enum": [
+            "scoped_compact",
+            "global_iri",
+            "versioned_item_iri"
+          ]
+        },
+        "governing_scope_iri": {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        },
+        "local_pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "boundary_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_iri_policy": {
+          "enum": [
+            "no_item_iri",
+            "maps_to_provider_and_roster_record_iris_in_snapshot",
+            "required_item_iri"
+          ]
+        }
+      }
+    },
+    "dependencyRecord": {
+      "$anchor": "dependencyRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dependency_id",
+        "dependency_type",
+        "dependency_iri",
+        "version_binding",
+        "required_phase",
+        "failure_behavior",
+        "fingerprint_requirement"
+      ],
+      "properties": {
+        "dependency_id": {
+          "type": "string",
+          "pattern": "^DEP-(0[1-9]|1[01])$"
+        },
+        "dependency_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependency_iri": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^https://[^\\s]+$"
+            }
+          ]
+        },
+        "version_binding": {
+          "enum": [
+            "exact",
+            "runtime_exact"
+          ]
+        },
+        "required_phase": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fingerprint_requirement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "normativeRuleCoverageRecord": {
+      "$anchor": "normativeRuleCoverageRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage_id",
+        "governing_scope_iri",
+        "rule_family",
+        "normative_sections",
+        "verification_mechanism",
+        "evidence_ids"
+      ],
+      "properties": {
+        "coverage_id": {
+          "type": "string",
+          "pattern": "^COV-(0[1-9]|1[0-9]|2[0-4])$"
+        },
+        "governing_scope_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0"
+        },
+        "rule_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normative_sections": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_mechanism": {
+          "enum": [
+            "document_inspection",
+            "schema_and_manifest",
+            "document_and_dependency_validation",
+            "schema_and_executable_fixtures",
+            "executable_fixtures_and_presentation_checks",
+            "executable_fixtures",
+            "schema_executable_fixtures_and_audit",
+            "presentation_conformance_inspection",
+            "document_and_presentation_inspection",
+            "conformance_dossier_inspection",
+            "bundle_validator",
+            "source_table_inspection",
+            "roster_snapshot_and_document_inspection",
+            "schema_validation_and_manifest_inspection"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(RR|QT|TC|RT|PRES)-[0-9]{2}$"
+          }
+        }
+      }
+    },
+    "normativeRuleCoverageManifest": {
+      "$anchor": "normativeRuleCoverageManifest",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage_manifest_iri",
+        "specification_iri",
+        "status",
+        "record_count",
+        "coverage_scope",
+        "records"
+      ],
+      "properties": {
+        "coverage_manifest_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0"
+        },
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "status": {
+          "const": "final"
+        },
+        "record_count": {
+          "const": 24
+        },
+        "coverage_scope": {
+          "const": "all_normative_rule_families_in_this_cks_version"
+        },
+        "records": {
+          "type": "array",
+          "minItems": 24,
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/normativeRuleCoverageRecord"
+          }
+        }
+      }
+    },
+    "identifierDependencyManifest": {
+      "$anchor": "identifierDependencyManifest",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest_iri",
+        "specification_iri",
+        "manifest_status",
+        "identifier_policy_iri",
+        "schema_bundle_iri",
+        "response_model_iri",
+        "output_model_iri",
+        "question_set_iri",
+        "provider_roster_version_iri",
+        "normative_rule_coverage_iri",
+        "identifier_family_count",
+        "identifier_families",
+        "dependencies"
+      ],
+      "properties": {
+        "manifest_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0"
+        },
+        "specification_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0"
+        },
+        "manifest_status": {
+          "const": "final"
+        },
+        "identifier_policy_iri": {
+          "const": "https://kgrid.org/standards/cks-iri/versions/0.1"
+        },
+        "schema_bundle_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0"
+        },
+        "response_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0"
+        },
+        "output_model_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0"
+        },
+        "question_set_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/question-sets/burden-questionnaire/versions/1.0"
+        },
+        "provider_roster_version_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0"
+        },
+        "normative_rule_coverage_iri": {
+          "const": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0"
+        },
+        "identifier_family_count": {
+          "const": 16
+        },
+        "identifier_families": {
+          "type": "array",
+          "minItems": 16,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/identifierFamilyRule"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 11,
+          "items": {
+            "$ref": "#/$defs/dependencyRecord"
+          }
+        }
+      }
+    }
+  }
+}

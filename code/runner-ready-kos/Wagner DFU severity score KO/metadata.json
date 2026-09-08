@@ -1,0 +1,224 @@
+{
+    "@context": "https://kgrid.org/koio/2.1/context.jsonld",
+    "@id": "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner",
+    "versionInfo": "2.1",
+    "@type": "KnowledgeObject",
+    "dc:title": "Meggitt-Wagner Classification of Diabetic Foot Lesions Knowledge Object",
+    "dc:identifier": [
+        "workshop-ko-1",
+        "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner"
+    ],
+    "dc:version": "1.0",
+    "dc:date": "2026-08-03",
+    "dc:source": [
+        "https://iwgdfguidelines.org/wp-content/uploads/2021/01/Monteiro-Soares_et_al-2020-IWGDF-classification-guideline.pdf",
+        "https://journals.sagepub.com/doi/pdf/10.1177/107110078100200202?casa_token=h7WVAeQnTBYAAAAA:9311kCjKiHb-MryHmhbclBrXDccBeYSqnNasKmADww_bu_YSS1D9vSRQa6a-GnIsNqtVFTE_zG8q-g"
+    ],
+    "dc:isReferencedBy": [],
+    "dc:description": "This demonstration-only CKS classifies one diabetic foot lesion or assessment site, at one assessment event, as Wagner score 0-5. It specifies classification—not treatment, prognosis, amputation risk, or hyperbaric-oxygen eligibility.",
+    "schema:creator": [
+        {
+            "@id": "https://kgrid.org",
+            "@type": "schema:Organization",
+            "schema:name": "Knowledge Systems Lab",
+            "schema:affiliation": "Knowledge Systems Lab, University of Michigan Medical School",
+            "schema:email": "kgrid-developers@umich.edu"
+        }
+    ],
+    "koio:hasKnowledge": [
+        {
+            "@id": "Wagner_Questionnaire_Logic",
+            "dc:title": "Wagner Questionnaire Logic",
+            "dc:identifier": "1",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-03",
+            "dc:description": "Ten yes or no questions, with adaptive logic, to classify a diabetic foot lesion as Wagner score 0-5.",
+            "dc:purpose": "Guides the end user through required adaptive Yes/No data collection and prevents an unworkable response set.",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/index.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            },
+            "koio:hasTest": [
+                {
+                    "@id": "Wagner_Questionnaire_Test",
+                    "@type": "koio:Test",
+                    "dc:title": "Wagner Questionnaire Test",
+                    "dc:description": "Node.js test suite that exercises multiple decision paths of the Wagner questionnaire runner and verifies the returned response vector, directly answered versus entailed questions, and definition metadata in question payloads.",
+                    "implementedBy": {
+                        "@id": "test/questionnaire.test.js",
+                        "@type": [
+                            "Implementation",
+                            "JavaScript"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "@id": "Wagner_Questionnaire_Scorer",
+            "dc:title": "Wagner Questionnaire Scorer",
+            "dc:identifier": "2",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-03",
+            "dc:description": "Questionnaire Response Analysis",
+            "dc:purpose": "Validates and analyzes any received response set, whether or not it came from the protected questionnaire interface.",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/scorer.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            },
+            "koio:hasTest": [
+                {
+                    "@id": "Wagner_Questionnaire_Scorer_Test",
+                    "@type": "koio:Test",
+                    "dc:title": "Wagner Questionnaire Scorer Test",
+                    "dc:description": "Node.js test suite for the Wagner scorer that verifies output shape, grade computation across representative questionnaire paths, and handling of indeterminate, incomplete, invalid, and conflicting response patterns.",
+                    "implementedBy": {
+                        "@id": "test/scorer.test.js",
+                        "@type": [
+                            "Implementation",
+                            "JavaScript"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "koio:hasService": [
+        {
+            "@id": "CLI_Service",
+            "@type": [
+                "Service",
+                "cli"
+            ],
+            "dc:description": "command-line program that interactively asks the Wagner questionnaire yes/no questions (with related term definitions), then prints both the questionnaire outcome and its computed analysis as formatted JSON.",
+            "hasInterface": "kgrid.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "bin/wagner.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Wagner_Questionnaire_Logic",
+                "Wagner_Questionnaire_Scorer"
+            ]
+        },
+        {
+            "@id": "Service_for_Questionnaire",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the runQuestionnaire software function",
+            "hasInterface": "kgrid.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/index.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Wagner_Questionnaire_Logic"
+            ]
+        },
+        {
+            "@id": "Service_for_Scorer",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the analyzeQuestionnaireResponse software function",
+            "hasInterface": "kgrid.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/scorer.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "Wagner_Questionnaire_Scorer"
+            ]
+        }
+    ],
+    "koio:hasDocumentation": [
+        {
+            "@id": "kgrid.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0.docx",
+            "@type": [
+                "InformationArtifact",
+                "Specification Document"
+            ],
+            "dc:title": "Meggitt-Wagner Classification of Diabetic Foot Lesions",
+            "dc:description": "Questionnaire Logic, Response Model, and Response Analysis Computable Knowledge Specification"
+        },
+        {
+            "@id": "Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary.docx",
+            "@type": [
+                "InformationArtifact",
+                "Summary"
+            ],
+            "dc:title": "Meggitt–Wagner CKS Summary",
+            "dc:description": "A one-page clinical knowledge summary for the Meggitt–Wagner CKS"
+        },
+        {
+            "@id": "README.md",
+            "@type": [
+                "InformationArtifact",
+                "Markdown Document"
+            ],
+            "dc:title": "Wagner Classification",
+            "dc:description": "Technical documentation."
+        },
+        {
+            "@id": "wagner_binder.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Binder Notebook"
+            ],
+            "dc:title": "Wagner Questionnaire Binder Jupyter Notebook Demo",
+            "dc:description": "A Binder Jupyter Notebook for viewing how to compute with the Wagner Questionnaire"
+        },
+        {
+            "@id": "wagner_colab.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Google Colab Notebook"
+            ],
+            "dc:title": "Wagner Questionnaire Google Colab Jupyter Notebook Demo",
+            "dc:description": "A Google Colab Jupyter Notebook for viewing how to compute with the Wagner Questionnaire"
+        },
+        {
+            "@id": "wagner_scribbler.jsnb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Scribbler Notebook"
+            ],
+            "dc:title": "Wagner Scribbler Notebook Demo",
+            "dc:description": "A Scribbler notebook for viewing how to compute with the Wagner Questionnaire"
+        },
+        {
+            "@id": "index.html",
+            "@type": [
+                "InformationArtifact",
+                "Information Page"
+            ],
+            "dc:title": "Wagner Classification Information Page",
+            "dc:description": "An information page for viewing the contents of the Meggitt-Wagner Classification of Diabetic Foot Lesions Knowledge Object"
+        }
+    ]
+}

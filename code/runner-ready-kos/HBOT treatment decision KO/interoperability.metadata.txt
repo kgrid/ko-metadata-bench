@@ -1,0 +1,33 @@
+@prefix schema:  <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0>
+    a schema:SoftwareSourceCode ;
+    schema:object <https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/input-model> ;
+    schema:result <https://kgrid.org/cks/dfu-hbo2-treatment-decision/output-models/1.0> ;
+    dcterms:conformsTo [
+        schema:name "DFU HBO2 Treatment Decision Exchange Profiles" ;
+        schema:object <https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0#input> ;
+        schema:result <https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0#result>
+    ] ;
+    schema:potentialAction [
+        a schema:Action ;
+        schema:name "Evaluate DFU HBO2 Treatment Decision" ;
+        schema:target <urn:javascript:function:evaluateInputObject> ;
+        schema:object <https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/input-model> ;
+        schema:result <https://kgrid.org/cks/dfu-hbo2-treatment-decision/output-models/1.0>
+    ] ;
+    schema:identifier "UHMS-DFU-HBO2-F6-CKS-1.0" ;
+    schema:version "1.0" .
+
+<https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/input-model>
+    schema:name "DFU HBO2 Treatment Decision Input" .
+
+<https://kgrid.org/cks/dfu-hbo2-treatment-decision/output-models/1.0>
+    schema:name "DFU HBO2 Treatment Decision Result" .
+
+<https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0#input>
+    schema:name "Complete DFU HBO2 Treatment Decision Input Profile" .
+
+<https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0#result>
+    schema:name "Complete DFU HBO2 Treatment Decision Result Profile" .

@@ -1,0 +1,467 @@
+{
+  "fixture_id": "TC-21",
+  "capability": "burden_analysis",
+  "operation": "analyze_pair",
+  "input": {
+    "first": {
+      "request_type": "calculate_burden_range",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "questionnaire_response": {
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "questionnaire_status": "completed",
+        "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+        "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+        "response_projection": {
+          "hyperbaric_oxygen_therapy_location": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+          "one_way_miles": 5,
+          "one_way_travel_minutes": 15,
+          "weekday_attendance_difficulty": "none"
+        },
+        "confirmed": true
+      },
+      "fixed_regimen_range_response": {
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "response_type": "fixed_regimen_range_response",
+        "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+        "status": "completed",
+        "knowledge_package_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+        "knowledge_scope": "general_not_patient_specific",
+        "indication": "diabetes_related_foot_ulcer",
+        "shorter_regimen_scenario": {
+          "episodes": 30,
+          "sessions_per_week": 5,
+          "course_weeks": 6.0
+        },
+        "longer_regimen_scenario": {
+          "episodes": 40,
+          "sessions_per_week": 5,
+          "course_weeks": 8.0
+        },
+        "combined_range": {
+          "episodes": [
+            30,
+            40
+          ],
+          "sessions_per_week": 5,
+          "course_weeks": [
+            6.0,
+            8.0
+          ]
+        },
+        "scheduled_facility_hours_per_episode": {
+          "value": 3.0,
+          "unit": "h"
+        },
+        "tailored_to_patient": false,
+        "display_label": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+      }
+    },
+    "second": {
+      "request_type": "calculate_burden_range",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "questionnaire_response": {
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "questionnaire_status": "completed",
+        "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+        "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+        "response_projection": {
+          "hyperbaric_oxygen_therapy_location": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-002",
+          "one_way_miles": 25,
+          "one_way_travel_minutes": 75,
+          "weekday_attendance_difficulty": "major"
+        },
+        "confirmed": true
+      },
+      "fixed_regimen_range_response": {
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "response_type": "fixed_regimen_range_response",
+        "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+        "status": "completed",
+        "knowledge_package_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+        "knowledge_scope": "general_not_patient_specific",
+        "indication": "diabetes_related_foot_ulcer",
+        "shorter_regimen_scenario": {
+          "episodes": 30,
+          "sessions_per_week": 5,
+          "course_weeks": 6.0
+        },
+        "longer_regimen_scenario": {
+          "episodes": 40,
+          "sessions_per_week": 5,
+          "course_weeks": 8.0
+        },
+        "combined_range": {
+          "episodes": [
+            30,
+            40
+          ],
+          "sessions_per_week": 5,
+          "course_weeks": [
+            6.0,
+            8.0
+          ]
+        },
+        "scheduled_facility_hours_per_episode": {
+          "value": 3.0,
+          "unit": "h"
+        },
+        "tailored_to_patient": false,
+        "display_label": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+      }
+    }
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "first": {
+      "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/2a2e88a2-72eb-4a7b-ab60-b7591aafe176",
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "result_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "issued_at": "2026-07-31T14:25:36.123Z",
+      "provenance": {
+        "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+        "engine_implementation_version": "1.0.0-fixture",
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+        "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+        "identifier_dependency_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+        "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+        "input_received_at": "2026-07-31T14:25:36.100Z",
+        "input_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "f508336db8e51646c480e17e3704ecffca5e270bc0f94bd7a36a5ff498a808ab"
+        },
+        "provider_roster_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "2002bd086333c6857c0ffd6c1b31fd08d1de4385d1846c0aba89f0129dd18d37"
+        },
+        "deterministic_result_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "4035dd571cc45404690bc9e1bda12ddd72f6566c40fd7874e83725876c073d1e"
+        }
+      },
+      "status": "completed",
+      "result_code": "RESULT-LOW-EXECUTION-BURDEN",
+      "objective_burden": {
+        "fixed_regimen_range_response": {
+          "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+          "response_type": "fixed_regimen_range_response",
+          "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+          "status": "completed",
+          "knowledge_package_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+          "knowledge_scope": "general_not_patient_specific",
+          "indication": "diabetes_related_foot_ulcer",
+          "shorter_regimen_scenario": {
+            "episodes": 30,
+            "sessions_per_week": 5,
+            "course_weeks": 6.0
+          },
+          "longer_regimen_scenario": {
+            "episodes": 40,
+            "sessions_per_week": 5,
+            "course_weeks": 8.0
+          },
+          "combined_range": {
+            "episodes": [
+              30,
+              40
+            ],
+            "sessions_per_week": 5,
+            "course_weeks": [
+              6.0,
+              8.0
+            ]
+          },
+          "scheduled_facility_hours_per_episode": {
+            "value": 3.0,
+            "unit": "h"
+          },
+          "tailored_to_patient": false,
+          "display_label": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+        },
+        "hyperbaric_oxygen_therapy_location_reference": {
+          "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+          "roster_record_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0/records/e-001",
+          "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+          "compact_id": "E-001",
+          "facility_listing": "Center for Wound Care & Hyperbaric Medicine / Springhill Medical Center",
+          "jurisdiction": "Alabama",
+          "address_status": "candidate",
+          "normalized_address_candidate": "3719 Dauphin St, Mobile, Alabama 36608, United States"
+        },
+        "reported_one_way_travel": {
+          "miles": 5,
+          "minutes": 15
+        },
+        "burden_by_regimen_scenario": {
+          "shorter_regimen": {
+            "episodes": 30,
+            "course_weeks": 6.0,
+            "travel_hours": 15,
+            "facility_hours": 90,
+            "total_patient_hours": 105,
+            "course_miles": 300
+          },
+          "longer_regimen": {
+            "episodes": 40,
+            "course_weeks": 8.0,
+            "travel_hours": 20,
+            "facility_hours": 120,
+            "total_patient_hours": 140,
+            "course_miles": 400
+          }
+        },
+        "overall_burden_range": {
+          "episodes": [
+            30,
+            40
+          ],
+          "travel_hours": [
+            15,
+            20
+          ],
+          "facility_hours": [
+            90,
+            120
+          ],
+          "total_patient_hours": [
+            105,
+            140
+          ],
+          "course_miles": [
+            300,
+            400
+          ]
+        },
+        "travel_band": {
+          "value": "low",
+          "basis": "reported_one_way_minutes_doubled"
+        }
+      },
+      "weekday_attendance_feasibility": {
+        "reported_value": "none",
+        "display_text": "No weekday-attendance difficulty reported"
+      },
+      "execution_burden_level": {
+        "score": 1,
+        "category": "low_execution_burden",
+        "primary_driver": "Repeated attendance (30–40 episodes; five per week)",
+        "secondary_driver": null,
+        "display_text": "Low execution burden"
+      },
+      "sensitivity": {
+        "longer_minus_shorter_episodes": 10,
+        "incremental_travel_hours": 5,
+        "incremental_facility_hours": 30,
+        "incremental_total_hours": 35,
+        "incremental_miles": 100,
+        "incremental_weeks": 2.0
+      },
+      "assumptions": [
+        {
+          "code": "ASM-01",
+          "text": "General DFU planning regimen range of 30–40 episodes at five sessions per week is used; it was not selected or calculated for the patient."
+        },
+        {
+          "code": "ASM-02",
+          "text": "A single fixed three-hour scheduled facility block per treatment episode is used as a conservative, realistic worst-case planning assumption. It is not a validated DFU-specific door-to-door elapsed-time estimate."
+        },
+        {
+          "code": "ASM-03",
+          "text": "Round trip is estimated as two times the patient-reported usual one-way miles and minutes."
+        },
+        {
+          "code": "ASM-04",
+          "text": "Reported travel values are planning estimates and are not independently verified by the engine."
+        }
+      ],
+      "evidence_sources": [],
+      "error": null,
+      "warnings": []
+    },
+    "second": {
+      "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/e491e4a8-db74-4b9d-b1f3-48bf9a3b66af",
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "result_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "issued_at": "2026-07-31T14:25:36.123Z",
+      "provenance": {
+        "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+        "engine_implementation_version": "1.0.0-fixture",
+        "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+        "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+        "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+        "identifier_dependency_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+        "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+        "input_received_at": "2026-07-31T14:25:36.100Z",
+        "input_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "9264039da13a7746ac0ee2a9e9323bccc4aec5b47491a7e7f7a8ad1653a10b6a"
+        },
+        "provider_roster_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "2002bd086333c6857c0ffd6c1b31fd08d1de4385d1846c0aba89f0129dd18d37"
+        },
+        "deterministic_result_fingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "RFC8785",
+          "value": "b213c3a91e6c23980f0fc8c3c04d6fe4304e9409e1d39aeeea845b5834ae0058"
+        }
+      },
+      "status": "completed",
+      "result_code": "RESULT-EXTREME-EXECUTION-BURDEN",
+      "objective_burden": {
+        "fixed_regimen_range_response": {
+          "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+          "response_type": "fixed_regimen_range_response",
+          "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+          "status": "completed",
+          "knowledge_package_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+          "knowledge_scope": "general_not_patient_specific",
+          "indication": "diabetes_related_foot_ulcer",
+          "shorter_regimen_scenario": {
+            "episodes": 30,
+            "sessions_per_week": 5,
+            "course_weeks": 6.0
+          },
+          "longer_regimen_scenario": {
+            "episodes": 40,
+            "sessions_per_week": 5,
+            "course_weeks": 8.0
+          },
+          "combined_range": {
+            "episodes": [
+              30,
+              40
+            ],
+            "sessions_per_week": 5,
+            "course_weeks": [
+              6.0,
+              8.0
+            ]
+          },
+          "scheduled_facility_hours_per_episode": {
+            "value": 3.0,
+            "unit": "h"
+          },
+          "tailored_to_patient": false,
+          "display_label": "General DFU HBOT planning range: approximately 30–40 episodes, usually five per week, over approximately 6–8 weeks."
+        },
+        "hyperbaric_oxygen_therapy_location_reference": {
+          "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+          "roster_record_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0/records/e-002",
+          "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-002",
+          "compact_id": "E-002",
+          "facility_listing": "Wound Healing & Hyperbaric Oxygen Center / Chandler Regional Medical Center",
+          "jurisdiction": "Arizona",
+          "address_status": "candidate",
+          "normalized_address_candidate": "1875 West Frye Rd, Chandler, Arizona 85224, United States"
+        },
+        "reported_one_way_travel": {
+          "miles": 25,
+          "minutes": 75
+        },
+        "burden_by_regimen_scenario": {
+          "shorter_regimen": {
+            "episodes": 30,
+            "course_weeks": 6.0,
+            "travel_hours": 75,
+            "facility_hours": 90,
+            "total_patient_hours": 165,
+            "course_miles": 1500
+          },
+          "longer_regimen": {
+            "episodes": 40,
+            "course_weeks": 8.0,
+            "travel_hours": 100,
+            "facility_hours": 120,
+            "total_patient_hours": 220,
+            "course_miles": 2000
+          }
+        },
+        "overall_burden_range": {
+          "episodes": [
+            30,
+            40
+          ],
+          "travel_hours": [
+            75,
+            100
+          ],
+          "facility_hours": [
+            90,
+            120
+          ],
+          "total_patient_hours": [
+            165,
+            220
+          ],
+          "course_miles": [
+            1500,
+            2000
+          ]
+        },
+        "travel_band": {
+          "value": "high",
+          "basis": "reported_one_way_minutes_doubled"
+        }
+      },
+      "weekday_attendance_feasibility": {
+        "reported_value": "major",
+        "display_text": "Major weekday-attendance difficulty reported"
+      },
+      "execution_burden_level": {
+        "score": 5,
+        "category": "extreme_execution_burden",
+        "primary_driver": "Major weekday-attendance difficulty",
+        "secondary_driver": "High reported travel time (2.5 round-trip hours)",
+        "display_text": "Extreme execution burden"
+      },
+      "sensitivity": {
+        "longer_minus_shorter_episodes": 10,
+        "incremental_travel_hours": 25,
+        "incremental_facility_hours": 30,
+        "incremental_total_hours": 55,
+        "incremental_miles": 500,
+        "incremental_weeks": 2.0
+      },
+      "assumptions": [
+        {
+          "code": "ASM-01",
+          "text": "General DFU planning regimen range of 30–40 episodes at five sessions per week is used; it was not selected or calculated for the patient."
+        },
+        {
+          "code": "ASM-02",
+          "text": "A single fixed three-hour scheduled facility block per treatment episode is used as a conservative, realistic worst-case planning assumption. It is not a validated DFU-specific door-to-door elapsed-time estimate."
+        },
+        {
+          "code": "ASM-03",
+          "text": "Round trip is estimated as two times the patient-reported usual one-way miles and minutes."
+        },
+        {
+          "code": "ASM-04",
+          "text": "Reported travel values are planning estimates and are not independently verified by the engine."
+        }
+      ],
+      "evidence_sources": [],
+      "error": null,
+      "warnings": []
+    },
+    "fixed_regimen_responses_exactly_equal": true
+  },
+  "execution_context": {
+    "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+    "engine_implementation_version": "1.0.0-fixture",
+    "input_received_at": "2026-07-31T14:25:36.100Z",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "result_instance_iris": {
+      "first": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/2a2e88a2-72eb-4a7b-ab60-b7591aafe176",
+      "second": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/e491e4a8-db74-4b9d-b1f3-48bf9a3b66af"
+    }
+  }
+}

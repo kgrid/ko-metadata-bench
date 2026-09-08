@@ -1,0 +1,74 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    # 1. Purpose
+    schema:description
+        "Converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy using Figure 6 of the 2015 UHMS guideline." ;
+
+    # 2. Scope
+    schema:usageInfo
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision#scope> ;
+
+    # 3. License
+    schema:license
+        <https://spdx.org/licenses/MIT.html> ;
+
+    # 4. Provenance
+    prov:has_provenance
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision#provenance> ;
+
+    # 5. Tests
+    schema:hasPart
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/decision.test.js>,
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_1_0.json>,
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_Schema_1_0.json> ;
+
+    # 6. Evidence
+    schema:citation
+        <https://pubmed.ncbi.nlm.nih.gov/26152105/> ;
+
+    # 7. Identity and version
+    schema:identifier
+        "workshop-ko-2" ;
+
+    schema:version
+        "1.0" .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision#scope>
+    a schema:CreativeWork ;
+    schema:description
+        "Applies to one candidate diabetic foot ulcer per invocation using supplied DFU confirmation, Wagner grade, acute-surgical-intervention status, and 30-day healing status. It returns a guideline-branch result for adjunctive HBO2 or an out-of-scope or validation-error result. It does not diagnose a diabetic foot ulcer, calculate Wagner grade, prescribe an HBO2 protocol, determine coverage, enumerate contraindications, or replace comprehensive care, clinical judgment, shared decision-making, safety screening, or production governance and currency review." .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision#provenance>
+    a prov:Entity ;
+    prov:wasAttributedTo <https://kgrid.org> ;
+    schema:datePublished "2026-08-05" ;
+    schema:description
+        "The knowledge object metadata identifies the Knowledge Systems Lab at the University of Michigan Medical School as creator and identifies Figure 6 of the 2015 UHMS guideline as the clinical knowledge source." .
+
+<https://kgrid.org>
+    a schema:Organization ;
+    schema:name "Knowledge Systems Lab" ;
+    schema:affiliation "Knowledge Systems Lab, University of Michigan Medical School" ;
+    schema:email "kgrid-developers@umich.edu" .
+
+
+# ============================================================
+# Minimal Reusability Profile
+#
+# schema:description   states the object's purpose.
+# schema:usageInfo     points to its scope statement.
+# schema:license       points to its governing license.
+# prov:has_provenance  points to its provenance record.
+# schema:hasPart       points to tests supplied with the object.
+# schema:citation      points to supporting evidence.
+#
+# The subject IRI, schema:identifier, and schema:version
+# identify the exact object version.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

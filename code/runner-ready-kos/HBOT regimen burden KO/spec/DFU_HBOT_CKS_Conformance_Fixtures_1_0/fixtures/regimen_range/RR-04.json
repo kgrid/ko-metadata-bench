@@ -1,0 +1,21 @@
+{
+  "fixture_id": "RR-04",
+  "capability": "regimen_range",
+  "operation": "respond",
+  "input": {
+    "request_type": "choose_regimen"
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "outcome": "error",
+    "error": {
+      "code": "ERR-09",
+      "status": "error",
+      "error_field": "request_type",
+      "message": "Input value is outside the closed value set or constraint."
+    },
+    "response": null
+  }
+}

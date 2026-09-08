@@ -1,0 +1,20 @@
+{
+  "name": "@kgrid/margolis-dfu-prognostic",
+  "version": "1.0.0",
+  "description": "Margolis two-factor prognostic model for diabetic foot ulcer healing by 16 weeks",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./prognosis": "./src/prognosis.js"
+  },
+  "bin": {
+    "margolis-dfu-prognostic": "bin/margolis-dfu-prognostic.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test",
+    "cli": "node bin/margolis-dfu-prognostic.js"
+  },
+  "keywords": ["diabetic-foot", "prognosis", "healing", "clinical-decision-support"],
+  "license": "MIT"
+}

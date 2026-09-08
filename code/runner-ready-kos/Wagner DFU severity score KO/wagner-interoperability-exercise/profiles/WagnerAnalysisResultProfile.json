@@ -1,0 +1,62 @@
+{
+  "artifactType": "object-profile",
+  "profile": "WagnerAnalysisResultProfile",
+  "semanticType": "WagnerClassificationResult",
+  "type": "object",
+  "required": [
+    "question_ids",
+    "responses",
+    "analysis_status",
+    "wagner_score",
+    "grade_label"
+  ],
+  "properties": {
+    "question_ids": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "string"
+      }
+    },
+    "responses": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "string"
+      }
+    },
+    "analysis_status": {
+      "type": "string",
+      "enum": [
+        "grade_computed",
+        "indeterminate",
+        "ambiguous",
+        "incomplete_response",
+        "conflicting_response"
+      ]
+    },
+    "wagner_score": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 5
+      }
+    },
+    "grade_label": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "example": {
+    "question_ids": ["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10"],
+    "responses": ["0", "0", "0", "0", "0", "1", "1", "X", "0", "0"],
+    "analysis_status": "grade_computed",
+    "wagner_score": [2],
+    "grade_label": ["Deep ulcer"]
+  }
+}

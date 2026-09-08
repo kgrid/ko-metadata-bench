@@ -1,0 +1,364 @@
+{
+  "artifactType": "interface-boundary-view",
+
+  "interfaceSpecification": {
+    "identifier": "WagnerJavaScriptInterfaceSpecification",
+    "version": "1.0",
+    "title": "Meggitt-Wagner JavaScript Interface",
+    "description": "The teaching interface specification for invoking the Meggitt-Wagner capability with a completed questionnaire response."
+  },
+
+  "targetKnowledgeObject": "meggitt-wagner-cks",
+  "targetVersion": "1.0",
+  "targetSpecification": "https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0",
+
+  "invocation": {
+    "operationId": "run",
+    "interactionStyle": "javascript-function",
+    "language": "JavaScript",
+    "member": "run",
+    "signature": "run(input)",
+    "usage": "await knowledgeObject.run(input)",
+    "asynchronous": true,
+    "completionMechanism": "promise"
+  },
+
+  "inputBinding": "CompletedQuestionnaireResponseProfile",
+  "outputBinding": "WagnerAnalysisResultProfile",
+
+  "bindings": {
+    "input": {
+      "description": "The completed questionnaire response is supplied as the first and only argument to run.",
+      "profile": "CompletedQuestionnaireResponseProfile",
+      "location": "function-argument",
+      "parameterName": "input",
+      "position": 0,
+      "required": true,
+      "passingConvention": "object-value"
+    },
+
+    "output": {
+      "description": "Successful execution resolves with a Wagner classification result.",
+      "profile": "WagnerAnalysisResultProfile",
+      "location": "resolved-return-value",
+      "required": true
+    },
+
+    "error": {
+      "description": "A failed interaction rejects with a structured interoperability error.",
+      "location": "rejected-promise"
+    }
+  },
+
+  "outcomes": {
+    "success": {
+      "code": "COMPLETED",
+      "condition": "The supplied input conforms to CompletedQuestionnaireResponseProfile and the capability completes normally.",
+      "delivery": "resolved-promise",
+      "profile": "WagnerAnalysisResultProfile",
+
+      "example": {
+        "question_ids": [
+          "Q01",
+          "Q02",
+          "Q03",
+          "Q04",
+          "Q05",
+          "Q06",
+          "Q07",
+          "Q08",
+          "Q09",
+          "Q10"
+        ],
+        "responses": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "1",
+          "1",
+          "X",
+          "0",
+          "0"
+        ],
+        "analysis_status": "grade_computed",
+        "wagner_score": [
+          2
+        ],
+        "grade_label": [
+          "Deep ulcer"
+        ]
+      }
+    },
+
+    "errors": {
+      "schema": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "phase"
+        ],
+
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_INPUT",
+              "CONTRACT_MISMATCH",
+              "EXECUTION_FAILED"
+            ]
+          },
+
+          "message": {
+            "type": "string"
+          },
+
+          "phase": {
+            "type": "string",
+            "enum": [
+              "input-validation",
+              "contract-binding",
+              "invocation"
+            ]
+          },
+
+          "details": {
+            "type": "object"
+          }
+        }
+      },
+
+      "definitions": [
+        {
+          "code": "INVALID_INPUT",
+          "condition": "The supplied input does not conform to CompletedQuestionnaireResponseProfile.",
+          "phase": "input-validation",
+          "delivery": "rejected-promise",
+
+          "example": {
+            "code": "INVALID_INPUT",
+            "message": "The response at responses[2] is not permitted by CompletedQuestionnaireResponseProfile.",
+            "phase": "input-validation",
+
+            "details": {
+              "profile": "CompletedQuestionnaireResponseProfile",
+              "location": "responses[2]",
+              "expected": [
+                "0",
+                "1",
+                "X"
+              ],
+              "actual": "7",
+              "violations": [
+                "responses[2] must contain one of the permitted values: 0, 1, or X"
+              ]
+            }
+          }
+        },
+
+        {
+          "code": "CONTRACT_MISMATCH",
+          "condition": "The input data object is valid, but the simulated invocation does not place it in the one input position declared by this interface specification.",
+          "phase": "contract-binding",
+          "delivery": "rejected-promise",
+
+          "example": {
+            "code": "CONTRACT_MISMATCH",
+            "message": "The valid input data object was supplied outside the operation’s one declared input position.",
+            "phase": "contract-binding",
+
+            "details": {
+              "operation": "run",
+              "declaredSignature": "run(input)",
+              "declaredArgumentCount": 1,
+              "expectedDataObjectArgumentIndex": 0,
+              "actualInvocation": "run(undefined, questionnaireAnswers)",
+              "actualArgumentCount": 2,
+              "actualDataObjectArgumentIndex": 1,
+              "dataObjectProfile": "CompletedQuestionnaireResponseProfile",
+              "dataObjectValid": true
+            }
+          }
+        },
+
+        {
+          "code": "EXECUTION_FAILED",
+          "condition": "The capability was invoked through the declared interface but did not complete normally.",
+          "phase": "invocation",
+          "delivery": "rejected-promise",
+
+          "example": {
+            "code": "EXECUTION_FAILED",
+            "message": "The simulated operation did not complete normally.",
+            "phase": "invocation",
+
+            "details": {
+              "operationId": "run",
+              "inputValidation": "passed",
+              "inputBinding": "passed",
+              "expectedCompletion": "resolved-promise",
+              "actualCompletion": "rejected-promise",
+              "reason": "Simulated internal calculation failure",
+              "simulated": true
+            }
+          }
+        }
+      ]
+    }
+  },
+
+  "simulationCases": [
+    {
+      "id": "invalid-input",
+      "title": "Invalid Input",
+      "outcome": "INVALID_INPUT",
+      "failurePoint": "input-data-object",
+
+      "explanation": "The supplied input does not conform to the declared input data-object profile.",
+
+      "cause": "A response value violates the declared input profile.",
+
+      "passedSteps": [],
+
+      "remediation": "Replace the unsupported response value with 0, 1, or X.",
+
+      "expected": {
+        "profile": "CompletedQuestionnaireResponseProfile",
+        "location": "responses[2]",
+        "allowedValues": [
+          "0",
+          "1",
+          "X"
+        ]
+      },
+
+      "actual": {
+        "profile": "CompletedQuestionnaireResponseProfile",
+        "location": "responses[2]",
+        "value": "7"
+      },
+
+      "inputExcerpt": {
+        "path": "responses[2]",
+        "expected": [
+          "0",
+          "1",
+          "X"
+        ],
+        "actual": "7"
+      }
+    },
+
+    {
+      "id": "contract-mismatch",
+      "title": "Invocation Assembled Incorrectly",
+      "outcome": "CONTRACT_MISMATCH",
+      "failurePoint": "input-binding",
+
+      "explanation": "The questionnaire answers form a valid data object, but the simulated request places that object outside the one input position declared by the interface.",
+
+      "cause": "The operation declares one input argument. The simulated invocation leaves that argument empty and supplies the valid data object as an undeclared second argument.",
+
+      "passedSteps": [
+        "input-data-object"
+      ],
+
+      "remediation": "Supply the valid questionnaire response as the first and only argument: run(questionnaireAnswers).",
+
+      "expected": {
+        "signature": "run(input)",
+        "argumentCount": 1,
+        "dataObjectArgumentIndex": 0,
+        "dataObjectProfile": "CompletedQuestionnaireResponseProfile"
+      },
+
+      "actual": {
+        "invocation": "run(undefined, questionnaireAnswers)",
+        "argumentCount": 2,
+        "dataObjectArgumentIndex": 1,
+        "dataObjectProfile": "CompletedQuestionnaireResponseProfile",
+        "dataObjectValid": true
+      },
+
+      "bindingExcerpt": {
+        "interface": {
+          "operation": "run",
+          "signature": "run(input)",
+
+          "declaredInputs": [
+            {
+              "position": 0,
+              "ordinal": "first",
+              "parameterName": "input",
+              "profile": "CompletedQuestionnaireResponseProfile"
+            }
+          ]
+        },
+
+        "simulatedInvocation": {
+          "expression": "run(undefined, questionnaireAnswers)",
+
+          "arguments": [
+            {
+              "position": 0,
+              "ordinal": "first",
+              "value": null,
+              "valueLabel": "Empty"
+            },
+            {
+              "position": 1,
+              "ordinal": "second",
+              "valueLabel": "Valid questionnaire answers",
+              "profile": "CompletedQuestionnaireResponseProfile",
+              "dataObjectValid": true
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "operation-failure",
+      "title": "Simulated Operation Failure",
+      "outcome": "EXECUTION_FAILED",
+      "failurePoint": "operation",
+
+      "explanation": "Input validation and binding succeed, but the simulated operation rejects instead of completing normally.",
+
+      "cause": "The simulated operation rejects after successful input validation and binding.",
+
+      "passedSteps": [
+        "input-data-object",
+        "input-binding"
+      ],
+
+      "remediation": "Investigate or repair the operation or its execution environment; changing the valid input binding will not correct this simulated runtime failure.",
+
+      "expected": {
+        "operationId": "run",
+        "inputValidation": "passed",
+        "inputBinding": "passed",
+        "completion": "resolved-promise",
+        "outcome": "COMPLETED"
+      },
+
+      "actual": {
+        "operationId": "run",
+        "inputValidation": "passed",
+        "inputBinding": "passed",
+        "completion": "rejected-promise",
+        "reason": "Simulated internal calculation failure",
+        "outcome": "EXECUTION_FAILED"
+      },
+
+      "operationExcerpt": {
+        "operationId": "run",
+        "expectedCompletion": "resolved-promise",
+        "actualCompletion": "rejected-promise",
+        "simulated": true
+      }
+    }
+  ]
+}

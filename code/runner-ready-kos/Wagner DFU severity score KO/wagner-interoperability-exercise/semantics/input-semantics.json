@@ -1,0 +1,115 @@
+{
+  "artifactType": "semantic-boundary-view",
+  "role": "input",
+  "concept": "CompletedQuestionnaireResponse",
+  "identifier": "https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse",
+  "meaning": "A completed questionnaire response accepted for analysis by this capability.",
+  "elements": [
+    {
+      "name": "specification_iri",
+      "meaning": "Identifies the exact computable knowledge specification governing interpretation of the input."
+    },
+    {
+      "name": "response_model_iri",
+      "meaning": "Identifies the response model that defines how the completed questionnaire response is represented and interpreted."
+    },
+    {
+      "name": "question_ids",
+      "meaning": "The canonical ordered identifiers of the ten questions represented in the completed questionnaire response.",
+      "cardinality": 10,
+      "members": [
+        {
+          "position": 1,
+          "id": "Q01",
+          "text": "Is extensive gangrene present involving most or all of the foot?",
+          "meaning": "Determines whether gangrene is extensive and involves most or all of the assessed foot."
+        },
+        {
+          "position": 2,
+          "id": "Q02",
+          "text": "Is localized gangrene present involving only part of the foot?",
+          "meaning": "Determines whether gangrene is localized to a limited portion of the assessed foot."
+        },
+        {
+          "position": 3,
+          "id": "Q03",
+          "text": "Is a deep abscess present?",
+          "meaning": "Determines whether an abscess is present in a deep tissue compartment or anatomical structure."
+        },
+        {
+          "position": 4,
+          "id": "Q04",
+          "text": "Is osteomyelitis present?",
+          "meaning": "Determines whether infection and inflammation involving bone or bone marrow is present."
+        },
+        {
+          "position": 5,
+          "id": "Q05",
+          "text": "Is comparably deep infection present?",
+          "meaning": "Determines whether a deep infection comparable in significance to a deep abscess or osteomyelitis is present."
+        },
+        {
+          "position": 6,
+          "id": "Q06",
+          "text": "Is an open ulcer present?",
+          "meaning": "Determines whether the assessed site has an ulcer with a break in the skin surface."
+        },
+        {
+          "position": 7,
+          "id": "Q07",
+          "text": "Does the ulcer extend into a deep anatomical structure such as tendon, joint capsule, muscle, joint, or bone?",
+          "meaning": "Determines whether the ulcer extends beyond skin and superficial subcutaneous tissue into a deeper anatomical structure."
+        },
+        {
+          "position": 8,
+          "id": "Q08",
+          "text": "Is the ulcer limited to skin or superficial subcutaneous tissue?",
+          "meaning": "Determines whether the ulcer remains superficial and does not extend into deeper anatomical structures."
+        },
+        {
+          "position": 9,
+          "id": "Q09",
+          "text": "Is the skin intact?",
+          "meaning": "Determines whether the skin at the assessed site is continuous and unbroken."
+        },
+        {
+          "position": 10,
+          "id": "Q10",
+          "text": "Does this assessment site represent an at-risk or previously ulcerated site with intact skin and no current open ulcer or higher-grade lesion?",
+          "meaning": "Determines whether the assessed site represents the Wagner Grade 0 at-risk state rather than an active ulcerative, infectious, or gangrenous lesion."
+        }
+      ]
+    },
+    {
+      "name": "responses",
+      "meaning": "The ordered response values corresponding positionally to the members of question_ids.",
+      "cardinality": 10,
+      "alignedWith": "question_ids",
+      "alignmentRule": "For every array position n, responses[n] is the response to question_ids[n].",
+      "values": [
+        {
+          "value": "0",
+          "equivalentRepresentations": [
+            0
+          ],
+          "meaning": "The condition stated by the corresponding question is absent."
+        },
+        {
+          "value": "1",
+          "equivalentRepresentations": [
+            1
+          ],
+          "meaning": "The condition stated by the corresponding question is present."
+        },
+        {
+          "value": "X",
+          "meaning": "The corresponding question was not applicable or was not asked because of the questionnaire's adaptive logic."
+        },
+        {
+          "value": "i",
+          "meaning": "The response required for the corresponding question is incomplete."
+        }
+      ]
+    }
+  ]
+}

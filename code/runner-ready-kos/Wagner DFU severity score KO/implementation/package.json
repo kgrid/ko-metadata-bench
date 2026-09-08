@@ -1,0 +1,26 @@
+{
+  "name": "@wagner/classification",
+  "version": "1.0.0",
+  "description": "Adaptive Wagner Classification questionnaire logic (Section 3)",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./questionnaire": "./src/index.js",
+    "./scorer": "./src/scorer.js",
+    "./knowledge-object": "./src/knowledge-object.js"
+  },
+  "bin": {
+    "wagner": "bin/wagner.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "diabetic-foot",
+    "wagner",
+    "questionnaire",
+    "classification"
+  ],
+  "license": "MIT"
+}

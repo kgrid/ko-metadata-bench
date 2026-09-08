@@ -1,0 +1,26 @@
+{
+  "executionMode": "contract",
+  "publishedBoundary": true,
+  "interfaceSpecification": "interface/interface.json",
+  "declaredInvocation": "await knowledgeObject.run(input)",
+  "entryPoint": "execution/contract-harness.js#execute",
+
+  "targetBinding": {
+    "type": "externalKnowledgeObject",
+    "identifier": "meggitt-wagner-cks",
+    "version": "1.0",
+    "specification": "https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0"
+  },
+
+  "input": {
+    "profile": "CompletedQuestionnaireResponseProfile",
+    "profileArtifact": "profiles/CompletedQuestionnaireResponseProfile.json",
+    "example": "examples/valid-input.json"
+  },
+
+  "output": {
+    "profile": "WagnerAnalysisResultProfile",
+    "profileArtifact": "profiles/WagnerAnalysisResultProfile.json",
+    "example": "examples/expected-output.json"
+  }
+}

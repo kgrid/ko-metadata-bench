@@ -1,0 +1,34 @@
+{
+  "fixture_id": "QT-03",
+  "capability": "burden_questionnaire",
+  "operation": "apply_events",
+  "input": [
+    {
+      "event": "set_filter",
+      "jurisdiction": "Alabama"
+    },
+    {
+      "event": "confirm_provider",
+      "compact_id": "E-001",
+      "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001"
+    }
+  ],
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "state": "QNTS-01",
+    "answers": {
+      "Q01": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+      "Q02": null,
+      "Q03": null,
+      "Q04": null
+    },
+    "registered_response": null,
+    "analysis_invoked": false,
+    "display_requirements": [
+      "facility_listing",
+      "normalized_address_candidate"
+    ]
+  }
+}

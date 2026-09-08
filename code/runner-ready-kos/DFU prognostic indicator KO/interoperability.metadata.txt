@@ -1,0 +1,115 @@
+@prefix schema:  <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+
+# ============================================================
+# Knowledge object interoperability metadata
+# ============================================================
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0>
+    a schema:SoftwareSourceCode ;
+
+
+    # ========================================================
+    # 1. Semantics
+    #
+    # What does this capability mean?
+    # ========================================================
+
+    schema:object
+        <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model> ;
+
+    schema:result
+        <https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0> ;
+
+
+    # ========================================================
+    # 2. Profiles
+    #
+    # What complete objects does this capability exchange?
+    # ========================================================
+
+    dcterms:conformsTo [
+
+        schema:name
+            "DFU Prognostic Evaluation Exchange Profiles" ;
+
+        schema:object
+            <urn:uhms:cks:margolis-dfu-prognosis:1.0:schema#/$defs/input> ;
+
+        schema:result
+            <urn:uhms:cks:margolis-dfu-prognosis:1.0:schema#/$defs/successOutput>
+    ] ;
+
+
+    # ========================================================
+    # 3. Interface
+    #
+    # How is this capability invoked?
+    # ========================================================
+
+    schema:potentialAction [
+
+        a schema:Action ;
+
+        schema:name
+            "Evaluate DFU Healing Prognosis" ;
+
+        schema:target
+            <urn:javascript:function:evaluate> ;
+
+        schema:object
+            <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model> ;
+
+        schema:result
+            <https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0>
+    ] ;
+
+
+    # ========================================================
+    # Identity and version
+    # ========================================================
+
+    schema:identifier
+        "workshop-ko-4" ;
+
+    schema:version
+        "1.0" .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model>
+    schema:name "DFU Prognostic Evaluation Input" .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0>
+    schema:name "DFU Healing Prognosis Result" .
+
+<urn:uhms:cks:margolis-dfu-prognosis:1.0:schema#/$defs/input>
+    schema:name "Complete DFU Prognostic Input Profile" .
+
+<urn:uhms:cks:margolis-dfu-prognosis:1.0:schema#/$defs/successOutput>
+    schema:name "Complete Successful Prognosis Result Profile" .
+
+
+# ============================================================
+# Minimal Interoperability Profile
+#
+# Three independent facets describe the interoperability
+# boundary of this knowledge object:
+#
+# 1. Semantics
+#    What does this capability mean?
+#
+# 2. Profiles
+#    What complete objects does this capability exchange?
+#
+# 3. Interface
+#    How is this capability invoked, and what objects are
+#    bound to that invocation?
+#
+# The success-output profile describes the normal prognostic
+# result. The same unified output model also governs failure
+# results, whose complete canonical schema is defined alongside
+# the success schema in the normative JSON binding.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

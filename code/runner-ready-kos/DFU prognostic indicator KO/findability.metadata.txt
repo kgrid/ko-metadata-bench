@@ -1,0 +1,144 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/margolis-dfu-prognostic>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    schema:name "Two-Factor Prognostic Model for Diabetic Foot Ulcer Healing by 16 Weeks" ;
+
+    schema:identifier "workshop-ko-4" ;
+
+    schema:version "1.0" ;
+
+    schema:abstract "A categorical pretreatment prognostic knowledge object that estimates the model-based probability that one diabetic foot ulcer will heal by 16 weeks from wound area and wound duration measured at the first clinical visit." ;
+
+    schema:alternateName "Margolis DFU Prognostic Model" ;
+
+    schema:alternateName "Margolis DFU Prognostic Lookup" ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D017719> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D011379> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D014945> ;
+
+    schema:additionalType <https://kgrid.org/koio#KnowledgeObject> ;
+
+    schema:isPartOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection> ;
+
+    schema:subjectOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/margolis-dfu-prognostic/metadata.json> ;
+
+    schema:keywords "diabetic foot ulcer" ;
+
+    schema:keywords "prognosis" ;
+
+    schema:keywords "16-week healing" ;
+
+    schema:keywords "wound area" ;
+
+    schema:keywords "wound duration" ;
+
+    schema:keywords "clinical decision support" ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Computational method" ;
+        schema:value "Deterministic categorical four-state prognostic lookup"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Programming language" ;
+        schema:value "JavaScript"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "Canonical JSON binding with JSON Schema"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "CommonJS Node.js package"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "JSON Schema Draft 2020-12"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "UCUM unit codes"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "Knowledge Object Implementation Ontology 2.1"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Interface style" ;
+        schema:value "Command-line interface and JavaScript library API"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Package name" ;
+        schema:value "@kgrid/margolis-dfu-prognostic"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Output classification" ;
+        schema:value "Four categorical diabetic-foot-ulcer prognostic groups" ;
+        schema:valueReference <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups>
+    ] .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups>
+    a schema:DefinedTermSet ;
+    schema:name "Margolis diabetic foot ulcer 16-week prognostic groups" ;
+    schema:description "Four categorical prognostic groups defined by first-visit wound area and wound duration, each associated with a fixed model-based probability of healing by 16 weeks." ;
+    schema:hasDefinedTerm
+        <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-01>,
+        <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-02>,
+        <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-03>,
+        <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-04> .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-01>
+    a schema:DefinedTerm ;
+    schema:name "Area at least 2 cm² and duration at least 8 weeks" ;
+    schema:termCode "ALG-01" ;
+    schema:description "The AREA_GE_2__DURATION_GE_8 prognostic group, with a model-based probability of healing by 16 weeks of 20.3%." ;
+    schema:inDefinedTermSet <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups> .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-02>
+    a schema:DefinedTerm ;
+    schema:name "Area at least 2 cm² and duration under 8 weeks" ;
+    schema:termCode "ALG-02" ;
+    schema:description "The AREA_GE_2__DURATION_LT_8 prognostic group, with a model-based probability of healing by 16 weeks of 30.4%." ;
+    schema:inDefinedTermSet <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups> .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-03>
+    a schema:DefinedTerm ;
+    schema:name "Area under 2 cm² and duration at least 8 weeks" ;
+    schema:termCode "ALG-03" ;
+    schema:description "The AREA_LT_2__DURATION_GE_8 prognostic group, with a model-based probability of healing by 16 weeks of 44.8%." ;
+    schema:inDefinedTermSet <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups> .
+
+<https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups/alg-04>
+    a schema:DefinedTerm ;
+    schema:name "Area under 2 cm² and duration under 8 weeks" ;
+    schema:termCode "ALG-04" ;
+    schema:description "The AREA_LT_2__DURATION_LT_8 prognostic group, with a model-based probability of healing by 16 weeks of 63.1%." ;
+    schema:inDefinedTermSet <https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/prognostic-groups> .
+
+# Identification, description, subject, type, technical characteristics, and indexing only.
+# Purpose, scope, inputs, outputs, access, licensing, provenance, tests, and evidence belong to other FAIR profiles.
+# These are profile conventions and do not redefine Schema.org or PROV-O.

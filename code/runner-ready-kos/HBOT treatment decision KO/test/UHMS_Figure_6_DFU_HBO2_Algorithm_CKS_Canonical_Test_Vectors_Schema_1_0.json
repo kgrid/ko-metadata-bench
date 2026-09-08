@@ -1,0 +1,1656 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/test-vector-schema",
+  "title": "UHMS Figure 6 DFU/HBO2 CKS Version 1.0 Canonical Test Vectors",
+  "description": "Normative schema for the canonical conformance vectors, governing resource IRIs, and validation-coverage matrix.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "serialization",
+    "schema_id",
+    "specification_id",
+    "specification_iri",
+    "decision_logic_iri",
+    "input_model_iri",
+    "result_model_iri",
+    "test_vector_set_iri",
+    "test_vector_schema_iri",
+    "vector_count",
+    "comparison",
+    "fixture_contract",
+    "vectors",
+    "validation_coverage",
+    "applicability_contract"
+  ],
+  "properties": {
+    "serialization": {
+      "const": "application/json"
+    },
+    "schema_id": {
+      "const": "UHMS-DFU-HBO2-F6-CKS-TestVectors-1.0"
+    },
+    "specification_id": {
+      "const": "UHMS-DFU-HBO2-F6-CKS-1.0"
+    },
+    "specification_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0"
+    },
+    "decision_logic_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/decision-logic"
+    },
+    "input_model_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/input-model"
+    },
+    "result_model_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/output-models/1.0"
+    },
+    "test_vector_set_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/test-vectors"
+    },
+    "test_vector_schema_iri": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/versions/1.0/test-vector-schema"
+    },
+    "vector_count": {
+      "const": 51
+    },
+    "comparison": {
+      "const": "deep equality of the complete expected_result object"
+    },
+    "fixture_contract": {
+      "const": {
+        "json-object": "The value is already a unique-name top-level object. Duplicate-property validation succeeds by construction.",
+        "raw-json": "The text is syntactically valid JSON and SHALL be parsed with every decoded property-name occurrence preserved until duplicate-property validation completes.",
+        "absent": "No top-level input object is presented to the function; validation returns ERR-01.",
+        "duplicate_preservation": "A parser or adapter SHALL NOT collapse, overwrite, merge, or discard repeated property-name occurrences before Section 3.7 step 2.",
+        "property_name_equality": "Compare decoded Unicode scalar-value sequences exactly, with no case folding, Unicode normalization, whitespace trimming, alias expansion, or locale rules.",
+        "duplicate_name_order": "Compare decoded Unicode scalar values left to right by ascending numeric code point; when one name is an exact prefix of another, the shorter name sorts first."
+      }
+    },
+    "validation_coverage": {
+      "const": [
+        {
+          "behavior_id": "VAL-01",
+          "normative_reference": "3.7 step 1",
+          "behavior": "Absent input object",
+          "coverage": [
+            "TC-16"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-02",
+          "normative_reference": "3.7 step 2; 3.5.2",
+          "behavior": "Duplicate preservation, equality, rejection, deterministic name selection, and precedence over missing fields",
+          "coverage": [
+            "TC-15",
+            "TC-38",
+            "TC-39",
+            "TC-40",
+            "TC-41",
+            "TC-42",
+            "TC-49"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-03",
+          "normative_reference": "3.7 step 3",
+          "behavior": "Required-field presence and IN-01–IN-04 precedence",
+          "coverage": [
+            "TC-08",
+            "TC-10",
+            "TC-11",
+            "TC-14",
+            "TC-20",
+            "TC-21"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-04",
+          "normative_reference": "3.7 step 4",
+          "behavior": "Null validation, canonical null-field order, and precedence between missing, null, and type phases",
+          "coverage": [
+            "TC-17",
+            "TC-21",
+            "TC-22",
+            "TC-23",
+            "TC-24",
+            "TC-48",
+            "TC-50"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-05",
+          "normative_reference": "3.7 steps 5–6",
+          "behavior": "IN-01 type and closed-value validation",
+          "coverage": [
+            "TC-18",
+            "TC-25",
+            "TC-32",
+            "TC-33",
+            "TC-47"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-06",
+          "normative_reference": "3.7 steps 7–8; 3.4",
+          "behavior": "IN-02 mathematical-integer semantics and closed-value validation, including 3.0",
+          "coverage": [
+            "TC-09",
+            "TC-12",
+            "TC-19",
+            "TC-29",
+            "TC-30",
+            "TC-31",
+            "TC-51"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-07",
+          "normative_reference": "3.7 steps 9–10",
+          "behavior": "IN-03 type and closed-value validation",
+          "coverage": [
+            "TC-13",
+            "TC-27",
+            "TC-36"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-08",
+          "normative_reference": "3.7 steps 11–12",
+          "behavior": "IN-04 type and closed-value validation",
+          "coverage": [
+            "TC-26",
+            "TC-28",
+            "TC-37"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-09",
+          "normative_reference": "3.5; 3.7",
+          "behavior": "Complete-object validation, including clinically unreachable fields",
+          "coverage": [
+            "TC-14",
+            "TC-36",
+            "TC-37"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-10",
+          "normative_reference": "3.5",
+          "behavior": "Unknown-property handling",
+          "coverage": [
+            "TC-34",
+            "TC-40",
+            "TC-43",
+            "TC-44",
+            "TC-45",
+            "TC-46"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-11",
+          "normative_reference": "3.5",
+          "behavior": "Input-property order independence",
+          "coverage": [
+            "TC-35"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-12",
+          "normative_reference": "3.5",
+          "behavior": "No coercion or transformation inside the conforming function",
+          "coverage": [
+            "TC-25",
+            "TC-27",
+            "TC-28",
+            "TC-30",
+            "TC-31",
+            "TC-32",
+            "TC-33",
+            "TC-47"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-13",
+          "normative_reference": "3.5.2",
+          "behavior": "No case folding, Unicode normalization, whitespace trimming, or alias expansion for property names",
+          "coverage": [
+            "TC-39",
+            "TC-43",
+            "TC-44",
+            "TC-45",
+            "TC-46"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "VAL-14",
+          "normative_reference": "3.7 step 13; Section 4",
+          "behavior": "Deterministic fail-fast validation completes before decision evaluation",
+          "coverage": [
+            "TC-07",
+            "TC-14",
+            "TC-18",
+            "TC-19",
+            "TC-21",
+            "TC-36",
+            "TC-37",
+            "TC-49",
+            "TC-50"
+          ],
+          "classification": "tested"
+        },
+        {
+          "behavior_id": "BND-01",
+          "normative_reference": "3.5; 3.5.1",
+          "behavior": "Present non-object top-level value",
+          "coverage": [],
+          "classification": "excluded—prohibited invocation with no CKS result"
+        },
+        {
+          "behavior_id": "BND-02",
+          "normative_reference": "3.5.1",
+          "behavior": "Malformed serialization or character-decoding failure",
+          "coverage": [],
+          "classification": "excluded—failure occurs before the CKS invocation boundary"
+        }
+      ]
+    },
+    "vectors": {
+      "type": "array",
+      "minItems": 51,
+      "maxItems": 51,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/testVector"
+      }
+    },
+    "applicability_contract": {
+      "const": {
+        "definition": "A vector is applicable when its input_fixture kind can be presented through the invocation mechanism included in the implementation's conformance claim.",
+        "universally_applicable_fixture_kinds": [
+          "absent",
+          "json-object"
+        ],
+        "serialized_text_fixture_kind": "raw-json",
+        "raw_json_test_ids": [
+          "TC-15",
+          "TC-38",
+          "TC-39",
+          "TC-40",
+          "TC-41",
+          "TC-42",
+          "TC-43",
+          "TC-44",
+          "TC-45",
+          "TC-46",
+          "TC-49"
+        ],
+        "serialized_text_rule": "Every raw-json vector applies to an implementation that accepts serialized text at the invocation boundary or includes a serialized-text adapter in its conformance claim.",
+        "native_object_only_exemption": "An implementation whose entire claimed invocation mechanism accepts only native unique-name objects is exempt from executing the listed raw-json vectors.",
+        "semantic_obligation": "Fixture exemption does not waive ERR-06 or property-name comparison semantics. If any claimed environment, parser, adapter, or property-sequence interface can produce or preserve duplicate names, the implementation SHALL enforce those semantics and SHALL execute the raw-json vectors or behaviorally equivalent duplicate-preserving tests."
+      }
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-01"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-02"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-03"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-04"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-05"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-06"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-07"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-08"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-09"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-10"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-11"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-12"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-13"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-14"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-15"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-16"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-17"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-18"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-19"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-20"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-21"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-22"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-23"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-24"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-25"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-26"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-27"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-28"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-29"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-30"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-31"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-32"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-33"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-34"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-35"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-36"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-37"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-38"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-39"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-40"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-41"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-42"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-43"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-44"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-45"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-46"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-47"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-48"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-49"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-50"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "vectors": {
+          "contains": {
+            "type": "object",
+            "required": [
+              "test_id"
+            ],
+            "properties": {
+              "test_id": {
+                "const": "TC-51"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "inputFixture": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "absent"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "raw-json"
+            },
+            "text": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "json-object"
+            },
+            "value": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "expectedResult": {
+      "oneOf": [
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-01",
+            "display_text": "No input object exists.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": null,
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-02",
+            "display_text": "Wagner grade is outside the closed value set: IN-02.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-02",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-03",
+            "display_text": "Input field has invalid data type: IN-01.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-01",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-03",
+            "display_text": "Input field has invalid data type: IN-02.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-02",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-03",
+            "display_text": "Input field has invalid data type: IN-03.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-03",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-03",
+            "display_text": "Input field has invalid data type: IN-04.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-04",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-06",
+            "display_text": "Duplicate input property: a.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "a",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-06",
+            "display_text": "Duplicate input property: dfu_confirmed.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "dfu_confirmed",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-06",
+            "display_text": "Duplicate input property: x.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "x",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-06",
+            "display_text": "Duplicate input property: z.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "z",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-07",
+            "display_text": "Required input field is missing: IN-01.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-01",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-07",
+            "display_text": "Required input field is missing: IN-02.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-02",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-07",
+            "display_text": "Required input field is missing: IN-03.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-03",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-07",
+            "display_text": "Required input field is missing: IN-04.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-04",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-08",
+            "display_text": "Required input field is null: IN-01.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-01",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-08",
+            "display_text": "Required input field is null: IN-02.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-02",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-08",
+            "display_text": "Required input field is null: IN-03.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-03",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-08",
+            "display_text": "Required input field is null: IN-04.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-04",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-09",
+            "display_text": "Input field has invalid closed-set value: IN-01.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-01",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-09",
+            "display_text": "Input field has invalid closed-set value: IN-03.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-03",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "error",
+            "result_id": "ERR-09",
+            "display_text": "Input field has invalid closed-set value: IN-04.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": null,
+            "error_field": "IN-04",
+            "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "out-of-scope",
+            "result_id": "OUT-OF-SCOPE",
+            "display_text": "Input is outside the clinical scope of this CKS.",
+            "evidence_quality": "not-applicable",
+            "recommendation_strength": "none",
+            "rule_id": "ALG-01",
+            "error_field": null,
+            "source_reference": "Huang et al. (2015), Figure 6",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "completed",
+            "result_id": "OUTPUT-01",
+            "display_text": "Suggest against adding HBO₂.",
+            "evidence_quality": "very-low",
+            "recommendation_strength": "conditional",
+            "rule_id": "ALG-02",
+            "error_field": null,
+            "source_reference": "Huang et al. (2015), Figure 6",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "completed",
+            "result_id": "OUTPUT-02",
+            "display_text": "Suggest adding HBO₂ urgently after surgery.",
+            "evidence_quality": "moderate",
+            "recommendation_strength": "conditional",
+            "rule_id": "ALG-03",
+            "error_field": null,
+            "source_reference": "Huang et al. (2015), Figure 6",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "completed",
+            "result_id": "OUTPUT-03",
+            "display_text": "Suggest adding HBO₂ to standard of care.",
+            "evidence_quality": "moderate",
+            "recommendation_strength": "conditional",
+            "rule_id": "ALG-04",
+            "error_field": null,
+            "source_reference": "Huang et al. (2015), Figure 6",
+            "warnings": {}
+          }
+        },
+        {
+          "const": {
+            "status": "completed",
+            "result_id": "OUTPUT-04",
+            "display_text": "Insufficient data to make a recommendation.",
+            "evidence_quality": "not-assigned",
+            "recommendation_strength": "none",
+            "rule_id": "ALG-05",
+            "error_field": null,
+            "source_reference": "Huang et al. (2015), Figure 6",
+            "warnings": {}
+          }
+        }
+      ]
+    },
+    "testVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "test_id",
+        "input_fixture",
+        "expected_result",
+        "assertion"
+      ],
+      "properties": {
+        "test_id": {
+          "enum": [
+            "TC-01",
+            "TC-02",
+            "TC-03",
+            "TC-04",
+            "TC-05",
+            "TC-06",
+            "TC-07",
+            "TC-08",
+            "TC-09",
+            "TC-10",
+            "TC-11",
+            "TC-12",
+            "TC-13",
+            "TC-14",
+            "TC-15",
+            "TC-16",
+            "TC-17",
+            "TC-18",
+            "TC-19",
+            "TC-20",
+            "TC-21",
+            "TC-22",
+            "TC-23",
+            "TC-24",
+            "TC-25",
+            "TC-26",
+            "TC-27",
+            "TC-28",
+            "TC-29",
+            "TC-30",
+            "TC-31",
+            "TC-32",
+            "TC-33",
+            "TC-34",
+            "TC-35",
+            "TC-36",
+            "TC-37",
+            "TC-38",
+            "TC-39",
+            "TC-40",
+            "TC-41",
+            "TC-42",
+            "TC-43",
+            "TC-44",
+            "TC-45",
+            "TC-46",
+            "TC-47",
+            "TC-48",
+            "TC-49",
+            "TC-50",
+            "TC-51"
+          ]
+        },
+        "input_fixture": {
+          "$ref": "#/definitions/inputFixture"
+        },
+        "expected_result": {
+          "$ref": "#/definitions/expectedResult"
+        },
+        "assertion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

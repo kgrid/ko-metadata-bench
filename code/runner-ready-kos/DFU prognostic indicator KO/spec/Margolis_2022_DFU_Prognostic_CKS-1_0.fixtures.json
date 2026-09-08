@@ -1,0 +1,631 @@
+{
+  "$schema": "./Margolis_2022_DFU_Prognostic_CKS-1_0.fixtures.schema.json",
+  "fixture_format": "MARGOLIS-CKS-FIXTURES-1",
+  "specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+  "specification_version": "1.0",
+  "specification_family_iri": "https://kgrid.org/cks/margolis-dfu-prognosis",
+  "specification_iri": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0",
+  "input_model_iri": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model",
+  "output_model_iri": "https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0",
+  "fixture_suite_iri": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/test-vectors",
+  "canonical_schema": "Margolis_2022_DFU_Prognostic_CKS-1_0.schema.json",
+  "runner_contract": {
+    "parse": "Parse input_document as RFC 8259 JSON while preserving every numeric token as an exact base-10 value; do not parse through binary floating point.",
+    "invoke": "For mode=invoke, pass the parsed JSON value to the core exactly once. For mode=inject-rule-cardinality-fault, invoke a documented test hook that forces zero or multiple lookup matches after otherwise successful validation.",
+    "validate_output": "Validate every returned object against canonical_schema before evaluating expectations.",
+    "path_equals": "Resolve each RFC 6901 JSON Pointer in expected.path_equals and require JSON deep equality with the supplied value.",
+    "ordered_errors": "For failure cases, project output.errors to ordered code/path pairs and require exact array equality. Ignore message wording except that canonical_schema requires a nonempty message.",
+    "path_absent": "Every pointer in expected.path_absent must fail to resolve.",
+    "pass": "Core Evaluator and Canonical JSON Binding Profile conformance require TC-01 through TC-23. Internal Fault-Injection Test Capability additionally requires TC-24."
+  },
+  "cases": [
+    {
+      "id": "TC-01",
+      "title": "Larger area and longer duration",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":3,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":12,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-01",
+          "/prognostic_group": "AREA_GE_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.203,
+          "/display_probability_percent": "20.3%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-GE-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-02",
+      "title": "Larger area and shorter duration",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":3,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-02",
+          "/prognostic_group": "AREA_GE_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.304,
+          "/display_probability_percent": "30.4%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-LT-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-03",
+      "title": "Smaller area and longer duration",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":12,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-03",
+          "/prognostic_group": "AREA_LT_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.448,
+          "/display_probability_percent": "44.8%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-GE-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-04",
+      "title": "Smaller area and shorter duration",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-04",
+          "/prognostic_group": "AREA_LT_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.631,
+          "/display_probability_percent": "63.1%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-LT-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-05",
+      "title": "Area equality enters AREA-GE-2",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":2,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-02",
+          "/prognostic_group": "AREA_GE_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.304,
+          "/display_probability_percent": "30.4%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-LT-8",
+          "/specification_notes": [
+            "Area equality assigned to AREA-GE-2 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-06",
+      "title": "Duration equality enters DUR-GE-8",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":8,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-03",
+          "/prognostic_group": "AREA_LT_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.448,
+          "/display_probability_percent": "44.8%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-GE-8",
+          "/specification_notes": [
+            "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-07",
+      "title": "Both equalities enter poorer strata",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":2,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":8,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-01",
+          "/prognostic_group": "AREA_GE_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.203,
+          "/display_probability_percent": "20.3%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-GE-8",
+          "/specification_notes": [
+            "Area equality assigned to AREA-GE-2 by CKS specification decision.",
+            "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-08",
+      "title": "Area equality and duration immediately below threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":2.0,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":7.999999999999999,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-02",
+          "/prognostic_group": "AREA_GE_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.304,
+          "/display_probability_percent": "30.4%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-LT-8",
+          "/specification_notes": [
+            "Area equality assigned to AREA-GE-2 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-09",
+      "title": "Area equality and duration immediately above threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":2.0,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":8.000000000000002,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-01",
+          "/prognostic_group": "AREA_GE_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.203,
+          "/display_probability_percent": "20.3%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-GE-8",
+          "/specification_notes": [
+            "Area equality assigned to AREA-GE-2 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-10",
+      "title": "Missing wound area",
+      "mode": "invoke",
+      "input_document": "{\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-01",
+            "path": "wound_area"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-11",
+      "title": "Numeric string is not coerced",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":\"1\",\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-02",
+            "path": "wound_area"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-12",
+      "title": "Nonpositive wound area",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":0,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-03",
+            "path": "wound_area"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-13",
+      "title": "Negative wound duration",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":-1,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-04",
+            "path": "wound_duration"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-14",
+      "title": "Area conversion equality from square millimeters",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":200,\"ucum_code\":\"mm2\"},\"wound_duration\":{\"value\":8,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-01",
+          "/prognostic_group": "AREA_GE_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.203,
+          "/display_probability_percent": "20.3%",
+          "/area_category": "AREA-GE-2",
+          "/duration_category": "DUR-GE-8",
+          "/normalized_inputs/wound_area/value": 2,
+          "/specification_notes": [
+            "Area equality assigned to AREA-GE-2 by CKS specification decision.",
+            "Duration equality assigned to DUR-GE-8 by CKS specification decision."
+          ]
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-15",
+      "title": "Duration equality enters DUR-GE-8",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":56,\"ucum_code\":\"d\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-03",
+          "/prognostic_group": "AREA_LT_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.448,
+          "/display_probability_percent": "44.8%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-GE-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-16",
+      "title": "Square millimeters below area threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":199,\"ucum_code\":\"mm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-04",
+          "/prognostic_group": "AREA_LT_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.631,
+          "/display_probability_percent": "63.1%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-LT-8",
+          "/normalized_inputs/wound_area/value": 1.99
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-17",
+      "title": "Fifty-five days remains below duration threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":55,\"ucum_code\":\"d\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-04",
+          "/prognostic_group": "AREA_LT_2__DURATION_LT_8",
+          "/healing_probability_16_weeks": 0.631,
+          "/display_probability_percent": "63.1%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-LT-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-18",
+      "title": "Fifty-six days equals duration threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":56,\"ucum_code\":\"d\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-03",
+          "/prognostic_group": "AREA_LT_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.448,
+          "/display_probability_percent": "44.8%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-GE-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-19",
+      "title": "Fifty-seven days exceeds duration threshold",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":57,\"ucum_code\":\"d\"}}",
+      "expected": {
+        "status": "success",
+        "path_equals": {
+          "/status": "success",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/result_id": "ALG-03",
+          "/prognostic_group": "AREA_LT_2__DURATION_GE_8",
+          "/healing_probability_16_weeks": 0.448,
+          "/display_probability_percent": "44.8%",
+          "/area_category": "AREA-LT-2",
+          "/duration_category": "DUR-GE-8"
+        },
+        "path_absent": [
+          "/errors"
+        ]
+      }
+    },
+    {
+      "id": "TC-20",
+      "title": "Unsupported area UCUM code",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-05",
+            "path": "wound_area"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-21",
+      "title": "Duration UCUM code is missing",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-05",
+            "path": "wound_duration"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-22",
+      "title": "Additional duration property is prohibited",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\",\"source\":\"reported-history\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-05",
+            "path": "wound_duration"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-23",
+      "title": "Additional top-level property is prohibited",
+      "mode": "invoke",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"},\"preconditions\":{}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-14",
+            "path": "$"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks"
+        ]
+      }
+    },
+    {
+      "id": "TC-24",
+      "title": "Injected zero-rule or multiple-rule internal fault",
+      "mode": "inject-rule-cardinality-fault",
+      "input_document": "{\"wound_area\":{\"value\":1,\"ucum_code\":\"cm2\"},\"wound_duration\":{\"value\":4,\"ucum_code\":\"wk\"}}",
+      "expected": {
+        "status": "failure",
+        "path_equals": {
+          "/status": "failure",
+          "/specification_id": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0",
+          "/specification_version": "1.0",
+          "/specification_notes": []
+        },
+        "ordered_errors": [
+          {
+            "code": "ERR-08",
+            "path": "internal"
+          }
+        ],
+        "path_absent": [
+          "/result_id",
+          "/prognostic_group",
+          "/healing_probability_16_weeks",
+          "/display_probability_percent",
+          "/area_category",
+          "/duration_category",
+          "/normalized_inputs",
+          "/basis",
+          "/input_provenance",
+          "/source_reference"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "fixture_id": "TC-24",
+  "capability": "burden_analysis",
+  "operation": "analyze",
+  "input": {
+    "response_projection": {
+      "hyperbaric_oxygen_therapy_location": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+      "one_way_miles": 12.5,
+      "one_way_travel_minutes": 22,
+      "weekday_attendance_difficulty": "some"
+    }
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/4412bbe7-ee6d-4abc-b697-0179bc8b87cc",
+    "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+    "result_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "provenance": {
+      "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+      "engine_implementation_version": "1.0.0-fixture",
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+      "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+      "identifier_dependency_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "input_received_at": "2026-07-31T14:25:36.100Z",
+      "input_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "RFC8785",
+        "value": "bc5893e8fe62eb37e063b6868d68ae464df66b0766f1b293fae092fc1ececd00"
+      },
+      "provider_roster_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "none",
+        "value": null
+      },
+      "deterministic_result_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "RFC8785",
+        "value": "abf4a315b90ba8ac6324071d5f6761a102ac82a47fb8fce39295c710121dfb18"
+      }
+    },
+    "status": "error",
+    "result_code": "ERR-04",
+    "objective_burden": null,
+    "weekday_attendance_feasibility": null,
+    "execution_burden_level": null,
+    "sensitivity": null,
+    "assumptions": [],
+    "evidence_sources": [],
+    "error": {
+      "code": "ERR-04",
+      "status": "error",
+      "error_field": "response_projection",
+      "message": "Unexpected input property is not permitted."
+    },
+    "warnings": []
+  },
+  "execution_context": {
+    "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+    "engine_implementation_version": "1.0.0-fixture",
+    "input_received_at": "2026-07-31T14:25:36.100Z",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/4412bbe7-ee6d-4abc-b697-0179bc8b87cc"
+  }
+}

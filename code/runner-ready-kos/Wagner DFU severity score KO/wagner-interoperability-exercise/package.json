@@ -1,0 +1,10 @@
+{
+  "name": "wagner-interoperability-exercise",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone interoperability exercise kit specifically for the Meggitt-Wagner CKS Knowledge Object",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}

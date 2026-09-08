@@ -1,0 +1,213 @@
+{
+    "@context": "https://kgrid.org/koio/2.1/context.jsonld",
+    "@id": "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision",
+    "versionInfo": "2.1",
+    "@type": "KnowledgeObject",
+    "dc:title": "Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object",
+    "dc:identifier": [
+        "workshop-ko-2",
+        "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision"
+    ],
+    "dc:version": "1.0",
+    "dc:date": "2026-08-05",
+    "dc:source": [
+        {
+            "@id": "https://pubmed.ncbi.nlm.nih.gov/26152105/",
+            "dc:bibliographicCitation": "Huang ET, Mansouri J, Murad MH, Joseph WS, Strauss MB, Tettelbach W, Worth ER. A clinical practice guideline for the use of hyperbaric oxygen therapy in the treatment of diabetic foot ulcers. Undersea & Hyperbaric Medicine. 2015;42(3):205-247. Figure 6, 'Algorithm for the use of HBO2.'"
+        }
+    ],
+    "dc:isReferencedBy": [],
+    "dc:description": "This knowledge object converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy (HBO2). It implements Figure 6 of the 2015 UHMS guideline; it does not diagnose a DFU, calculate Wagner grade, prescribe an HBO2 protocol, or determine coverage.",
+    "schema:creator": [
+        {
+            "@id": "https://kgrid.org",
+            "@type": "schema:Organization",
+            "schema:name": "Knowledge Systems Lab",
+            "schema:affiliation": "Knowledge Systems Lab, University of Michigan Medical School",
+            "schema:email": "kgrid-developers@umich.edu"
+        }
+    ],
+    "koio:hasKnowledge": [
+        {
+            "@id": "DFU_HBO2_Decision_Logic",
+            "dc:title": "DFU HBO2 Decision Logic",
+            "dc:identifier": "1",
+            "dc:version": "1.0",
+            "dc:date": "2026-08-05",
+            "dc:description": "Deterministic decision logic that validates diabetic foot ulcer case inputs and produces standardized recommendation, out-of-scope, or error outcomes for hyperbaric oxygen treatment decision.",
+            "dc:purpose": "",
+            "@type": "koio:Knowledge",
+            "implementedBy": {
+                "@id": "src/decision.js",
+                "@type": [
+                    "Implementation",
+                    "Function",
+                    "JavaScript"
+                ]
+            }
+        }
+    ],
+    "koio:hasService": [
+        {
+            "@id": "CLI_Service",
+            "@type": [
+                "Service",
+                "cli"
+            ],
+            "dc:description": "command-line interface that parses invocation modes and input formats, runs the DFU HBO2 treatment decision logic, and prints the resulting recommendation or validation error as formatted JSON.",
+            "hasInterface": "README.md",
+            "implementedBy": {
+                "@id": "bin/dfu-hbo2.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "DFU_HBO2_Decision_Logic"
+            ]
+        },
+        {
+            "@id": "Service_for_Decision_Logic",
+            "@type": [
+                "Service",
+                "library"
+            ],
+            "dc:description": "Way of invoking the DFU HBO2 treatment decision logic",
+            "hasInterface": "UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx",
+            "implementedBy": {
+                "@id": "src/decision.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "dependsOn": [
+                "DFU_HBO2_Decision_Logic"
+            ]
+        }
+    ],
+    "koio:hasTest": [
+        {
+            "@id": "Decision_Logic_Test",
+            "@type": "koio:Test",
+            "dc:title": "Decision Logic Test",
+            "dc:description": "Loads the canonical DFU HBO2 test-vector dataset, verifies there are exactly 51 vectors, and runs one assertion-driven test per vector to confirm evaluateFixture returns the expected result for each case.",
+            "implementedBy": {
+                "@id": "test/decision.test.js",
+                "@type": [
+                    "Implementation",
+                    "JavaScript"
+                ]
+            },
+            "koio:hasDocumentation": [
+                {
+                    "@id": "test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_1_0.json",
+                    "@type": [
+                        "InformationArtifact",
+                        "Test Vector Document"
+                    ],
+                    "dc:title": "Canonical Test Vectors for DFU HBO2 Decision Logic",
+                    "dc:description": "Canonical test vectors for the DFU HBO2 decision logic, including input and expected output."
+                },
+                {
+                    "@id": "test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_Schema_1_0.json",
+                    "@type": [
+                        "InformationArtifact",
+                        "Test Vector Schema Document"
+                    ],
+                    "dc:title": "Canonical Test Vectors Schema for DFU HBO2 Decision Logic",
+                    "dc:description": "Schema for the canonical test vectors of the DFU HBO2 decision logic, including input and expected output."
+                }
+            ]
+        }
+    ],
+    "koio:hasDocumentation": [
+        {
+            "@id": "UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx",
+            "@type": [
+                "InformationArtifact",
+                "Specification Document"
+            ],
+            "dc:title": "Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers",
+            "dc:description": "This demonstration-only CKS converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy (HBO2). It implements Figure 6 of the 2015 UHMS guideline; it does not diagnose a DFU, calculate Wagner grade, prescribe an HBO2 protocol, or determine coverage."
+        },
+        {
+            "@id": "UHMS_DFU_HBO2_CKS_One-Page_Clinical-Knowledge_Summary.docx",
+            "@type": [
+                "InformationArtifact",
+                "Summary"
+            ],
+            "dc:title": "UHMS DFU HBO2 CKS Summary",
+            "dc:description": "A one-page clinical knowledge summary for the UHMS DFU HBO2 CKS"
+        },
+        {
+            "@id": "README.md",
+            "@type": [
+                "InformationArtifact",
+                "Markdown Document"
+            ],
+            "dc:title": "DFU HBO2 Treatment Decision",
+            "dc:description": "Technical package documentation."
+        },
+        {
+            "@id": "DFU_HBO2_Treatment_Decision_Schema_Bundle_1_0.json",
+            "@type": [
+                "InformationArtifact",
+                "JSON Schema Document",
+                "Conformance Artifact"
+            ],
+            "dc:title": "DFU HBO2 Treatment Decision Runtime Schema Bundle Version 1.0",
+            "dc:identifier": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0",
+            "dc:description": "Normative JSON Schema Draft 7 bundle containing separately addressable complete input and unified result profiles for evaluateInputObject."
+        },
+        {
+            "@id": "interoperability.metadata.txt",
+            "@type": [
+                "InformationArtifact",
+                "Interoperability Metadata"
+            ],
+            "dc:title": "DFU HBO2 Treatment Decision Interoperability Metadata",
+            "dc:description": "Three-facet interoperability profile binding semantics, complete exchanged-object profiles, and the normative object-level invocation interface."
+        },
+        {
+            "@id": "dfu_hbo2_binder.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Binder Notebook"
+            ],
+            "dc:title": "DFU HBO2 Binder Jupyter Notebook Demo",
+            "dc:description": "A Binder notebook for computing with the DFU HBO2 package."
+        },
+        {
+            "@id": "dfu_hbo2_colab.ipynb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Google Colab Notebook"
+            ],
+            "dc:title": "DFU HBO2 Google Colab Jupyter Notebook Demo",
+            "dc:description": "A Colab notebook for computing with the DFU HBO2 package."
+        },
+        {
+            "@id": "dfu_hbo2_scribbler.jsnb",
+            "@type": [
+                "InformationArtifact",
+                "Jupyter Notebook",
+                "Scribbler Notebook"
+            ],
+            "dc:title": "DFU HBO2 Scribbler Notebook Demo",
+            "dc:description": "A Scribbler notebook for computing with the DFU HBO2 package."
+        },
+        {
+            "@id": "index.html",
+            "@type": [
+                "InformationArtifact",
+                "Information Page"
+            ],
+            "dc:title": "DFU HBO2 Treatment Decision Information Page",
+            "dc:description": "An information page for viewing the contents of the DFU HBO2 Treatment Decision Knowledge Object"
+        }
+    ]
+}

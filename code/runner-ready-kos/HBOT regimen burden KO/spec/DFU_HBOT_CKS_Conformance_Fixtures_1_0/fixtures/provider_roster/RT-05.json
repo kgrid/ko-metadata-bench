@@ -1,0 +1,30 @@
+{
+  "fixture_id": "RT-05",
+  "capability": "provider_roster",
+  "operation": "validate_record",
+  "input": {
+    "roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+    "roster_record_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0/records/e-001",
+    "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+    "compact_id": "E-001",
+    "record_status": "retired",
+    "selectable": false,
+    "successor_provider_iris": [],
+    "address_verification_required": false,
+    "facility_listing": "Center for Wound Care & Hyperbaric Medicine / Springhill Medical Center",
+    "jurisdiction": "Alabama",
+    "normalized_address_candidate": "3719 Dauphin St, Mobile, Alabama 36608, United States",
+    "address_status": "candidate",
+    "uhms_distinction": "No",
+    "joint_commission_mark": "Yes",
+    "address_source": "https://www.uhms.org/accredited-facilities/springhill-medical-center.html"
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "valid": true,
+    "selectable": false,
+    "error": null
+  }
+}

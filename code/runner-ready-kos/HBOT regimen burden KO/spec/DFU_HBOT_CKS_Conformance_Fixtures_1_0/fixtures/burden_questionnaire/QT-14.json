@@ -1,0 +1,33 @@
+{
+  "fixture_id": "QT-14",
+  "capability": "burden_questionnaire",
+  "operation": "apply_events",
+  "input": [
+    {
+      "event": "confirm_provider",
+      "provider_iri": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001"
+    },
+    {
+      "event": "answer",
+      "question": "Q02",
+      "value": -0.1
+    }
+  ],
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "state": "QNTS-01",
+    "answers": {
+      "Q01": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-001",
+      "Q02": null,
+      "Q03": null,
+      "Q04": null
+    },
+    "registered_response": null,
+    "analysis_invoked": false,
+    "display_requirements": [
+      "Q02_out_of_range"
+    ]
+  }
+}

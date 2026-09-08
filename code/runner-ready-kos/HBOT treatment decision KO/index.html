@@ -1,0 +1,1458 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object</title>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-a: #eef2f6;
+            --bg-b: #edf1f5;
+            --ink: #132235;
+            --muted: #526274;
+            --panel: #ffffff;
+            --line: #d9e1ea;
+            --brand: #005ea8;
+            --brand-2: #0d6b5f;
+            --legend-knowledge-stroke: #cc7a00;
+            --legend-service-stroke: #2d6ea3;
+            --legend-test-stroke: #2b8a3e;
+            --legend-doc-stroke: #7a4ab3;
+            --surface-soft: #f6f9fc;
+            --shadow: 0 2px 10px rgba(19, 34, 53, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: linear-gradient(180deg, var(--bg-a) 0%, var(--bg-b) 100%);
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            line-height: 1.5;
+            padding: 32px;
+        }
+
+        h1, h2, h3 {
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            letter-spacing: 0.01em;
+            line-height: 1.2;
+        }
+
+        a {
+            color: var(--brand);
+            text-decoration-thickness: 2px;
+            text-underline-offset: 2px;
+        }
+
+        .page-hero {
+            max-width: 1400px;
+            margin: 0 auto 22px auto;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 24px 26px;
+            box-shadow: var(--shadow);
+            animation: fade-in-up 300ms ease-out both;
+        }
+
+        .page-hero h1 {
+            margin: 0 0 10px 0;
+            font-size: clamp(1.45rem, 2.2vw, 2rem);
+        }
+
+        .page-subtitle {
+            margin: 0 0 16px 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+            max-width: 78ch;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-pill {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface-soft);
+            padding: 11px 14px;
+            color: #2a3b4f;
+            font-size: 0.84rem;
+            text-align: left;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .graph-panel {
+            max-width: 1400px;
+            margin: 0 auto 22px auto;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            animation: fade-in-up 340ms ease-out both;
+        }
+
+        .graph-panel > summary {
+            cursor: pointer;
+            list-style: none;
+            display: block;
+            position: relative;
+            padding: 2px 84px 12px 2px;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            font-weight: 700;
+            font-size: 1.02rem;
+        }
+
+        .graph-summary-title {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .graph-summary-stats {
+            margin-top: 0;
+        }
+
+        .graph-panel[open] .graph-summary-stats {
+            display: none;
+        }
+
+        .graph-panel > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .graph-panel > summary::after {
+            content: "Show";
+            color: var(--brand);
+            font-size: 0.82rem;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 4px 10px;
+            background: var(--surface-soft);
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .graph-panel[open] > summary::after {
+            content: "Hide";
+        }
+
+        .graph-panel h2 {
+            margin-top: 2px;
+            margin-bottom: 10px;
+            font-size: 1.08rem;
+            border-left: 3px solid var(--brand);
+            padding-left: 12px;
+        }
+
+        .graph-panel p {
+            margin: 0 0 14px 0;
+            color: var(--muted);
+        }
+
+        .graph-panel .mermaid {
+            background: #fcfdfe;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 12px 18px 12px;
+            max-height: 300px;
+            overflow: hidden;
+        }
+
+        .graph-panel .mermaid svg {
+            font-size: 8px;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .graph-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0 0 12px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .graph-node-legend {
+            flex-wrap: wrap;
+            gap: 6px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 2px;
+        }
+
+        
+
+        .graph-node-legend .graph-legend-item {
+            padding: 5px 9px 5px 7px;
+            font-size: 0.78rem;
+        }
+
+        .graph-node-legend .count {
+            font-size: 0.74rem;
+        }
+
+        .graph-legend-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .graph-legend-group {
+            flex: 1 1 0px;
+            min-width: 280px;
+        }
+        
+        .graph-legend-group.graph-legend-nodes {
+            flex: 1.5 1 0;
+        }
+
+        .graph-legend-group-title {
+            margin: 0;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            font-weight: 700;
+            font-size: 0.86rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .graph-legend-inline-title {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 2px;
+        }
+
+        .graph-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #ffffff;
+            padding: 6px 12px 6px 8px;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            font-size: 0.82rem;
+            color: var(--muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .graph-legend-item input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: var(--brand);
+        }
+
+        .graph-legend-item input[data-node-type] {
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1px solid var(--node-stroke, var(--brand));
+            border-radius: 5px;
+            background: var(--node-fill, #ffffff);
+            display: inline-grid;
+            place-content: center;
+        }
+
+        .graph-legend-item input[data-node-type]::before {
+            content: "";
+            width: 5px;
+            height: 10px;
+            transform: scale(0);
+            transition: transform 120ms ease-in-out;
+            border-right: 2px solid rgba(0, 0, 0, 0.55);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.55);
+            transform-origin: center;
+            rotate: 45deg;
+        }
+
+        .graph-legend-item input[data-node-type]:checked::before {
+            transform: scale(1);
+        }
+
+        .graph-legend-item input[data-node-type]:focus-visible {
+            outline: 2px solid rgba(0, 94, 168, 0.35);
+            outline-offset: 1px;
+        }
+
+        .graph-legend-item input[data-node-type="ko"] { --node-fill: #fff3cd; --node-stroke: #b08900; }
+        .graph-legend-item input[data-node-type="knowledge"] { --node-fill: #ffd9b3; --node-stroke: #cc7a00; }
+        .graph-legend-item input[data-node-type="service"] { --node-fill: #cde8ff; --node-stroke: #2d6ea3; }
+        .graph-legend-item input[data-node-type="test"] { --node-fill: #d6f5df; --node-stroke: #2b8a3e; }
+        .graph-legend-item input[data-node-type="doc"] { --node-fill: #efe0ff; --node-stroke: #7a4ab3; }
+
+        .graph-legend-item input[data-edge-type] {
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1px solid var(--edge-stroke, var(--brand));
+            border-radius: 5px;
+            background: #ffffff;
+            display: inline-grid;
+            place-content: center;
+        }
+
+        .graph-legend-item input[data-edge-type]::before {
+            content: "";
+            width: 5px;
+            height: 10px;
+            transform: scale(0);
+            transition: transform 120ms ease-in-out;
+            border-right: 2px solid rgba(0, 0, 0, 0.55);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.55);
+            transform-origin: center;
+            rotate: 45deg;
+        }
+
+        .graph-legend-item input[data-edge-type]:checked::before {
+            transform: scale(1);
+        }
+
+        .graph-legend-item input[data-edge-type]:focus-visible {
+            outline: 2px solid rgba(0, 94, 168, 0.35);
+            outline-offset: 1px;
+        }
+
+        .graph-legend-item input[data-edge-type="has"] { --edge-stroke: #000000; }
+        .graph-legend-item input[data-edge-type="depends"] { --edge-stroke: #cc7a00; }
+
+        .graph-legend-item .count {
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .legend-arrow {
+            width: 18px;
+            height: 0;
+            border-top: 3px solid #2b8a3e;
+            position: relative;
+            margin-right: 2px;
+            flex: 0 0 auto;
+        }
+
+        .legend-arrow::after {
+            content: "";
+            position: absolute;
+            right: -2px;
+            top: -5px;
+            border-left: 6px solid currentColor;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            color: inherit;
+        }
+
+        .legend-arrow-has {
+            border-top-color: #000000;
+            color: #000000;
+        }
+
+        .legend-arrow-depends {
+            border-top-color: #cc7a00;
+            border-top-style: dashed;
+            color: #cc7a00;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(320px, 1fr);
+            width: 100%;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .left-column,
+        .right-column {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+            animation: fade-in-up 360ms ease-out both;
+        }
+
+        .metadata {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .metadata .metadata-title {
+            margin-top: 0;
+            font-size: clamp(1.1rem, 1.6vw, 1.25rem);
+            margin-bottom: 12px;
+        }
+
+        .metadata p {
+            margin: 10px 0;
+        }
+
+        .metadata hr {
+            border: none;
+            border-top: 1px solid var(--line);
+            margin: 18px 0;
+        }
+
+        .metadata ul {
+            margin: 8px 0 16px 0;
+            padding-left: 22px;
+        }
+
+        .metadata li {
+            margin-bottom: 12px;
+        }
+
+        .metadata h2 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.08rem;
+            border-left: 3px solid var(--brand);
+            padding-left: 12px;
+        }
+
+        .metadata h2.section-emphasis,
+        .doc-section h2.section-emphasis,
+        .test-section h2.section-emphasis {
+            margin-top: 26px;
+            margin-bottom: 14px;
+            font-size: 1.24rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            border-left-width: 5px;
+            background: #f6f9fc;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .section-emphasis.section-knowledge {
+            border-left-color: var(--legend-knowledge-stroke);
+        }
+
+        .section-emphasis.section-service {
+            border-left-color: var(--legend-service-stroke);
+        }
+
+        .section-emphasis.section-doc {
+            border-left-color: var(--legend-doc-stroke);
+        }
+
+        .section-emphasis.section-test {
+            border-left-color: var(--legend-test-stroke);
+        }
+
+        .metadata h3 {
+            margin: 8px 0;
+            font-size: 1rem;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 16px;
+        }
+
+        .doc-section,
+        .test-section {
+            color: var(--ink);
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            box-shadow: 0 2px 8px rgba(19, 34, 53, 0.04);
+            font-size: 0.96rem;
+            padding: 16px;
+        }
+
+        .doc-section {
+            background: #fdfefe;
+        }
+
+        .test-section {
+            background: #fdfefe;
+        }
+
+        .doc-section h2,
+        .test-section h2 {
+            margin-top: 2px;
+            margin-bottom: 12px;
+            font-size: 1.04rem;
+            border-left: 3px solid var(--brand-2);
+            padding-left: 10px;
+        }
+
+        .doc-section ul,
+        .test-section ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .doc-section li,
+        .test-section li {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .doc-section h3,
+        .test-section h3 {
+            margin: 2px 0 8px 0;
+            font-size: 0.98rem;
+        }
+
+        .doc-section img,
+        .test-section img {
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .right-column {
+                position: static;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 18px;
+            }
+
+            .graph-panel .mermaid svg {
+                max-width: 100%;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+        }
+    </style>
+    </head>
+    <body>
+        <section class="page-hero">
+            <h1>Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object</h1>
+        </section>
+        <details class="graph-panel" id="relationshipGraph" open>
+            <summary>
+                <span class="graph-summary-title">Relationship Graph</span>
+                <div class="stat-grid graph-summary-stats">
+                    <div class="stat-pill">Computable Knowledge: 1</div>
+                    <div class="stat-pill">Services: 2</div>
+                    <div class="stat-pill">Documentation: 9</div>
+                    <div class="stat-pill">Tests: 1</div>
+                </div>
+            </summary>
+            <div class="graph-legend-layout">
+                <div class="graph-legend-group graph-legend-nodes">
+                    <ul class="graph-legend graph-node-legend">
+                        <li class="graph-legend-inline-title">
+                            <span class="graph-legend-group-title">Nodes:</span>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-node-type="knowledge" checked>
+                                <span>Computable Knowledge</span>
+                                <span class="count">(1)</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-node-type="service" checked>
+                                <span>Service</span>
+                                <span class="count">(2)</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-node-type="test" checked>
+                                <span>Test</span>
+                                <span class="count">(1)</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-node-type="doc" checked>
+                                <span>Documentation</span>
+                                <span class="count">(9)</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="graph-legend-group">
+                    <ul class="graph-legend graph-edge-legend">
+                        <li class="graph-legend-inline-title">
+                            <span class="graph-legend-group-title">Relationship Arrows:</span>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-edge-type="has" checked>
+                                <span class="legend-arrow legend-arrow-has"></span>
+                                <span>has</span>
+                                <span class="count">(13)</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="graph-legend-item">
+                                <input type="checkbox" data-edge-type="depends">
+                                <span class="legend-arrow legend-arrow-depends"></span>
+                                <span>depends on</span>
+                                <span class="count">(2)</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mermaid" id="graphMermaid"></div>
+        </details>
+        <div class="container">
+        <div class="left-column">
+            <div class="metadata" id="metadata">
+            <h2 class="metadata-title">Overview</h2>
+            <p>This knowledge object converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy (HBO2). It implements Figure 6 of the 2015 UHMS guideline; it does not diagnose a DFU, calculate Wagner grade, prescribe an HBO2 protocol, or determine coverage.</p>
+            <hr>
+            <p><strong>ID:</strong> <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision" target='_blank' rel='noopener noreferrer'> 
+                https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision
+            </a></p>
+            <p><strong>Information page metadata:</strong> <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/metadata.json" target='_blank' rel='noopener noreferrer'> 
+                metadata.json 
+            </a></p>
+            
+            
+            
+                <strong>Identifier:</strong>
+                                 
+                                     
+                    workshop-ko-2,       
+                                     
+                    https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision      
+                
+            
+            
+            
+            
+            <p><strong>Type:</strong> <a href="https://kgrid.org/koio#KnowledgeObject" target='_blank' rel='noopener noreferrer'>KnowledgeObject</a></p>
+            <p><strong>Version:</strong> 1.0</p>
+            <p><strong>Date:</strong> 2026-08-05</p>
+            
+            
+            
+                              
+            
+                </p><b>Source:</b></p>
+                   
+                <ul>                 
+                 
+                    <li>     
+                    <a href="https://pubmed.ncbi.nlm.nih.gov/26152105/" target='_blank' rel='noopener noreferrer'>
+                        Huang ET, Mansouri J, Murad MH, Joseph WS, Strauss MB, Tettelbach W, Worth ER. A clinical practice guideline for the use of hyperbaric oxygen therapy in the treatment of diabetic foot ulcers. Undersea & Hyperbaric Medicine. 2015;42(3):205-247. Figure 6, 'Algorithm for the use of HBO2.'
+                    </a>
+                    </li>
+                   
+                </ul>
+            
+            
+                              
+            
+                </p><b>Is referenced by:</b></p>
+                   
+                <ul>                 
+                   
+                </ul>
+            
+            <hr>
+            
+            
+                <h2>Creator</h2>
+                 
+                <ul>  
+                 
+                    <li>
+                        <h3> 
+                             Knowledge Systems Lab</h3>
+                        <p><strong>Affiliation:</strong> Knowledge Systems Lab, University of Michigan Medical School</p>
+                        
+                        
+                            <p><strong>Email:</strong> 
+                                <a href="mailto:kgrid-developers@umich.edu" target='_blank' rel='noopener noreferrer'>
+                                    kgrid-developers@umich.edu
+                                </a>
+                            </p>
+                        
+                        <p><strong>Website:</strong> 
+                            <a href="https://kgrid.org" target='_blank' rel='noopener noreferrer'>
+                                https://kgrid.org
+                            </a>
+                        </p>
+                    </li>
+                   
+                </ul>
+            
+            
+            
+                       
+            <br/>
+
+            
+                <hr>
+                <h2 class="section-emphasis section-knowledge">Knowledge</h2>
+                
+                    
+                    
+                    
+                    <a id="graph-knowledge-1"></a>
+                    <a id="DFU_HBO2_Decision_Logic"></a>
+                    </p>
+                        <p><h3> DFU HBO2 Decision Logic</h3></p>
+                         
+                    <p><strong>ID:</strong> 
+                        DFU_HBO2_Decision_Logic
+                    </p>
+
+                    <p><strong>Type:</strong> 
+                            <a href="https://kgrid.org/koio#Knowledge" target='_blank' rel='noopener noreferrer'>
+                                Knowledge
+                            </a>
+                    </p>
+                    
+                        <p><strong>Description:</strong> Deterministic decision logic that validates diabetic foot ulcer case inputs and produces standardized recommendation, out-of-scope, or error outcomes for hyperbaric oxygen treatment decision.</p>
+                    
+                    
+                    
+                        <p><strong>Date:</strong> 
+                            2026-08-05
+                        </p>
+                    
+                    
+                    
+                                
+                                      
+                    
+                    
+                                       
+                    
+                        
+                        <p><strong>Implemented by:</strong> 
+                        <ul>
+                        
+                            <li>
+                            <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/src/decision.js" target='_blank' rel='noopener noreferrer'>
+                                decision.js
+                            </a><br/>(type: 
+                                
+                                <a href="https://kgrid.org/koio#Implementation" target='_blank' rel='noopener noreferrer'>Implementation</a>, <a href="https://w3id.org/function/ontology#Function" target='_blank' rel='noopener noreferrer'>Function</a>, <a href="http://www.ebi.ac.uk/swo/SWO_0000108" target='_blank' rel='noopener noreferrer'>JavaScript</a>)
+                            </li>
+                        
+                        </ul>
+                        </p>
+                                      
+                                        
+                    
+                    
+                          
+                    <br/>             
+                
+            
+
+            
+            <hr>
+            <h2 class="section-emphasis section-service">Services</h2>
+            
+            
+
+                <a id="graph-service-1"></a>
+
+                <p><h3> CLI_Service</h3></p>
+                
+                    <p><strong>Description:</strong> command-line interface that parses invocation modes and input formats, runs the DFU HBO2 treatment decision logic, and prints the resulting recommendation or validation error as formatted JSON.</p>
+                
+                <p><strong>Type:</strong> 
+                        <a href="https://kgrid.org/koio#Service" target='_blank' rel='noopener noreferrer'>
+                            Service
+                        </a>
+                </p>
+                <p><strong>Depends on:</strong> 
+                
+                
+                
+                    
+                    <a href="#DFU_HBO2_Decision_Logic">DFU_HBO2_Decision_Logic</a>
+                
+                </p>
+                
+                        <p><strong>Has interface:</strong> 
+                            <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/README.md" target='_blank' rel='noopener noreferrer'>
+                                README.md
+                            </a>
+                        </p>
+                 
+                
+                
+                    <p><strong>Implemented by:</strong> 
+                    <ul>
+                        
+                            <li>
+                            
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/bin/dfu-hbo2.js" target='_blank' rel='noopener noreferrer'>
+                                    dfu-hbo2.js
+                                </a>                                 
+                              <br/>(type: 
+                                
+                                <a href="https://kgrid.org/koio#Implementation" target='_blank' rel='noopener noreferrer'>Implementation</a>, <a href="http://www.ebi.ac.uk/swo/SWO_0000108" target='_blank' rel='noopener noreferrer'>JavaScript</a>) 
+                            </li>
+                              
+                        </ul>            
+                    </p>
+                
+                <br/>
+            
+
+                <a id="graph-service-2"></a>
+
+                <p><h3> Service_for_Decision_Logic</h3></p>
+                
+                    <p><strong>Description:</strong> Way of invoking the DFU HBO2 treatment decision logic</p>
+                
+                <p><strong>Type:</strong> 
+                        <a href="https://kgrid.org/koio#Service" target='_blank' rel='noopener noreferrer'>
+                            Service
+                        </a>
+                </p>
+                <p><strong>Depends on:</strong> 
+                
+                
+                
+                    
+                    <a href="#DFU_HBO2_Decision_Logic">DFU_HBO2_Decision_Logic</a>
+                
+                </p>
+                
+                        <p><strong>Has interface:</strong> 
+                            <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx" target='_blank' rel='noopener noreferrer'>
+                                UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx
+                            </a>
+                        </p>
+                 
+                
+                
+                    <p><strong>Implemented by:</strong> 
+                    <ul>
+                        
+                            <li>
+                            
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/src/decision.js" target='_blank' rel='noopener noreferrer'>
+                                    decision.js
+                                </a>                                 
+                              <br/>(type: 
+                                
+                                <a href="https://kgrid.org/koio#Implementation" target='_blank' rel='noopener noreferrer'>Implementation</a>, <a href="http://www.ebi.ac.uk/swo/SWO_0000108" target='_blank' rel='noopener noreferrer'>JavaScript</a>) 
+                            </li>
+                              
+                        </ul>            
+                    </p>
+                
+                <br/>
+            
+            
+        </div>            
+        </div>
+        <div class="right-column">
+            <div class="doc-section" id="doc-section">
+            
+                <h2 class="section-emphasis section-doc">Documentation</h2>
+                <ul>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx" target='_blank' rel='noopener noreferrer'>Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>This demonstration-only CKS converts four supplied facts about one candidate diabetic foot ulcer into one guideline-branch result for adjunctive hyperbaric oxygen therapy (HBO2). It implements Figure 6 of the 2015 UHMS guideline; it does not diagnose a DFU, calculate Wagner grade, prescribe an HBO2 protocol, or determine coverage.</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Specification Document" target='_blank' rel='noopener noreferrer'>
+                                    Specification Document
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/UHMS_DFU_HBO2_CKS_One-Page_Clinical-Knowledge_Summary.docx" target='_blank' rel='noopener noreferrer'>UHMS DFU HBO2 CKS Summary</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>A one-page clinical knowledge summary for the UHMS DFU HBO2 CKS</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Summary" target='_blank' rel='noopener noreferrer'>
+                                    Summary
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/README.md" target='_blank' rel='noopener noreferrer'>DFU HBO2 Treatment Decision</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>Technical package documentation.</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Markdown Document" target='_blank' rel='noopener noreferrer'>
+                                    Markdown Document
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_binder.ipynb" target='_blank' rel='noopener noreferrer'>DFU HBO2 Binder Jupyter Notebook Demo</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                                <a href="https://mybinder.org/v2/gh/kgrid-objects/FAIR-DO-Workshop/HEAD?urlpath=lab/tree/collection/dfu-hbo2-treatment-decision/dfu_hbo2_binder.ipynb%3Fkernel_name%3Djavascript"
+                                    target="_blank" rel="noopener noreferrer">
+                                    <img src="https://mybinder.org/badge_logo.svg" alt="Binder">
+                                </a>
+                            
+                            
+                        
+
+                        </h3>
+                        <p>A Binder notebook for computing with the DFU HBO2 package.</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Jupyter Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Jupyter Notebook
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Binder Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Binder Notebook
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_colab.ipynb" target='_blank' rel='noopener noreferrer'>DFU HBO2 Google Colab Jupyter Notebook Demo</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+                            
+                                <a href="https://colab.research.google.com/github/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_colab.ipynb" target="_blank" rel="noopener noreferrer"> <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"> </a>
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>A Colab notebook for computing with the DFU HBO2 package.</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Jupyter Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Jupyter Notebook
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Google Colab Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Google Colab Notebook
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_scribbler.jsnb" target='_blank' rel='noopener noreferrer'>DFU HBO2 Scribbler Notebook Demo</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                                <a href="https://app.scribbler.live/?jsnb=https%3A%2F%2Fraw.githubusercontent.com%2Fkgrid-objects%2FFAIR-DO-Workshop%2FHEAD%2Fcollection%2Fdfu-hbo2-treatment-decision%2Fdfu_hbo2_scribbler.jsnb" target="_blank" rel="noopener noreferrer"> <img src="https://img.shields.io/badge/Open%20In-Scribbler-2F9E44?logo=javascript&logoColor=white" alt="Open In Scribbler"> </a>
+                            
+                        
+
+                        </h3>
+                        <p>A Scribbler notebook for computing with the DFU HBO2 package.</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Jupyter Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Jupyter Notebook
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Scribbler Notebook" target='_blank' rel='noopener noreferrer'>
+                                    Scribbler Notebook
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/index.html" target='_blank' rel='noopener noreferrer'>DFU HBO2 Treatment Decision Information Page</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>An information page for viewing the contents of the DFU HBO2 Treatment Decision Knowledge Object</p>
+                        
+                            <p><strong>Document of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Information Page" target='_blank' rel='noopener noreferrer'>
+                                    Information Page
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_1_0.json" target='_blank' rel='noopener noreferrer'>Canonical Test Vectors for DFU HBO2 Decision Logic</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>Canonical test vectors for the DFU HBO2 decision logic, including input and expected output.</p>
+                        
+                            <p><strong>Document of:</strong> Decision Logic Test (koio#Test) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Test Vector Document" target='_blank' rel='noopener noreferrer'>
+                                    Test Vector Document
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                    <li>
+                        
+                        
+                        <h3>
+                        <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_Schema_1_0.json" target='_blank' rel='noopener noreferrer'>Canonical Test Vectors Schema for DFU HBO2 Decision Logic</a>
+                        <br/>
+                        
+                            
+                            
+                            
+                        
+                            
+                            
+                            
+                        
+
+                        </h3>
+                        <p>Schema for the canonical test vectors of the DFU HBO2 decision logic, including input and expected output.</p>
+                        
+                            <p><strong>Document of:</strong> Decision Logic Test (koio#Test) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#InformationArtifact" target='_blank' rel='noopener noreferrer'>
+                                    InformationArtifact
+                                </a>, 
+                          
+                                <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/Test Vector Schema Document" target='_blank' rel='noopener noreferrer'>
+                                    Test Vector Schema Document
+                                </a>
+                        
+                        <br/><br/>
+                    </li>
+                
+                </ul>
+            
+        </div>
+
+            <div class="test-section" id="test-section">
+            
+                <h2 class="section-emphasis section-test">Tests</h2>
+                <ul>
+                
+                    <a id="graph-test-1"></a>
+                    <li>
+                        <h3><a href="https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/decision.test.js" target='_blank' rel='noopener noreferrer'>Decision Logic Test</a></h3>
+                        <p>Loads the canonical DFU HBO2 test-vector dataset, verifies there are exactly 51 vectors, and runs one assertion-driven test per vector to confirm evaluateFixture returns the expected result for each case.</p>
+                        
+                            <p><strong>Test of:</strong> Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object (koio#KnowledgeObject) </p>
+                        
+                        <p><strong>Type:</strong> 
+                        
+                          
+                                <a href="https://kgrid.org/koio#Implementation" target='_blank' rel='noopener noreferrer'>
+                                    Implementation
+                                </a>, 
+                          
+                                <a href="http://www.ebi.ac.uk/swo/SWO_0000108" target='_blank' rel='noopener noreferrer'>
+                                    JavaScript
+                                </a>
+                        
+                    </li>
+                
+                </ul>
+            
+            </div>
+        </div>
+        </div>
+        <script type="module">
+            import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+            const graphData = {"nodes": [{"id": "N1", "label": "Clinical Practice Guideline Alg...", "full_label": "Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers Knowledge Object", "type": "ko", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbo2-treatment-decision"}, {"id": "N2", "label": "DFU HBO2 Decision Logic", "full_label": "DFU HBO2 Decision Logic", "type": "knowledge", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/src/decision.js"}, {"id": "N3", "label": "CLI_Service", "full_label": "CLI_Service", "type": "service", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/bin/dfu-hbo2.js"}, {"id": "N4", "label": "Service_for_Decision_Logic", "full_label": "Service_for_Decision_Logic", "type": "service", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/src/decision.js"}, {"id": "N5", "label": "Decision Logic Test", "full_label": "Decision Logic Test", "type": "test", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/decision.test.js"}, {"id": "N6", "label": "Clinical Practice Guideline Alg...", "full_label": "Clinical Practice Guideline Algorithm for Hyperbaric Oxygen Therapy in Diabetic Foot Ulcers", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx"}, {"id": "N7", "label": "UHMS DFU HBO2 CKS Summary", "full_label": "UHMS DFU HBO2 CKS Summary", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/UHMS_DFU_HBO2_CKS_One-Page_Clinical-Knowledge_Summary.docx"}, {"id": "N8", "label": "DFU HBO2 Treatment Decision", "full_label": "DFU HBO2 Treatment Decision", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/README.md"}, {"id": "N9", "label": "DFU HBO2 Binder Jupyter Noteboo...", "full_label": "DFU HBO2 Binder Jupyter Notebook Demo", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_binder.ipynb"}, {"id": "N10", "label": "DFU HBO2 Google Colab Jupyter N...", "full_label": "DFU HBO2 Google Colab Jupyter Notebook Demo", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_colab.ipynb"}, {"id": "N11", "label": "DFU HBO2 Scribbler Notebook Demo", "full_label": "DFU HBO2 Scribbler Notebook Demo", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/dfu_hbo2_scribbler.jsnb"}, {"id": "N12", "label": "DFU HBO2 Treatment Decision Inf...", "full_label": "DFU HBO2 Treatment Decision Information Page", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/index.html"}, {"id": "N13", "label": "Canonical Test Vectors for DFU...", "full_label": "Canonical Test Vectors for DFU HBO2 Decision Logic", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_1_0.json"}, {"id": "N14", "label": "Canonical Test Vectors Schema f...", "full_label": "Canonical Test Vectors Schema for DFU HBO2 Decision Logic", "type": "doc", "link": "https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbo2-treatment-decision/test/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Canonical_Test_Vectors_Schema_1_0.json"}], "edges": [{"source": "N1", "target": "N10", "type": "has"}, {"source": "N1", "target": "N11", "type": "has"}, {"source": "N1", "target": "N12", "type": "has"}, {"source": "N1", "target": "N2", "type": "has"}, {"source": "N1", "target": "N3", "type": "has"}, {"source": "N1", "target": "N4", "type": "has"}, {"source": "N1", "target": "N5", "type": "has"}, {"source": "N1", "target": "N6", "type": "has"}, {"source": "N1", "target": "N7", "type": "has"}, {"source": "N1", "target": "N8", "type": "has"}, {"source": "N1", "target": "N9", "type": "has"}, {"source": "N3", "target": "N2", "type": "depends"}, {"source": "N4", "target": "N2", "type": "depends"}, {"source": "N5", "target": "N13", "type": "has"}, {"source": "N5", "target": "N14", "type": "has"}], "counts": {"ko": 1, "knowledge": 1, "service": 2, "test": 1, "doc": 9}, "edge_counts": {"has": 13, "depends": 2}};
+            const graphPanel = document.getElementById("relationshipGraph");
+            const graphTarget = document.getElementById("graphMermaid");
+            const legendCheckboxes = document.querySelectorAll(".graph-legend input[type='checkbox']");
+            const nodeTypeCheckboxes = document.querySelectorAll(".graph-legend input[data-node-type]");
+            const edgeTypeCheckboxes = document.querySelectorAll(".graph-edge-legend input[data-edge-type]");
+
+            const classDefs = [
+                "classDef ko fill:#fff3cd,stroke:#b08900,stroke-width:2px,color:#4a3a00,font-weight:bold;",
+                "classDef knowledge fill:#ffd9b3,stroke:#cc7a00,stroke-width:1.5px,color:#3b2200;",
+                "classDef service fill:#cde8ff,stroke:#2d6ea3,stroke-width:1.5px,color:#0f2f4a;",
+                "classDef test fill:#d6f5df,stroke:#2b8a3e,stroke-width:1.5px,color:#13361d;",
+                "classDef doc fill:#efe0ff,stroke:#7a4ab3,stroke-width:1.5px,color:#301943;",
+                "classDef empty fill:#f4f4f4,stroke:#9aa7b5,stroke-width:1px,color:#3b4b5a;"
+            ];
+
+            function buildGraphDefinition() {
+                const activeTypes = new Set(
+                    Array.from(nodeTypeCheckboxes)
+                        .filter((box) => box.checked)
+                        .map((box) => box.getAttribute("data-node-type"))
+                );
+                activeTypes.add("ko");
+
+                const activeEdgeTypes = new Set(
+                    Array.from(edgeTypeCheckboxes)
+                        .filter((box) => box.checked)
+                        .map((box) => box.getAttribute("data-edge-type"))
+                );
+
+                const visibleNodes = graphData.nodes.filter((node) => activeTypes.has(node.type));
+                const visibleNodeIds = new Set(visibleNodes.map((node) => node.id));
+                const visibleEdges = graphData.edges.filter(
+                    (edge) =>
+                        visibleNodeIds.has(edge.source) &&
+                        visibleNodeIds.has(edge.target) &&
+                        activeEdgeTypes.has(edge.type)
+                );
+
+                const lines = ["graph TB", ...classDefs];
+
+                if (visibleNodes.length === 0) {
+                    lines.push('EMPTY["No node types selected"]');
+                    lines.push("class EMPTY empty;");
+                    return lines.join("\n");
+                }
+
+                for (const node of visibleNodes) {
+                    lines.push(`${node.id}["${node.label}"]`);
+                }
+
+                for (const edge of visibleEdges) {
+                    lines.push(`${edge.source} --> ${edge.target}`);
+                }
+
+                visibleEdges.forEach((edge, index) => {
+                    if (edge.type === "depends") {
+                        lines.push(`linkStyle ${index} stroke:#cc7a00,stroke-width:2.2px,stroke-dasharray: 6 4;`);
+                    } else {
+                        lines.push(`linkStyle ${index} stroke:#000000,stroke-width:2.2px;`);
+                    }
+                });
+
+                for (const node of visibleNodes) {
+                    lines.push(`class ${node.id} ${node.type};`);
+                }
+
+                return lines.join("\n");
+            }
+
+            function wireGraphNodeLinks() {
+                const svg = graphTarget.querySelector("svg");
+                if (!svg) {
+                    return;
+                }
+
+                for (const node of graphData.nodes) {
+                    // Mermaid renders flowchart nodes with IDs like flowchart-N1-0.
+                    const nodeElement = svg.querySelector(`g.node[id*="-${node.id}-"]`);
+                    if (!nodeElement) {
+                        continue;
+                    }
+
+                    const fullLabel = node.full_label || node.label;
+                    const titleText = node.link ? `${fullLabel}
+Open artifact` : fullLabel;
+                    let titleEl = nodeElement.querySelector("title");
+                    if (!titleEl) {
+                        titleEl = document.createElementNS("http://www.w3.org/2000/svg", "title");
+                        nodeElement.prepend(titleEl);
+                    }
+                    titleEl.textContent = titleText;
+
+                    if (node.link) {
+                        nodeElement.style.cursor = "pointer";
+                        nodeElement.addEventListener("click", () => {
+                            window.open(node.link, "_blank", "noopener,noreferrer");
+                        });
+                    }
+                }
+            }
+
+            function fitGraphToContainer() {
+                const svg = graphTarget.querySelector("svg");
+                if (!svg) {
+                    return;
+                }
+
+                const box = svg.viewBox && svg.viewBox.baseVal;
+                const naturalWidth = box && box.width ? box.width : svg.getBBox().width;
+                const naturalHeight = box && box.height ? box.height : svg.getBBox().height;
+                if (!naturalWidth || !naturalHeight) {
+                    return;
+                }
+
+                const styles = getComputedStyle(graphTarget);
+                const maxHeight = parseFloat(styles.maxHeight) || naturalHeight;
+                const paddingX = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+                const paddingY = (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0);
+                const availableWidth = Math.max(1, graphTarget.clientWidth - paddingX);
+                const availableHeight = Math.max(1, maxHeight - paddingY);
+                const innerMargin = 10;
+                const widthScale = Math.max(0.01, (availableWidth - innerMargin * 2) / naturalWidth);
+                const heightScale = Math.max(0.01, (availableHeight - innerMargin * 2) / naturalHeight);
+                const scale = Math.min(1, widthScale, heightScale);
+
+                svg.style.maxWidth = "none";
+                svg.style.width = `${naturalWidth * scale}px`;
+                svg.style.height = `${naturalHeight * scale}px`;
+            }
+
+            async function renderRelationshipGraph() {
+                if (!graphPanel.open) {
+                    return;
+                }
+
+                const definition = buildGraphDefinition();
+                const renderId = `relationship-graph-${Date.now()}`;
+                const { svg } = await mermaid.render(renderId, definition);
+                graphTarget.innerHTML = svg;
+                fitGraphToContainer();
+                requestAnimationFrame(fitGraphToContainer);
+                wireGraphNodeLinks();
+            }
+
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: "neutral",
+                securityLevel: "loose",
+                flowchart: { curve: "catmullRom", nodeSpacing: 10, rankSpacing: 100, padding: 5, useMaxWidth: false }
+            });
+
+            graphPanel.addEventListener("toggle", () => {
+                if (graphPanel.open) {
+                    renderRelationshipGraph();
+                }
+            });
+
+            for (const box of legendCheckboxes) {
+                box.addEventListener("change", renderRelationshipGraph);
+            }
+
+            window.addEventListener("resize", () => {
+                fitGraphToContainer();
+            });
+
+            if (graphPanel.open) {
+                renderRelationshipGraph();
+            }
+        </script>
+    </body>
+    </html>
+    

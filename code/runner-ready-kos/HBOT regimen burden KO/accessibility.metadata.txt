@@ -1,0 +1,42 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbot-bounded-regimen-and-execution-burden>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    # Access instance 1 — Public web access
+    schema:potentialAction
+        [
+            a schema:ViewAction ;
+            schema:name "Open through HTTPS" ;
+            schema:target
+                [
+                    a schema:EntryPoint ;
+                    schema:urlTemplate
+                        "https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbot-bounded-regimen-and-execution-burden" ;
+                    schema:description
+                        "Public access; no authentication or payment required." ;
+                    schema:name "HTTPS"
+                ]
+        ] ;
+
+    # Access instance 2 — FDO Bench retrieval
+    schema:potentialAction
+        [
+            a schema:DownloadAction ;
+            schema:name "Download from FDO Bench" ;
+            schema:target
+                [
+                    a schema:EntryPoint ;
+                    schema:identifier "HBOT Regimen Burden KO" ;
+                    schema:description
+                        "Available from the knowledge object embedded in FDO Bench; password authentication is required; no payment required." ;
+                    schema:name "FDO Bench KO Access API 1.0" ;
+                    schema:contentType "application/zip" ;
+                    schema:actionApplication
+                        [
+                            a schema:SoftwareApplication ;
+                            schema:name "FDO Bench"
+                        ]
+                ]
+        ] .

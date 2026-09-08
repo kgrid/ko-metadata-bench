@@ -1,0 +1,236 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://kgrid.org/kos/wagner/versions/ko-1.0>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    # 1. Identification
+    schema:name
+        "Meggitt-Wagner Classification of Diabetic Foot Lesions Knowledge Object" ;
+
+    schema:alternateName
+        "Wagner Classification" ;
+
+    schema:identifier
+        "workshop-ko-1" ;
+
+    schema:version
+        "1.0" ;
+
+    # 2. Description
+    schema:abstract
+        "This demonstration-only clinical knowledge summary classifies one diabetic foot lesion or assessment site, at one assessment event, as Wagner score 0-5. It specifies classification—not treatment, prognosis, amputation risk, or hyperbaric-oxygen eligibility." ;
+
+    # 3. Subject
+    schema:about
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/terms/diabetic-foot-lesion>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/terms/diabetic-foot-ulcer>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/terms/at-risk-site>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/terms/gangrene>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/terms/osteomyelitis>,
+        <https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0011849>,
+        <https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0342257>,
+        <https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0011882>,
+        <https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0206172>,
+        <http://id.nlm.nih.gov/mesh/D003920>,
+        <http://id.nlm.nih.gov/mesh/D048909>,
+        <http://id.nlm.nih.gov/mesh/D003929>,
+        <http://id.nlm.nih.gov/mesh/D017719> ;
+
+    schema:keywords
+        "diabetic foot",
+        "diabetic foot lesion",
+        "Meggitt-Wagner classification",
+        "Wagner score",
+        "adaptive questionnaire",
+        "clinical knowledge summary" ;
+
+    # 4. Type
+    schema:additionalType
+        <https://kgrid.org/koio#KnowledgeObject> ;
+
+    # 5. Technical characteristics
+    schema:additionalProperty
+        [
+            a schema:PropertyValue ;
+            schema:name "Computational method" ;
+            schema:value "Adaptive yes/no questionnaire with deterministic Wagner score analysis"
+        ],
+        [
+            a schema:PropertyValue ;
+            schema:name "Programming language" ;
+            schema:value "JavaScript"
+        ],
+        [
+            a schema:PropertyValue ;
+            schema:name "Representation" ;
+            schema:value "CommonJS Node.js package"
+        ],
+        [
+            a schema:PropertyValue ;
+            schema:name "Technical standard" ;
+            schema:value "Knowledge Object Implementation Ontology 2.1"
+        ],
+        [
+            a schema:PropertyValue ;
+            schema:name "Interface style" ;
+            schema:value "Command-line interface and JavaScript library API"
+        ],
+        [
+            a schema:PropertyValue ;
+            schema:name "Output classification" ;
+            schema:value "Wagner grade 0-5" ;
+            schema:valueReference
+                <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale>
+        ] ;
+
+    # 6. Indexing
+    schema:isPartOf
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection> ;
+
+    schema:subjectOf
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/wagner/metadata.json> .
+
+
+# Controlled UMLS term descriptions
+<https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0011849>
+    a schema:DefinedTerm ;
+    schema:name "Diabetes mellitus" ;
+    schema:termCode "C0011849" ;
+    schema:inDefinedTermSet <https://uts.nlm.nih.gov/uts/umls/home> .
+
+<https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0342257>
+    a schema:DefinedTerm ;
+    schema:name "Complication due to diabetes mellitus" ;
+    schema:termCode "C0342257" ;
+    schema:inDefinedTermSet <https://uts.nlm.nih.gov/uts/umls/home> .
+
+<https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0011882>
+    a schema:DefinedTerm ;
+    schema:name "Diabetic neuropathy" ;
+    schema:termCode "C0011882" ;
+    schema:inDefinedTermSet <https://uts.nlm.nih.gov/uts/umls/home> .
+
+<https://uts-ws.nlm.nih.gov/rest/content/current/CUI/C0206172>
+    a schema:DefinedTerm ;
+    schema:name "Diabetic foot" ;
+    schema:termCode "C0206172" ;
+    schema:inDefinedTermSet <https://uts.nlm.nih.gov/uts/umls/home> .
+
+
+# Controlled MeSH term descriptions
+<http://id.nlm.nih.gov/mesh/D003920>
+    a schema:DefinedTerm ;
+    schema:name "Diabetes Mellitus" ;
+    schema:termCode "D003920" ;
+    schema:inDefinedTermSet <https://www.nlm.nih.gov/mesh/> .
+
+<http://id.nlm.nih.gov/mesh/D048909>
+    a schema:DefinedTerm ;
+    schema:name "Diabetes Complications" ;
+    schema:termCode "D048909" ;
+    schema:inDefinedTermSet <https://www.nlm.nih.gov/mesh/> .
+
+<http://id.nlm.nih.gov/mesh/D003929>
+    a schema:DefinedTerm ;
+    schema:name "Diabetic Neuropathies" ;
+    schema:termCode "D003929" ;
+    schema:inDefinedTermSet <https://www.nlm.nih.gov/mesh/> .
+
+<http://id.nlm.nih.gov/mesh/D017719>
+    a schema:DefinedTerm ;
+    schema:name "Diabetic Foot" ;
+    schema:termCode "D017719" ;
+    schema:inDefinedTermSet <https://www.nlm.nih.gov/mesh/> .
+
+
+# Computed Wagner outcome classification
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale>
+    a schema:DefinedTermSet ;
+    schema:name "Meggitt-Wagner grade scale" ;
+    schema:description
+        "A six-level classification from Grade 0 through Grade 5. The capability assigns the highest applicable Wagner grade." ;
+    schema:hasDefinedTerm
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/0>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/1>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/2>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/3>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/4>,
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/5> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/0>
+    a schema:DefinedTerm ;
+    schema:name "At-risk foot without an open ulcer" ;
+    schema:termCode "0" ;
+    schema:description
+        "No open ulcer is present, and the foot has findings indicating risk, such as deformity, callus, or a pre-ulcerative or healed-ulcer site." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/1>
+    a schema:DefinedTerm ;
+    schema:name "Superficial ulcer" ;
+    schema:termCode "1" ;
+    schema:description
+        "An open superficial ulcer involving skin or superficial subcutaneous tissue that does not extend into tendon, capsule, bone, or other deep structures." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/2>
+    a schema:DefinedTerm ;
+    schema:name "Deep ulcer" ;
+    schema:termCode "2" ;
+    schema:description
+        "A deep ulcer extending into tendon, capsule, muscle, joint, bone, or another underlying structure, without established deep abscess, osteomyelitis, or gangrene." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/3>
+    a schema:DefinedTerm ;
+    schema:name "Deep ulcer with abscess or osteomyelitis" ;
+    schema:termCode "3" ;
+    schema:description
+        "A deep diabetic foot ulcer complicated by established deep abscess, osteomyelitis, or comparably deep infection, without gangrene requiring Grade 4 or Grade 5 classification." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/4>
+    a schema:DefinedTerm ;
+    schema:name "Localized gangrene" ;
+    schema:termCode "4" ;
+    schema:description
+        "Gangrene affects a localized portion of the foot, such as one or more toes or part of the forefoot, and is not extensive across the entire foot." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grades/5>
+    a schema:DefinedTerm ;
+    schema:name "Extensive gangrene" ;
+    schema:termCode "5" ;
+    schema:description
+        "Gangrene is extensive and involves most or all of the foot." ;
+    schema:inDefinedTermSet
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/grade-scale> .
+
+
+# ============================================================
+#Findability Profile
+#
+# The subject IRI, schema:name, schema:alternateName,
+# schema:identifier, and schema:version identify the object.
+#
+# schema:abstract            describes what the object is.
+# schema:about               identifies controlled subjects.
+# schema:keywords            supplies additional search terms.
+# schema:additionalType      identifies the knowledge-object type.
+# schema:additionalProperty  states searchable technical features.
+# schema:isPartOf            identifies a containing catalog.
+# schema:subjectOf           points to the indexed catalog record.
+#
+# Purpose, scope, inputs, outputs, access locations, licensing,
+# provenance, tests, and evidence are specified in the other
+# FAIR metadata profiles and are not repeated here.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

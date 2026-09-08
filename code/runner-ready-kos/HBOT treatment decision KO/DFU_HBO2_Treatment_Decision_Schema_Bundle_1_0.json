@@ -1,0 +1,299 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kgrid.org/cks/dfu-hbo2-treatment-decision/schema-bundles/versions/1.0",
+  "title": "DFU HBO2 Treatment Decision Runtime Schema Bundle Version 1.0",
+  "description": "Normative runtime object profiles for the evaluateInputObject interoperability boundary. This bundle is distinct from the canonical test-vector schema.",
+  "definitions": {
+    "input": {
+      "$id": "#input",
+      "title": "Complete evaluateInputObject invocation input",
+      "description": "The complete native object accepted by evaluateInputObject after an object exists. Unknown properties are permitted and ignored. Values are validated without coercion.",
+      "type": "object",
+      "required": [
+        "dfu_confirmed",
+        "wagner_grade",
+        "acute_surgical_intervention",
+        "not_healed_after_30_days"
+      ],
+      "properties": {
+        "dfu_confirmed": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        "wagner_grade": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "acute_surgical_intervention": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        "not_healed_after_30_days": {
+          "type": "string",
+          "enum": [
+            "true",
+            "false"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "$id": "#result",
+      "title": "Complete evaluateInputObject unified result",
+      "description": "Every completed, out-of-scope, and validation-error object returnable by evaluateInputObject. Each enum member is an exact closed nine-field result mapping.",
+      "type": "object",
+      "enum": [
+        {
+          "status": "completed",
+          "result_id": "OUTPUT-01",
+          "display_text": "Suggest against adding HBO₂.",
+          "evidence_quality": "very-low",
+          "recommendation_strength": "conditional",
+          "rule_id": "ALG-02",
+          "error_field": null,
+          "source_reference": "Huang et al. (2015), Figure 6",
+          "warnings": {}
+        },
+        {
+          "status": "completed",
+          "result_id": "OUTPUT-02",
+          "display_text": "Suggest adding HBO₂ urgently after surgery.",
+          "evidence_quality": "moderate",
+          "recommendation_strength": "conditional",
+          "rule_id": "ALG-03",
+          "error_field": null,
+          "source_reference": "Huang et al. (2015), Figure 6",
+          "warnings": {}
+        },
+        {
+          "status": "completed",
+          "result_id": "OUTPUT-03",
+          "display_text": "Suggest adding HBO₂ to standard of care.",
+          "evidence_quality": "moderate",
+          "recommendation_strength": "conditional",
+          "rule_id": "ALG-04",
+          "error_field": null,
+          "source_reference": "Huang et al. (2015), Figure 6",
+          "warnings": {}
+        },
+        {
+          "status": "completed",
+          "result_id": "OUTPUT-04",
+          "display_text": "Insufficient data to make a recommendation.",
+          "evidence_quality": "not-assigned",
+          "recommendation_strength": "none",
+          "rule_id": "ALG-05",
+          "error_field": null,
+          "source_reference": "Huang et al. (2015), Figure 6",
+          "warnings": {}
+        },
+        {
+          "status": "out-of-scope",
+          "result_id": "OUT-OF-SCOPE",
+          "display_text": "Input is outside the clinical scope of this CKS.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": "ALG-01",
+          "error_field": null,
+          "source_reference": "Huang et al. (2015), Figure 6",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-07",
+          "display_text": "Required input field is missing: IN-02.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-02",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-02",
+          "display_text": "Wagner grade is outside the closed value set: IN-02.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-02",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-07",
+          "display_text": "Required input field is missing: IN-03.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-03",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-07",
+          "display_text": "Required input field is missing: IN-04.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-04",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-03",
+          "display_text": "Input field has invalid data type: IN-02.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-02",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-09",
+          "display_text": "Input field has invalid closed-set value: IN-03.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-03",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-01",
+          "display_text": "No input object exists.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": null,
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-08",
+          "display_text": "Required input field is null: IN-01.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-01",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-03",
+          "display_text": "Input field has invalid data type: IN-01.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-01",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-07",
+          "display_text": "Required input field is missing: IN-01.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-01",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-08",
+          "display_text": "Required input field is null: IN-02.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-02",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-08",
+          "display_text": "Required input field is null: IN-03.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-03",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-08",
+          "display_text": "Required input field is null: IN-04.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-04",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-09",
+          "display_text": "Input field has invalid closed-set value: IN-01.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-01",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-09",
+          "display_text": "Input field has invalid closed-set value: IN-04.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-04",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-03",
+          "display_text": "Input field has invalid data type: IN-03.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-03",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        },
+        {
+          "status": "error",
+          "result_id": "ERR-03",
+          "display_text": "Input field has invalid data type: IN-04.",
+          "evidence_quality": "not-applicable",
+          "recommendation_strength": "none",
+          "rule_id": null,
+          "error_field": "IN-04",
+          "source_reference": "UHMS-DFU-HBO2-F6-CKS-1.0, Section 3.7",
+          "warnings": {}
+        }
+      ]
+    }
+  }
+}

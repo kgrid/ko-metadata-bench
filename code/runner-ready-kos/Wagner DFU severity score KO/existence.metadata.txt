@@ -1,0 +1,52 @@
+@prefix koer: <https://example.org/koer/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# KO-SPECIFIC SCHEMA: This record describes one Knowledge Object and
+# accounts for the metadata components that belong to that KO.
+
+# TEMPORARY ID: replace this IRI when a permanent identifier is assigned.
+<urn:uuid:4be7dcb2-66f3-4dab-878c-a186578cabe0>
+    a koer:KnowledgeObjectExistenceRecord ;
+    koer:recordsKnowledgeObject
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner>
+    a koer:KnowledgeObject ;
+    dcterms:title "Meggitt-Wagner Classification of Diabetic Foot Lesions Knowledge Object" ;
+    koer:hasMetadataComponent
+        <#metadata-existence>,
+        <#metadata-core>,
+        <#metadata-accessibility>,
+        <#metadata-findability>,
+        <#metadata-interoperability>,
+        <#metadata-reusability> .
+
+<#metadata-existence>
+    a koer:MetadataComponent ;
+    koer:filePath "existence.metadata.txt" ;
+    dcterms:type "existence" .
+
+<#metadata-core>
+    a koer:MetadataComponent ;
+    koer:filePath "metadata.json" ;
+    dcterms:type "core" .
+
+<#metadata-accessibility>
+    a koer:MetadataComponent ;
+    koer:filePath "accessibility.metadata.txt" ;
+    dcterms:type "accessibility" .
+
+<#metadata-findability>
+    a koer:MetadataComponent ;
+    koer:filePath "findability.metadata.txt" ;
+    dcterms:type "findability" .
+
+<#metadata-interoperability>
+    a koer:MetadataComponent ;
+    koer:filePath "interoperability.metadata.txt" ;
+    dcterms:type "interoperability" .
+
+<#metadata-reusability>
+    a koer:MetadataComponent ;
+    koer:filePath "reusability.metadata.txt" ;
+    dcterms:type "reusability" .

@@ -1,0 +1,135 @@
+@prefix schema:  <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+
+# ============================================================
+# Knowledge object interoperability metadata
+# ============================================================
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0>
+    a schema:SoftwareSourceCode ;
+
+
+    # ========================================================
+    # 1. Semantics
+    #
+    # What does this capability mean?
+    #
+    # schema:object identifies the meaning of the accepted
+    # input object.
+    #
+    # schema:result identifies the meaning of the produced
+    # output object.
+    # ========================================================
+
+    schema:object
+        <https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse> ;
+
+    schema:result
+        <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerClassificationResult> ;
+
+
+    # ========================================================
+    # 2. Profiles
+    #
+    # What complete objects does this capability exchange?
+    #
+    # The profile binding explicitly identifies:
+    #   - the input object profile
+    #   - the output object profile
+    #
+    # It does not rely on RDF statement ordering.
+    # ========================================================
+
+    dcterms:conformsTo [
+
+        schema:name
+            "Wagner Classification Exchange Profiles" ;
+
+        schema:object
+            <https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponseProfile> ;
+
+        schema:result
+            <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerAnalysisResultProfile>
+    ] ;
+
+
+    # ========================================================
+    # 3. Interface
+    #
+    # How is this capability used?
+    #
+    # schema:target identifies the invocation mechanism.
+    #
+    # schema:object identifies the object supplied to the
+    # invocation.
+    #
+    # schema:result identifies the object returned from the
+    # invocation.
+    # ========================================================
+
+    schema:potentialAction [
+
+        a schema:Action ;
+
+        schema:name
+            "Run Wagner Classification Analysis" ;
+
+        schema:target
+            <urn:javascript:function:run> ;
+
+        schema:object
+            <https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse> ;
+
+        schema:result
+            <https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerClassificationResult>
+    ] ;
+
+
+    # ========================================================
+    # Identity and version
+    # ========================================================
+
+    schema:identifier
+        "meggitt-wagner-cks" ;
+
+    schema:version
+        "1.0" .
+
+<https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponse>
+    schema:name "Completed Wagner Questionnaire Response" .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerClassificationResult>
+    schema:name "Wagner Classification Result" .
+
+<https://kgrid.org/cks/meggitt-wagner/response-models/1.0/CompletedQuestionnaireResponseProfile>
+    schema:name "Complete Wagner Questionnaire Response Profile" .
+
+<https://kgrid.org/cks/meggitt-wagner/versions/cks-1.0/WagnerAnalysisResultProfile>
+    schema:name "Complete Wagner Analysis Result Profile" .
+
+
+# ============================================================
+# Minimal Interoperability Profile
+#
+# Three independent facets describe the interoperability
+# boundary of a knowledge object:
+#
+# 1. Semantics
+#    What does this capability mean?
+#
+# 2. Profiles
+#    What complete objects does this capability exchange?
+#
+# 3. Interface
+#    How is this capability invoked, and what objects are
+#    bound to that invocation?
+#
+# The profile and interface descriptors use explicit
+# schema:object and schema:result relationships so that
+# input and output roles are represented directly rather
+# than inferred from RDF statement order.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

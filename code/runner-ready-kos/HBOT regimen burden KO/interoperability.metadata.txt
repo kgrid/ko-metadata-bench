@@ -1,0 +1,116 @@
+@prefix schema:  <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+
+# ============================================================
+# Knowledge object interoperability metadata
+# Burden Response Analysis capability
+# ============================================================
+
+<https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0>
+    a schema:SoftwareSourceCode ;
+
+
+    # ========================================================
+    # 1. Semantics
+    #
+    # What does this capability mean?
+    # ========================================================
+
+    schema:object
+        <https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0> ;
+
+    schema:result
+        <https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0> ;
+
+
+    # ========================================================
+    # 2. Profiles
+    #
+    # What complete objects does this capability exchange?
+    # ========================================================
+
+    dcterms:conformsTo [
+
+        schema:name
+            "Burden Response Analysis Exchange Profiles" ;
+
+        schema:object
+            <https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0#analysisRequest> ;
+
+        schema:result
+            <https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0#completedAnalysisResult>
+    ] ;
+
+
+    # ========================================================
+    # 3. Interface
+    #
+    # How is this capability invoked?
+    # ========================================================
+
+    schema:potentialAction [
+
+        a schema:Action ;
+
+        schema:name
+            "Calculate DFU HBOT Execution Burden" ;
+
+        schema:target
+            <urn:javascript:function:calculateBurdenRange> ;
+
+        schema:object
+            <https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0> ;
+
+        schema:result
+            <https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0>
+    ] ;
+
+
+    # ========================================================
+    # Identity and version
+    # ========================================================
+
+    schema:identifier
+        "workshop-ko-3" ;
+
+    schema:version
+        "1.0" .
+
+<https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0>
+    schema:name "DFU HBOT Burden Analysis Request" .
+
+<https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0>
+    schema:name "DFU HBOT Execution Burden Analysis Result" .
+
+<https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0#analysisRequest>
+    schema:name "Complete Burden Analysis Request Profile" .
+
+<https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0#completedAnalysisResult>
+    schema:name "Complete Burden Analysis Result Profile" .
+
+
+# ============================================================
+# Minimal Interoperability Profile
+#
+# Three independent facets describe the interoperability
+# boundary of the Burden Response Analysis capability:
+#
+# 1. Semantics
+#    What does this capability mean?
+#
+# 2. Profiles
+#    What complete objects does this capability exchange?
+#
+# 3. Interface
+#    How is this capability invoked, and what objects are
+#    bound to that invocation?
+#
+# The profile and interface descriptors use explicit
+# schema:object and schema:result relationships so that input
+# and output roles are represented directly rather than
+# inferred from RDF statement order.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uhms:cks:margolis-dfu-prognosis:1.0:fixtures-schema",
+  "title": "Margolis 2022 DFU Prognostic CKS-1.0 Canonical Fixture Suite",
+  "type": "object",
+  "required": [
+    "$schema",
+    "fixture_format",
+    "specification_id",
+    "specification_version",
+    "specification_family_iri",
+    "specification_iri",
+    "input_model_iri",
+    "output_model_iri",
+    "fixture_suite_iri",
+    "canonical_schema",
+    "runner_contract",
+    "cases"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./Margolis_2022_DFU_Prognostic_CKS-1_0.fixtures.schema.json"
+    },
+    "fixture_format": {
+      "const": "MARGOLIS-CKS-FIXTURES-1"
+    },
+    "specification_id": {
+      "const": "MARGOLIS-DFU-PROGNOSIS-CKS-1.0"
+    },
+    "specification_version": {
+      "const": "1.0"
+    },
+    "canonical_schema": {
+      "const": "Margolis_2022_DFU_Prognostic_CKS-1_0.schema.json"
+    },
+    "runner_contract": {
+      "type": "object",
+      "required": [
+        "parse",
+        "invoke",
+        "validate_output",
+        "path_equals",
+        "ordered_errors",
+        "path_absent",
+        "pass"
+      ],
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "specification_family_iri": {
+      "const": "https://kgrid.org/cks/margolis-dfu-prognosis"
+    },
+    "specification_iri": {
+      "const": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0"
+    },
+    "input_model_iri": {
+      "const": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/input-model"
+    },
+    "output_model_iri": {
+      "const": "https://kgrid.org/cks/margolis-dfu-prognosis/output-models/1.0"
+    },
+    "fixture_suite_iri": {
+      "const": "https://kgrid.org/cks/margolis-dfu-prognosis/versions/1.0/test-vectors"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "errorKey": {
+      "type": "object",
+      "required": [
+        "code",
+        "path"
+      ],
+      "properties": {
+        "code": {
+          "pattern": "^ERR-(0[1-9]|1[0-4])$"
+        },
+        "path": {
+          "enum": [
+            "$",
+            "wound_area",
+            "wound_duration",
+            "internal",
+            "preconditions.area_measurement_method",
+            "preconditions.assessment_binding"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected": {
+      "type": "object",
+      "required": [
+        "status",
+        "path_equals",
+        "path_absent"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "success",
+            "failure"
+          ]
+        },
+        "path_equals": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^/"
+          }
+        },
+        "ordered_errors": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/errorKey"
+          }
+        },
+        "path_absent": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failure"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "ordered_errors"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "success"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "ordered_errors"
+              ]
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "mode",
+        "input_document",
+        "expected"
+      ],
+      "properties": {
+        "id": {
+          "pattern": "^TC-(0[1-9]|1[0-9]|2[0-4])$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "invoke",
+            "inject-rule-cardinality-fault"
+          ]
+        },
+        "input_document": {
+          "type": "string",
+          "minLength": 2
+        },
+        "expected": {
+          "$ref": "#/$defs/expected"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

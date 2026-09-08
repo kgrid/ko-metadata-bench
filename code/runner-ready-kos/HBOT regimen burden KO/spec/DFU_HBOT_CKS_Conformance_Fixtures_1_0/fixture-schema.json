@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_id",
+    "capability",
+    "operation",
+    "input",
+    "dependency_state",
+    "expected"
+  ],
+  "properties": {
+    "fixture_id": {
+      "type": "string",
+      "pattern": "^(RR|QT|TC|RT)-[0-9]{2}$"
+    },
+    "capability": {
+      "enum": [
+        "regimen_range",
+        "burden_questionnaire",
+        "burden_analysis",
+        "provider_roster"
+      ]
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {},
+    "input_json": {
+      "type": "string"
+    },
+    "dependency_state": {
+      "type": "object"
+    },
+    "execution_context": {
+      "type": "object"
+    },
+    "expected": {}
+  }
+}

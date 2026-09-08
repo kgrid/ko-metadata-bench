@@ -1,0 +1,75 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner>
+    a schema:CreativeWork, prov:Entity ;
+
+    # 1. Purpose
+    schema:description
+        "Demonstration-only computable knowledge that uses an adaptive Yes/No questionnaire and deterministic response analysis to classify one diabetic foot lesion or assessment site at one assessment event as Wagner score 0–5." ;
+
+    # 2. Scope
+    schema:usageInfo
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner#scope> ;
+
+    # 3. License
+    schema:license
+        <https://spdx.org/licenses/MIT.html> ;
+
+    # 4. Provenance
+    prov:has_provenance
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner#provenance> ;
+
+    # 5. Tests
+    schema:hasPart
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/wagner/implementation/test/knowledge-object.test.js>,
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/wagner/implementation/test/questionnaire.test.js>,
+        <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/wagner/implementation/test/scorer.test.js> ;
+
+    # 6. Evidence
+    schema:citation
+        <https://iwgdfguidelines.org/wp-content/uploads/2021/01/Monteiro-Soares_et_al-2020-IWGDF-classification-guideline.pdf>,
+        <https://doi.org/10.1177/107110078100200202> ;
+
+    # 7. Identity and version
+    schema:identifier
+        "workshop-ko-1" ;
+
+    schema:version
+        "1.0" .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner#scope>
+    a schema:CreativeWork ;
+    schema:description
+        "For demonstration and educational use only. Each response must concern exactly one diabetic foot lesion or specifically identified assessment site, on the same affected foot, at the same assessment event. The CKS supports demonstrations in clinical decision support, quality improvement, and research, but is not production-ready or validated for real-world use. Its output is a Wagner classification only and must not by itself be used for treatment, prognosis, triage, amputation-risk estimation, complete infection or perfusion assessment, or hyperbaric-oxygen eligibility. The supplied text and logic are English-only, and the CKS does not support scoring directly from an image." .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/wagner#provenance>
+    a prov:Entity ;
+    prov:wasAttributedTo <https://kgrid.org> ;
+    schema:datePublished "2026-08-03" ;
+    schema:description
+        "The supplied specification states that it was created by the Knowledge Systems Lab in the Department of Learning Health Sciences at the University of Michigan Medical School." .
+
+<https://kgrid.org>
+    a schema:Organization ;
+    schema:name "Knowledge Systems Lab" ;
+    schema:affiliation "Knowledge Systems Lab, University of Michigan Medical School" ;
+    schema:email "kgrid-developers@umich.edu" .
+
+
+# ============================================================
+# Minimal Reusability Profile
+#
+# schema:description   states the object's purpose.
+# schema:usageInfo     points to its scope statement.
+# schema:license       points to its governing license.
+# prov:has_provenance  points to its provenance record.
+# schema:hasPart       points to tests supplied with the object.
+# schema:citation      points to supporting evidence.
+#
+# The subject IRI, schema:identifier, and schema:version
+# identify the exact object version.
+#
+# These are profile conventions for this metadata pattern.
+# They do not redefine the source vocabularies.
+# ============================================================

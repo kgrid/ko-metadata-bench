@@ -1,0 +1,23 @@
+{
+  "fixture_id": "RR-03",
+  "capability": "regimen_range",
+  "operation": "respond",
+  "input": {
+    "request_type": "show_regimen_range",
+    "patient_age": 64,
+    "desired_weeks": 4
+  },
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "outcome": "error",
+    "error": {
+      "code": "ERR-04",
+      "status": "error",
+      "error_field": "desired_weeks",
+      "message": "Unexpected input property is not permitted."
+    },
+    "response": null
+  }
+}

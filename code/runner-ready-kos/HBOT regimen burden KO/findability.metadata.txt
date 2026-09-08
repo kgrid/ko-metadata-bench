@@ -1,0 +1,114 @@
+@prefix schema: <https://schema.org/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+
+<https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/dfu-hbot-bounded-regimen-and-execution-burden>
+    a schema:SoftwareSourceCode, prov:Entity ;
+
+    schema:name "DFU HBOT Bounded Regimen and Execution Burden" ;
+
+    schema:identifier "workshop-ko-3" ;
+
+    schema:version "1.0" ;
+
+    schema:abstract "A knowledge object that estimates the execution burden of a contemplated outpatient hyperbaric oxygen therapy course by combining a fixed population-level regimen range with a selected facility, patient-reported travel, and reported weekday-attendance difficulty." ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D017719> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D006931> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D014195> ;
+
+    schema:about <http://id.nlm.nih.gov/mesh/D011795> ;
+
+    schema:additionalType <https://kgrid.org/koio#KnowledgeObject> ;
+
+    schema:isPartOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection> ;
+
+    schema:subjectOf <https://github.com/kgrid-objects/FAIR-DO-Workshop/blob/main/collection/dfu-hbot-bounded-regimen-and-execution-burden/metadata.json> ;
+
+    schema:keywords "diabetic foot ulcer" ;
+
+    schema:keywords "hyperbaric oxygen therapy" ;
+
+    schema:keywords "HBOT" ;
+
+    schema:keywords "treatment burden" ;
+
+    schema:keywords "execution burden" ;
+
+    schema:keywords "travel burden" ;
+
+    schema:keywords "weekday attendance" ;
+
+    schema:keywords "regimen planning" ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Computational method" ;
+        schema:value "Three-part deterministic architecture with fixed regimen range, interactive questionnaire, and rule-based burden analysis"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Programming language" ;
+        schema:value "JavaScript"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "CommonJS Node.js package"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Representation" ;
+        schema:value "Canonical JSON artifacts with JSON Schema"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "Knowledge Object Implementation Ontology 2.1"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "JSON Schema Draft 2020-12"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "RFC 8785 JSON Canonicalization Scheme"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Technical standard" ;
+        schema:value "SHA-256"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Interface style" ;
+        schema:value "Command-line interface and JavaScript library API"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Package name" ;
+        schema:value "@dfu-hbot/bounded-regimen-and-execution-burden"
+    ] ;
+
+    schema:additionalProperty [
+        a schema:PropertyValue ;
+        schema:name "Output classification" ;
+        schema:value "Five-level ordinal execution-burden scale: low, moderate, high, very high, and extreme"
+    ] .
+
+# Findability Profile
+# Identification, description, subject, type, technical characteristics, and indexing only.
+# Purpose, scope, inputs, outputs, access, licensing, provenance, tests, and evidence belong to other FAIR profiles.
+# These are profile conventions and do not redefine Schema.org or PROV-O.

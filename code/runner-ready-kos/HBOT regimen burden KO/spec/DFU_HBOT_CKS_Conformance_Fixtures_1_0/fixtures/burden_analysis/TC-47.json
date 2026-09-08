@@ -1,0 +1,62 @@
+{
+  "fixture_id": "TC-47",
+  "capability": "burden_analysis",
+  "operation": "analyze",
+  "input": null,
+  "dependency_state": {
+    "provider_roster": "available_valid"
+  },
+  "expected": {
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/a2f6a4b0-9d9e-42f9-9c07-0e36afc7a8b2",
+    "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+    "result_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "provenance": {
+      "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+      "engine_implementation_version": "1.0.0-fixture",
+      "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+      "fixture_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+      "identifier_dependency_manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+      "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "input_received_at": "2026-07-31T14:25:36.100Z",
+      "input_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "none",
+        "value": null
+      },
+      "provider_roster_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "none",
+        "value": null
+      },
+      "deterministic_result_fingerprint": {
+        "algorithm": "SHA-256",
+        "canonicalization": "RFC8785",
+        "value": "abd7fc04867ce97037cbe79dc2e9a0eeaa9042ed1ed58642e4004b7daf474071"
+      }
+    },
+    "status": "error",
+    "result_code": "ERR-01",
+    "objective_burden": null,
+    "weekday_attendance_feasibility": null,
+    "execution_burden_level": null,
+    "sensitivity": null,
+    "assumptions": [],
+    "evidence_sources": [],
+    "error": {
+      "code": "ERR-01",
+      "status": "error",
+      "error_field": null,
+      "message": "Input object is required."
+    },
+    "warnings": []
+  },
+  "execution_context": {
+    "engine_implementation_iri": "https://example.org/dfu-hbot-engine/reference",
+    "engine_implementation_version": "1.0.0-fixture",
+    "input_received_at": "2026-07-31T14:25:36.100Z",
+    "issued_at": "2026-07-31T14:25:36.123Z",
+    "result_instance_iri": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/a2f6a4b0-9d9e-42f9-9c07-0e36afc7a8b2"
+  }
+}

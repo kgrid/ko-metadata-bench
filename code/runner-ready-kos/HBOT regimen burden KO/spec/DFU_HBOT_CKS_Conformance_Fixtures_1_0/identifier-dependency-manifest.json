@@ -1,0 +1,244 @@
+{
+  "manifest_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+  "specification_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+  "manifest_status": "final",
+  "identifier_policy_iri": "https://kgrid.org/standards/cks-iri/versions/0.1",
+  "schema_bundle_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+  "response_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+  "output_model_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+  "question_set_iri": "https://kgrid.org/cks/dfu-hbot-burden/question-sets/burden-questionnaire/versions/1.0",
+  "provider_roster_version_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+  "normative_rule_coverage_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+  "identifier_family_count": 16,
+  "identifier_families": [
+    {
+      "family_id": "questions",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/question-sets/burden-questionnaire/versions/1.0",
+      "local_pattern": "Q01–Q04",
+      "boundary_rule": "Local to the question-set version",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "questionnaire_states",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/versions/cks-1.0",
+      "local_pattern": "QNTS-* | QTS-*",
+      "boundary_rule": "Local to the CKS version",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "knowledge_elements",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+      "local_pattern": "RK-01–RK-14",
+      "boundary_rule": "Local to the knowledge-package version",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "analytical_inputs",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+      "local_pattern": "IN-01–IN-04",
+      "boundary_rule": "May appear as error_field; meaning comes from the response model",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "analysis_errors",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "local_pattern": "ERR-01–ERR-10",
+      "boundary_rule": "May appear as result_code and error.code",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "audit_outcomes",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "local_pattern": "AUDIT-01–AUDIT-07",
+      "boundary_rule": "Local to the audit contract",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "presentation_checks",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "local_pattern": "PRES-01–PRES-08",
+      "boundary_rule": "Local presentation-audit identifiers",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "coverage_records",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "local_pattern": "COV-01–COV-24",
+      "boundary_rule": "Local coverage-manifest identifiers",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "conformance_fixtures",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+      "local_pattern": "RR-## | QT-## | TC-## | RT-##",
+      "boundary_rule": "Unique only within the fixture-bundle version",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "dependencies",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+      "local_pattern": "DEP-01–DEP-11",
+      "boundary_rule": "Local dependency-record identifiers",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "assumptions",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "local_pattern": "ASM-01–ASM-04",
+      "boundary_rule": "May appear as assumption.code",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "schema_rules",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+      "local_pattern": "G-01–G-23",
+      "boundary_rule": "Local validation-rule identifiers",
+      "item_iri_policy": "no_item_iri"
+    },
+    {
+      "family_id": "provider_aliases",
+      "identifier_kind": "scoped_compact",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "local_pattern": "E-001–E-141",
+      "boundary_rule": "Display/audit alias; never accepted as IN-01",
+      "item_iri_policy": "maps_to_provider_and_roster_record_iris_in_snapshot"
+    },
+    {
+      "family_id": "providers",
+      "identifier_kind": "global_iri",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e",
+      "local_pattern": "https://kgrid.org/cks/dfu-hbot-burden/providers/e-nnn",
+      "boundary_rule": "Stable provider entity across roster versions",
+      "item_iri_policy": "required_item_iri"
+    },
+    {
+      "family_id": "roster_records",
+      "identifier_kind": "versioned_item_iri",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "local_pattern": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0/records/e-nnn",
+      "boundary_rule": "Exact historical roster record",
+      "item_iri_policy": "required_item_iri"
+    },
+    {
+      "family_id": "result_instances",
+      "identifier_kind": "global_iri",
+      "governing_scope_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "local_pattern": "https://kgrid.org/cks/dfu-hbot-burden/result-instances/{lowercase UUIDv4}",
+      "boundary_rule": "One immutable IRI per emitted result occurrence",
+      "item_iri_policy": "required_item_iri"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependency_id": "DEP-01",
+      "dependency_type": "governing_identifier_policy",
+      "dependency_iri": "https://kgrid.org/standards/cks-iri/versions/0.1",
+      "version_binding": "exact",
+      "required_phase": "authoring_and_publication",
+      "failure_behavior": "conformance_claim_prohibited",
+      "fingerprint_requirement": "not_computationally_loaded"
+    },
+    {
+      "dependency_id": "DEP-02",
+      "dependency_type": "governing_response_model",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/response-models/1.0",
+      "version_binding": "exact",
+      "required_phase": "questionnaire_and_analysis",
+      "failure_behavior": "ERR-05",
+      "fingerprint_requirement": "captured_through_specification_and_schema_versions"
+    },
+    {
+      "dependency_id": "DEP-03",
+      "dependency_type": "named_output_model",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/output-models/1.0",
+      "version_binding": "exact",
+      "required_phase": "analysis_and_audit",
+      "failure_behavior": "AUDIT-03",
+      "fingerprint_requirement": "captured_through_specification_and_schema_versions"
+    },
+    {
+      "dependency_id": "DEP-04",
+      "dependency_type": "question_set",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/question-sets/burden-questionnaire/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "questionnaire",
+      "failure_behavior": "questionnaire_completion_prohibited",
+      "fingerprint_requirement": "captured_through_specification_version"
+    },
+    {
+      "dependency_id": "DEP-05",
+      "dependency_type": "general_regimen_knowledge_package",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/knowledge-packages/general-dfu-regimen/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "regimen_range_and_analysis",
+      "failure_behavior": "ERR-05",
+      "fingerprint_requirement": "captured_through_specification_and_schema_versions"
+    },
+    {
+      "dependency_id": "DEP-06",
+      "dependency_type": "provider_roster_snapshot",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/provider-rosters/appendix-e/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "questionnaire_analysis_and_replay",
+      "failure_behavior": "ERR-05_or_ERR-10_per_stage",
+      "fingerprint_requirement": "SHA-256_over_UTF-8_RFC8785_canonical_complete_closed_providerRosterSnapshot_required_when_loaded_not_raw_file_bytes_or_selected_record"
+    },
+    {
+      "dependency_id": "DEP-07",
+      "dependency_type": "normative_schema_bundle",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/schema-bundles/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "validation_and_replay",
+      "failure_behavior": "conformance_or_replay_prohibited",
+      "fingerprint_requirement": "retained_exact_artifact"
+    },
+    {
+      "dependency_id": "DEP-08",
+      "dependency_type": "executable_fixture_bundle",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/conformance-fixtures/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "conformance_testing",
+      "failure_behavior": "conformance_claim_prohibited",
+      "fingerprint_requirement": "bundle_manifest_SHA-256"
+    },
+    {
+      "dependency_id": "DEP-09",
+      "dependency_type": "identifier_and_dependency_manifest",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/identifier-dependency-manifests/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "implementation_validation_and_replay",
+      "failure_behavior": "identifier_or_dependency_conformance_prohibited",
+      "fingerprint_requirement": "retained_exact_artifact"
+    },
+    {
+      "dependency_id": "DEP-10",
+      "dependency_type": "engine_implementation",
+      "dependency_iri": null,
+      "version_binding": "runtime_exact",
+      "required_phase": "analysis_and_replay",
+      "failure_behavior": "AUDIT-03_or_AUDIT-07",
+      "fingerprint_requirement": "engine_implementation_iri_and_version_required_in_provenance"
+    },
+    {
+      "dependency_id": "DEP-11",
+      "dependency_type": "normative_rule_coverage_manifest",
+      "dependency_iri": "https://kgrid.org/cks/dfu-hbot-burden/normative-rule-coverage/versions/1.0",
+      "version_binding": "exact",
+      "required_phase": "conformance_claim",
+      "failure_behavior": "conformance_claim_prohibited",
+      "fingerprint_requirement": "retained_exact_artifact"
+    }
+  ]
+}
