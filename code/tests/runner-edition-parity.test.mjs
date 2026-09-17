@@ -46,9 +46,10 @@ test("both editions embed byte-identical Runner manifests and bundle source", as
   const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
   const reactFiles = jsonBetween(page, "const objectFileOverrides: Record<string, string> = ", ";\nconst objectBinaryOverrides");
   const standaloneFiles = jsonBetween(standalone, "const overrides=", ";\nconst objectBinaryOverrides");
-  const runnerPaths = Object.keys(reactFiles).filter((path) => /\/runner\/(runner\.manifest\.json|runner\.bundle\.js)$/.test(path)).sort();
+  const isRunnerResource = (path) => /\/runner\.(manifest\.json|bundle\.js)$/.test(path);
+  const runnerPaths = Object.keys(reactFiles).filter(isRunnerResource).sort();
   assert.equal(runnerPaths.length, 8);
-  assert.deepEqual(Object.keys(standaloneFiles).filter((path) => /\/runner\/(runner\.manifest\.json|runner\.bundle\.js)$/.test(path)).sort(), runnerPaths);
+  assert.deepEqual(Object.keys(standaloneFiles).filter(isRunnerResource).sort(), runnerPaths);
   for (const path of runnerPaths) assert.equal(standaloneFiles[path], reactFiles[path], `${path} remains byte-identical`);
 });
 

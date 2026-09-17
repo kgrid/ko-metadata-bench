@@ -46,6 +46,8 @@ test("ships a self-contained standalone HTML edition", async () => {
     "utf8",
   );
   assert.match(html, /^<!doctype html>/i);
+  assert.match(html, /<div class="workspaces"><section class="pane" id="leftPane"><\/section><\/div>/);
+  assert.doesNotMatch(html, /<div class="workspaces single-editor-workspace"><section class="pane" id="leftPane"><\/section><\/div>/);
   assert.match(html, /function renderMetadataRig\(\)/);
   assert.match(html, /A rig to interact with Knowledge Object metadata/);
   assert.match(html, /data-metadata-interact=/);
@@ -69,7 +71,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<button type="submit">Search<\/button>/);
   assert.match(html, /input\.addEventListener\("input",\(\)=>\{clearButton\.hidden=!input\.value;if\(!input\.value\)\{currentResults=\[\];searched=false;submittedQuery="";paintResults\(\)\}\}\)/);
   assert.match(html, /form\.addEventListener\("submit",event=>\{event\.preventDefault\(\);submittedQuery=input\.value\.trim\(\);if\(!submittedQuery\)\{currentResults=\[\];searched=false\}else\{currentResults=searchAll\(submittedQuery\);searched=true\}paintResults\(\)\}\)/);
-  assert.match(html, /const objectFolderNames=\["Wagner DFU severity score KO","HBOT treatment decision KO","HBOT regimen burden KO","DFU prognostic indicator KO"\]/);
+  assert.match(html, /const objectFolderNames=\["Wagner DFU Severity Score KO","HBOT treatment decision KO","HBOT regimen burden KO","DFU prognostic indicator KO"\]/);
   assert.doesNotMatch(html, /objectNames=\{1:"Knowledge Object 1"/);
   assert.match(html, /Instrument set: \$\{embeddedObjectCount\} embedded knowledge/);
   assert.match(html, /Knowledge Objects explorer/);
@@ -340,8 +342,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /status:"binding-unavailable"/);
   assert.match(html, /same input and output are progressively annotated/);
   assert.match(html, /Host-supplied simulation binding/);
-  assert.match(html, /wagner-interoperability-exercise\/examples\/raw-input\.json/);
-  assert.match(html, /wagner-interoperability-exercise\/examples\/expected-output\.json/);
+  assert.match(html, /interoperability-exercise\/examples\/raw-input\.json/);
+  assert.match(html, /interoperability-exercise\/examples\/expected-output\.json/);
   assert.match(html, /function loadInteroperabilityExerciseKit\(\{files,readText\}\)/);
   assert.match(html, /configFiles\.length!==1/);
   assert.match(html, /parseState\(config\.simulationState/);
@@ -395,8 +397,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /authenticatedPreparations=new WeakSet/);
   assert.match(html, /knowledge-object-not-found/);
   assert.match(html, /-working-copy/);
-  assert.match(html, /"1\/Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx":"UEsDB/);
-  assert.match(html, /"1\/kgrid\.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0\.docx":"UEsDB/);
+  assert.match(html, /"1\/[^"\n]*Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx":"UEsDB/);
+  assert.match(html, /"1\/[^"\n]*kgrid\.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0\.docx":"UEsDB/);
   assert.match(html, /Object\.hasOwn\(drafts,key\(object\.sourceIndex,path\)\)/);
   assert.match(html, /accessPredicates=new Set\(\["https:\/\/schema\.org\/url","https:\/\/schema\.org\/urlTemplate","https:\/\/schema\.org\/distribution","https:\/\/schema\.org\/contentUrl","https:\/\/schema\.org\/downloadUrl"\]\)/);
   assert.match(html, /statement\.predicate\.value==="https:\/\/schema\.org\/potentialAction"/);
@@ -604,9 +606,9 @@ test("findability quotes are strict and unquoted terms use AND ranking", async (
 
 test("KO replacement orders objects by workshop identifier metadata", async () => {
   const script = await readFile(new URL("../scripts/update-embedded-kos.mjs", import.meta.url), "utf8");
-  assert.match(script, /schema:identifier\\s\+"workshop-ko-\(\\d\+\)"/);
-  assert.match(script, /const an = workshopNumber\(root, a\.name\)/);
-  assert.match(script, /const bn = workshopNumber\(root, b\.name\)/);
+  assert.match(script, /orderWorkshopObjects/);
+  assert.match(script, /relative\(folderPath, path\)/);
+  assert.doesNotMatch(script, /join\(root, folderName, "findability\.metadata\.txt"\)/);
 });
 
 test("keeps published metadata, exercise kit, and simulation session as explicit models", async () => {

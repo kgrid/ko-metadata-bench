@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, relative } from "node:path";
+import { orderWorkshopObjects } from "../app/workshop-ordering.js";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
@@ -53,29 +54,19 @@ function serializeForScript(value, indent) {
     .replaceAll("\u2029", "\\u2029");
 }
 
-function workshopNumber(root, folderName) {
-  try {
-    const source = readFileSync(join(root, folderName, "findability.metadata.txt"), "utf8");
-    const match = source.match(/schema:identifier\s+"workshop-ko-(\d+)"/i);
-    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
-  } catch {
-    return Number.MAX_SAFE_INTEGER;
-  }
-}
-
 try {
   execFileSync("unzip", ["-q", zipPath, "-d", temp]);
   let root = temp;
   const rootEntries = readdirSync(root, { withFileTypes: true }).filter((entry) => !ignored(entry.name));
   if (rootEntries.length === 1 && rootEntries[0].isDirectory()) root = join(root, rootEntries[0].name);
 
-  const folders = readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && !ignored(entry.name))
-    .sort((a, b) => {
-      const an = workshopNumber(root, a.name);
-      const bn = workshopNumber(root, b.name);
-      return an - bn || a.name.localeCompare(b.name);
-    });
+  const candidates = readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !ignored(entry.name));
+  const folders = orderWorkshopObjects(candidates.map((entry) => {
+    const folderPath = join(root, entry.name);
+    const paths = walk(folderPath);
+    const files = paths.map((path) => relative(folderPath, path).split("\\").join("/"));
+    return { entry, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
+  })).map((object) => object.entry);
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);
   const folderNames = folders.map((folder) => folder.name);
 

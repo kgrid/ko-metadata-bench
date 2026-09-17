@@ -107,7 +107,7 @@ test("Runner output and failure text cannot be interpreted as parent-page HTML",
 
 test("closing a Runner removes only its full-screen layer and preserves the Knowledge Objects view", () => {
   assert.match(react, /onClose=\{\(\) => setGraphicView\(null\)\}/);
-  assert.match(react, /<div className="koGrid">\{OBJECT_IDS\.map/);
+  assert.match(react, /<div className="koGrid"(?: key=\{koPanelReset\})?>\{OBJECT_IDS\.map/);
   assert.match(standalone, /close=\(\)=>\{sandbox\?\.dispose\(\);document\.removeEventListener\("keydown",escape\);view\.remove\(\)\}/);
   assert.match(standalone, /class="ko-grid"/);
   assert.doesNotMatch(standalone, /close=\(\)=>\{[^}]*workspace\.innerHTML/);

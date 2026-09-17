@@ -58,11 +58,14 @@ function standaloneBinaryOverrides(source) {
 
 test("React and standalone editions embed identical Findability and Reusability metadata", async () => {
   const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const pageFiles = pageTextOverrides(page);
   const overrides = standaloneOverrides(standalone);
   for (let objectId = 1; objectId <= 4; objectId += 1) {
     for (const file of ["findability.metadata.txt", "reusability.metadata.txt"]) {
-      const key = `${objectId}/${file}`;
-      assert.equal(overrides[key], pageEmbeddedValue(page, key), `${key} remains identical in both formats`);
+      const matches = Object.keys(pageFiles).filter((key) => key.startsWith(`${objectId}/`) && key.endsWith(`/${file}`));
+      assert.equal(matches.length, 1, `${file} is discovered exactly once for object ${objectId}`);
+      const [key] = matches;
+      assert.equal(overrides[key], pageFiles[key], `${key} remains identical in both formats`);
     }
   }
 });

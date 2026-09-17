@@ -2,7 +2,7 @@ import { DataFactory, Parser, Writer } from "n3";
 import { renderReusabilityCanonicalTemplate } from "./canonical-metadata-renderer.js";
 import { assertControlledMetadataEquivalence } from "./metadata-semantic-equivalence.js";
 
-export const REUSABILITY_ENRICHMENT_TARGET = 4;
+export const REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER = "workshop-ko-4";
 export const REUSABILITY_ENRICHMENT_FILE = "reusability.metadata.txt";
 
 const SCHEMA = "https://schema.org/";

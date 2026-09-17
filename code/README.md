@@ -125,7 +125,14 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 - `npm run dev`: start local development
 - `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
+- `npm test`: build once, run the regression suite, and verify fast browser parity across the server-deployed and standalone editions
+- `npm run test:regression`: run the non-browser regression suite against the existing build and sources
+- `npm run test:parity:fast`: build and run startup, navigation, workspace-style, panel, and full-screen parity journeys
+- `npm run test:parity:visual`: compare both editions with all reviewed desktop and narrow-view baselines
+- `npm run test:parity:visual:update`: deliberately regenerate all visual baselines after reviewing an intended UI change
+- `npm run test:parity:visual:desktop`: verify only the reviewed 1440×1000 desktop baselines
+- `npm run test:parity:visual:narrow`: verify only the reviewed 390×844 narrow-view baselines
+- `npm run test:parity:visual:narrow:update`: deliberately generate or replace only the narrow-view baselines
 - `npm run db:generate`: generate Drizzle migrations after schema changes
 
 ## Learn More

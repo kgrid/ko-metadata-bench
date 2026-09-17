@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Parser } from "n3";
-import { constructReusabilityMetadata, createReusabilityEnrichmentBaseline, evaluateReusabilityEnrichment, getReusabilityEnrichmentInput, getReusabilityEvidenceOptions, getReusabilityEvidencePresentationOptions, getReusabilityLicenseOptions, getReusabilityUnlockState, REUSABILITY_ENRICHMENT_TARGET, setReusabilityEvidence, setReusabilityLicenses, setReusabilityScope } from "../app/reusability-enrichment.js";
+import { constructReusabilityMetadata, createReusabilityEnrichmentBaseline, evaluateReusabilityEnrichment, getReusabilityEnrichmentInput, getReusabilityEvidenceOptions, getReusabilityEvidencePresentationOptions, getReusabilityLicenseOptions, getReusabilityUnlockState, REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER, setReusabilityEvidence, setReusabilityLicenses, setReusabilityScope } from "../app/reusability-enrichment.js";
 
 async function canonicalTargetSource() {
+  assert.equal(REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER, "workshop-ko-4");
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const key = `  "${REUSABILITY_ENRICHMENT_TARGET}/reusability.metadata.txt": `;
+  const key = `  "4/reusability.metadata.txt": `;
   const start = source.indexOf(key);
   assert.notEqual(start, -1, "canonical target metadata is embedded");
   const valueStart = start + key.length;
@@ -15,7 +16,7 @@ async function canonicalTargetSource() {
 
 async function embeddedTargetFile(file) {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const key = `  "${REUSABILITY_ENRICHMENT_TARGET}/${file}": `;
+  const key = `  "4/${file}": `;
   const start = source.indexOf(key);
   assert.notEqual(start, -1, `${file} is embedded`);
   const valueStart = start + key.length;

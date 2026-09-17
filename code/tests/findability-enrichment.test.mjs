@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Parser } from "n3";
-import { confirmFindabilityFullName, constructFindabilityMetadata, createFindabilityEnrichmentBaseline, evaluateFindabilityEnrichment, FINDABILITY_ENRICHMENT_TARGET, getCanonicalFindabilityName, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions, getFindabilityUnlockState, setFindabilityControlledSubjects, setFindabilityDescription, setFindabilityOutputTerms, setFindabilitySearchTerms } from "../app/findability-enrichment.js";
+import { confirmFindabilityFullName, constructFindabilityMetadata, createFindabilityEnrichmentBaseline, evaluateFindabilityEnrichment, FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, getCanonicalFindabilityName, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions, getFindabilityUnlockState, setFindabilityControlledSubjects, setFindabilityDescription, setFindabilityOutputTerms, setFindabilitySearchTerms } from "../app/findability-enrichment.js";
 
 async function canonicalTargetSource() {
+  assert.equal(FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, "workshop-ko-4");
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const key = `  "${FINDABILITY_ENRICHMENT_TARGET}/findability.metadata.txt": `;
+  const key = `  "4/findability.metadata.txt": `;
   const start = source.indexOf(key);
   assert.notEqual(start, -1, "canonical target metadata is embedded");
   const valueStart = start + key.length;
