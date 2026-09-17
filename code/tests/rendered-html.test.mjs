@@ -71,7 +71,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<button type="submit">Search<\/button>/);
   assert.match(html, /input\.addEventListener\("input",\(\)=>\{clearButton\.hidden=!input\.value;if\(!input\.value\)\{currentResults=\[\];searched=false;submittedQuery="";paintResults\(\)\}\}\)/);
   assert.match(html, /form\.addEventListener\("submit",event=>\{event\.preventDefault\(\);submittedQuery=input\.value\.trim\(\);if\(!submittedQuery\)\{currentResults=\[\];searched=false\}else\{currentResults=searchAll\(submittedQuery\);searched=true\}paintResults\(\)\}\)/);
-  assert.match(html, /const objectFolderNames=\["Wagner DFU Severity Score KO","HBOT treatment decision KO","HBOT regimen burden KO","DFU prognostic indicator KO"\]/);
+  assert.match(html, /const objectFolderNames=\["DFU-Severity-Score-KO","HBOT-Treatment-Decision-KO","HBOT-Regimen-Burden-KO","DFU-Prognostic-Indicator-KO"\]/);
   assert.doesNotMatch(html, /objectNames=\{1:"Knowledge Object 1"/);
   assert.match(html, /Instrument set: \$\{embeddedObjectCount\} embedded knowledge/);
   assert.match(html, /Knowledge Objects explorer/);
