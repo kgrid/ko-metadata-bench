@@ -5,7 +5,7 @@ const editions = {
   standalone: new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url).href,
 };
 
-const objectName = "DFU-Severity-Score-KO";
+const objectName = "DFU Severity Score KO";
 
 async function panelFor(page, name) {
   return page.getByText(name, { exact: true }).first().locator("xpath=ancestor::details[1]");
