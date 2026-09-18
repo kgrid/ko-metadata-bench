@@ -15,7 +15,7 @@ const views = [
   { key: "knowledge-objects", heading: "Knowledge Objects", control: null },
   { key: "metadata", heading: "Metadata", control: "Metadata Rig" },
   { key: "findability", heading: "Findability", control: "F exercise" },
-  { key: "accessibility", heading: "Accessibility", control: "A exercise" },
+  { key: "accessibility", heading: "Access", control: "A exercise" },
   { key: "interoperability", heading: "Interoperability", control: "I exercise" },
   { key: "reusability", heading: "Reusability", control: "R exercise" },
 ];

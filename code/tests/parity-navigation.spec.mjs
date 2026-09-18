@@ -53,7 +53,7 @@ async function navigateAndRecord(page, url) {
 
   for (const exercise of [
     { key: "findability", control: "F exercise", heading: "Findability", shared: "Audit" },
-    { key: "accessibility", control: "A exercise", heading: "Accessibility" },
+    { key: "accessibility", control: "A exercise", heading: "Access" },
     { key: "interoperability", control: "I exercise", heading: "Interoperability", shared: "Stages" },
     { key: "reusability", control: "R exercise", heading: "Reusability" },
   ]) {

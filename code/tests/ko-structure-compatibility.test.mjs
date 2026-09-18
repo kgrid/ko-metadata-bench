@@ -41,7 +41,7 @@ function fixture(layout) {
   const documentationRoot = nested ? "auxiliary/aux-documentation/" : "";
   const runnerRoot = nested ? "auxiliary/aux-runner/" : "runner/";
   const exerciseRoot = nested ? "auxiliary/aux-interoperability-exercise/" : "wagner-interoperability-exercise/";
-  const paths = { existence: `${metadataRoot}existence.metadata.txt`, core: "metadata.json", accessibility: `${metadataRoot}accessibility.metadata.txt`, findability: `${metadataRoot}findability.metadata.txt`, interoperability: `${metadataRoot}interoperability.metadata.txt`, reusability: `${metadataRoot}reusability.metadata.txt` };
+  const paths = { existence: `${metadataRoot}existence.metadata.txt`, core: "metadata.json", accessibility: `${metadataRoot}access.metadata.txt`, findability: `${metadataRoot}findability.metadata.txt`, interoperability: `${metadataRoot}interoperability.metadata.txt`, reusability: `${metadataRoot}reusability.metadata.txt` };
   const sources = {
     [paths.core]: metadataJson, [paths.accessibility]: "accessibility", [paths.findability]: findability, [paths.interoperability]: "interoperability", [paths.reusability]: "reusability",
     [`${documentationRoot}graphic.abstract.webp`]: "abstract-binary-placeholder", [`${documentationRoot}graphic.logic.webp`]: "logic-binary-placeholder",
@@ -56,7 +56,7 @@ for (const layout of ["root-oriented", "nested"]) {
   test(`${layout} KO exposes the same logical SWA resources`, () => {
     const ko = fixture(layout);
     const resources = discoverResourceMap({ files: ko.files, readText: ko.readText });
-    for (const logicalName of ["metadata.json", "accessibility.metadata.txt", "findability.metadata.txt", "interoperability.metadata.txt", "reusability.metadata.txt", "graphic.abstract.webp", "graphic.logic.webp", "runner/runner.manifest.json"]) assert.ok(resources.resolve(logicalName), `${layout} ${logicalName} should resolve`);
+    for (const logicalName of ["metadata.json", "access.metadata.txt", "findability.metadata.txt", "interoperability.metadata.txt", "reusability.metadata.txt", "graphic.abstract.webp", "graphic.logic.webp", "runner/runner.manifest.json"]) assert.ok(resources.resolve(logicalName), `${layout} ${logicalName} should resolve`);
     assert.equal(ko.readText(resources.resolve("findability.metadata.txt")), findability);
     assert.deepEqual(inspectWorkshopOrder({ folderName: layout, files: ko.files, readText: ko.readText }), { folderName: layout, valid: true, number: 1, findabilityPath: ko.paths.findability, diagnostic: null });
     const runner = discoverRunnerAvailability({ files: ko.files, readText: ko.readText });

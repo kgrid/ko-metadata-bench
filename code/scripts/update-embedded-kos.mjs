@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { orderWorkshopObjects } from "../app/workshop-ordering.js";
 
 const [zipPath, version] = process.argv.slice(2);
@@ -72,6 +72,10 @@ try {
 
   const textFiles = {};
   const binaryFiles = {};
+  const serverBinaryFiles = {};
+  const serverStaticFiles = {};
+  const serverKoAssetRoot = join(workspace, "public", "ko-assets");
+  rmSync(serverKoAssetRoot, { recursive: true, force: true });
   folders.forEach((folder, index) => {
     const folderPath = join(root, folder.name);
     for (const path of walk(folderPath).sort()) {
@@ -81,6 +85,18 @@ try {
       if (looksText(buffer)) textFiles[key] = buffer.toString("utf8");
       else {
         binaryFiles[key] = buffer.toString("base64");
+        if (/\.pdf$/i.test(path)) {
+          const relativePath = relative(folderPath, path).split("\\").join("/");
+          const destination = join(serverKoAssetRoot, String(index + 1), relativePath);
+          mkdirSync(dirname(destination), { recursive: true });
+          copyFileSync(path, destination);
+          serverStaticFiles[key] = {
+            url: `/ko-assets/${[String(index + 1), ...relativePath.split("/")].map(encodeURIComponent).join("/")}`,
+            byteLength: buffer.byteLength,
+          };
+        } else {
+          serverBinaryFiles[key] = binaryFiles[key];
+        }
         if (/\.docx$/i.test(path)) textFiles[key] = extractedDocxText(path);
       }
     }
@@ -92,7 +108,7 @@ try {
   react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
   react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
   react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
-  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(binaryFiles, 2)};\nconst base64ToBytes`, "React binary payload");
+  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst base64ToBytes`, "React binary and static-asset payloads");
   writeFileSync(reactPath, react);
 
   const standalonePath = join(workspace, "outputs/Knowledge-Object-Workbench.html");
@@ -110,7 +126,7 @@ try {
   );
   writeFileSync(standalonePath, standalone);
 
-  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, binaryFiles: Object.keys(binaryFiles).length }, null, 2));
+  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length }, null, 2));
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }

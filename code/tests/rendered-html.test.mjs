@@ -121,7 +121,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /context\.fillText\(label,cx,cy-middleRadius\+\.5\)/);
   assert.match(html, /Findability exercise/);
   assert.match(html, /class="view-title"><div class="search-mark">F<\/div><h2>Findability<\/h2>/);
-  assert.match(html, /class="view-title"><div class="search-mark">A<\/div><h2>Accessibility<\/h2>/);
+  assert.match(html, /class="view-title"><div class="search-mark">A<\/div><h2>Access<\/h2>/);
   assert.match(html, /class="view-title"><div class="search-mark">I<\/div><h2>Interoperability<\/h2>/);
   assert.match(html, /class="view-title"><div class="search-mark">R<\/div><h2>Reusability<\/h2>/);
   assert.match(html, /class="view-title"><div class="ko-instrument-mark">KOs<\/div><h2>Knowledge Objects<\/h2>/);
@@ -558,11 +558,32 @@ test("ships a self-contained standalone HTML edition", async () => {
     "README.md",
     "graphic.abstract.webp",
     "metadata.json",
-    "accessibility.metadata.txt",
+    "access.metadata.txt",
     "findability.metadata.txt",
     "interoperability.metadata.txt",
     "reusability.metadata.txt",
   ]) assert.match(html, new RegExp(filename.replaceAll(".", "\\.")));
+  assert.doesNotMatch(html, /accessibility\.metadata\.txt/);
+  assert.match(html, /\.metadata-rig-exercise\{grid-column:1\/-1;width:100%/);
+  assert.match(html, /if\(!visibleFiles\.includes\(s\.file\)\)s\.file=initialFileForObject\(s\.object\)/);
+  assert.match(html, /if\(!metadataFilesForObject\(nextObject\)\.includes\(s\.file\)\)s\.file=initialFileForObject\(nextObject\)/);
+  assert.doesNotMatch(html, /if\(!filesForObject\(nextObject\)\.includes\(s\.file\)\)/);
+  const serverSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(serverSource, /access\.metadata\.txt/);
+  assert.doesNotMatch(serverSource, /accessibility\.metadata\.txt/);
+});
+
+test("both Metadata Rig file rails expose access.metadata.txt and never the retired filename", async () => {
+  const [serverSource, standaloneHtml] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8"),
+  ]);
+  for (const edition of [serverSource, standaloneHtml]) {
+    assert.match(edition, /"access\.metadata\.txt"/);
+    assert.doesNotMatch(edition, /accessibility\.metadata\.txt/);
+  }
+  assert.match(serverSource, /<span className="fileName">\{fileName\}<\/span>/);
+  assert.match(standaloneHtml, /<span class="file-name">\$\{f\}<\/span>/);
 });
 
 test("browser abstract dialog uses the embedded PDF rather than a downloadable route", async () => {
@@ -782,7 +803,7 @@ test("KO access API prepares deterministic embedded and working ZIP representati
   const objects = [{ id: "wagner", name: "Wagner", sourceIndex: 5, aliases: [5, "Knowledge Object 5"] }];
   const embedded = [{ path: "metadata.json", content: "embedded" }, { path: "src/index.js", content: "run();" }];
   const working = [{ path: "metadata.json", content: "edited" }, { path: "src/index.js", content: "run();" }];
-  const api = createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles: () => embedded, getWorkingFiles: () => working, environment: globalThis });
+  const api = createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles: async () => embedded, getWorkingFiles: async () => working, environment: globalThis });
   assert.deepEqual(api.listKnowledgeObjects(), [{ id: "wagner", name: "Wagner" }]);
 
   const missingPassword = await api.prepareKnowledgeObjectZip({ knowledgeObjectId: "wagner" });

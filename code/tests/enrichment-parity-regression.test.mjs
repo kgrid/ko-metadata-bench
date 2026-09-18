@@ -15,17 +15,10 @@ import {
   getReusabilityLicenseOptions,
   getReusabilityUnlockState,
 } from "../app/reusability-enrichment.js";
+import { embeddedLogicalEntry } from "./embedded-test-resources.mjs";
 
 const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
-
-function pageEmbeddedValue(source, key) {
-  const marker = `  ${JSON.stringify(key)}: `;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `${key} is embedded in the React edition`);
-  const valueStart = start + marker.length;
-  return JSON.parse(source.slice(valueStart, source.indexOf(",\n", valueStart)));
-}
 
 function standaloneOverrides(html) {
   const marker = "const overrides=";
@@ -49,7 +42,11 @@ function pageTextOverrides(source) {
 }
 
 function pageBinaryOverrides(source) {
-  return objectLiteralBetween(source, "const objectBinaryOverrides: Record<string, string> = ", ";\nconst base64ToBytes", "React binary bundle");
+  return objectLiteralBetween(source, "const objectBinaryOverrides: Record<string, string> = ", ";\nconst objectStaticAssetOverrides", "React binary bundle");
+}
+
+function pageStaticAssetOverrides(source) {
+  return objectLiteralBetween(source, "const objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ", ";\nconst base64ToBytes", "React static-asset bundle");
 }
 
 function standaloneBinaryOverrides(source) {
@@ -70,17 +67,45 @@ test("React and standalone editions embed identical Findability and Reusability 
   }
 });
 
-test("React and standalone editions embed identical complete KO payloads", async () => {
+test("server static KO PDFs and standalone embedded PDFs preserve complete edition payloads", async () => {
   const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
   const pageText = pageTextOverrides(page);
   const standaloneText = standaloneOverrides(standalone);
   const pageBinary = pageBinaryOverrides(page);
+  const pageStatic = pageStaticAssetOverrides(page);
   const standaloneBinary = standaloneBinaryOverrides(standalone);
 
   assert.deepEqual(Object.keys(standaloneText).sort(), Object.keys(pageText).sort(), "all embedded text-file paths match");
   assert.deepEqual(standaloneText, pageText, "all embedded text-file contents match");
-  assert.deepEqual(Object.keys(standaloneBinary).sort(), Object.keys(pageBinary).sort(), "all embedded binary-file paths match");
-  assert.deepEqual(standaloneBinary, pageBinary, "all embedded binary-file contents match");
+  const standalonePdfKeys = Object.keys(standaloneBinary).filter((key) => /\.pdf$/i.test(key)).sort();
+  const standaloneNonPdf = Object.fromEntries(Object.entries(standaloneBinary).filter(([key]) => !/\.pdf$/i.test(key)));
+  assert.deepEqual(pageBinary, standaloneNonPdf, "non-PDF binary contents remain identical");
+  assert.deepEqual(Object.keys(pageStatic).sort(), standalonePdfKeys, "every standalone KO PDF has a server static-asset record");
+  assert.equal(Object.keys(pageBinary).some((key) => /\.pdf$/i.test(key)), false, "server client bundle contains no KO PDF bytes");
+  assert.match(page, /className="koViewPdfButton"/, "server file reader exposes the generic PDF action");
+  assert.match(page, />View PDF<\/button>/, "server PDF action has a clear visible label");
+  assert.match(page, /<EmbeddedEvidenceDialog objectId=\{objectId\} file=\{selectedFile\}/, "server PDF action reuses the embedded PDF viewer");
+  assert.match(standalone, /class="ko-view-pdf-button" hidden>View PDF<\/button>/, "standalone file reader exposes the generic PDF action");
+  assert.match(standalone, /openEmbeddedEvidence\(objectId,encodeURIComponent\(file\)\)/, "standalone PDF action reuses the embedded PDF viewer");
+  assert.match(standalone, /canvas\?\.addEventListener\("pointerdown",\(\)=>queueMicrotask\(sync\)\)/, "standalone PDF control follows the radial's own selection event");
+  assert.doesNotMatch(standalone, /new MutationObserver\(sync\)\.observe\(explorer/, "standalone PDF control does not observe or interfere with radial selection state");
+  assert.match(standalone, /mountKoExplorersBeforeAllRingSelection/, "standalone restores explicit hit-testing for bricks in the four-ring view");
+  assert.match(standalone, /if\(name\)name\.textContent=file;if\(meta\)meta\.textContent=selectedLayer\.label/, "standalone all-ring selection updates file context directly");
+  assert.match(standalone, /mountKoExplorersBeforeSettledPdfAction/, "standalone refreshes the PDF action after every radial selection handler has settled");
+  assert.match(standalone, /canvas\.addEventListener\("pointerdown",\(\)=>setTimeout\(sync,0\)\)/, "standalone multi-ring PDF action follows the completed brick selection");
+  assert.match(standalone, /URL\.createObjectURL\(new Blob\(/, "standalone opens embedded PDFs through a local Blob URL");
+  assert.match(standalone, /window\.open\(pdfUrl,"_blank"\)/, "standalone keeps the opener relationship required by its opaque-origin PDF Blob");
+  assert.doesNotMatch(standalone, /window\.open\(pdfUrl,"_blank","noopener"\)/, "standalone does not sever access to its opaque-origin Blob registry");
+  assert.match(standalone, /URL\.revokeObjectURL\(pdfUrl\)/, "standalone eventually releases the temporary PDF Blob URL");
+  assert.doesNotMatch(standalone, /src="data:application\/pdf;base64,\$\{binary\}"/, "standalone does not hand Chrome's PDF viewer a giant data URL");
+  for (const key of standalonePdfKeys) {
+    const expectedBytes = Buffer.from(standaloneBinary[key], "base64");
+    const asset = pageStatic[key];
+    assert.equal(asset.byteLength, expectedBytes.byteLength, `${key} declares its exact byte length`);
+    assert.match(asset.url, /^\/ko-assets\//, `${key} uses a same-origin static URL`);
+    const servedBytes = await readFile(new URL(`../public${asset.url}`, import.meta.url));
+    assert.deepEqual(servedBytes, expectedBytes, `${key} static bytes match the standalone payload exactly`);
+  }
 });
 
 test("both editions route metadata-dependent views through their working copy", async () => {
@@ -112,10 +137,12 @@ test("metadata completion transitions directly from guided entry to the normal T
 
 test("complete enrichment lasts for the session and reset restores only the selected baseline", async () => {
   const page = await readFile(pageUrl, "utf8");
-  const canonicalFindability = pageEmbeddedValue(page, "4/findability.metadata.txt");
-  const canonicalReusability = pageEmbeddedValue(page, "4/reusability.metadata.txt");
-  const findabilityKey = "4/findability.metadata.txt";
-  const reusabilityKey = "4/reusability.metadata.txt";
+  const findabilityEntry = embeddedLogicalEntry(page, 4, "findability.metadata.txt");
+  const reusabilityEntry = embeddedLogicalEntry(page, 4, "reusability.metadata.txt");
+  const canonicalFindability = findabilityEntry.value;
+  const canonicalReusability = reusabilityEntry.value;
+  const findabilityKey = findabilityEntry.key;
+  const reusabilityKey = reusabilityEntry.key;
 
   const findability = constructFindabilityMetadata(canonicalFindability, {
     fullNameConfirmed: true,

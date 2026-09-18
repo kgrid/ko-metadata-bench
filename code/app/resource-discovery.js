@@ -1,7 +1,7 @@
 const LOGICAL_TYPE_BY_NAME = Object.freeze({
   "existence.metadata.txt": "existence",
   "metadata.json": "core",
-  "accessibility.metadata.txt": "accessibility",
+  "access.metadata.txt": "accessibility",
   "findability.metadata.txt": "findability",
   "interoperability.metadata.txt": "interoperability",
   "reusability.metadata.txt": "reusability",

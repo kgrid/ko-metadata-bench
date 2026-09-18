@@ -4,18 +4,11 @@ import test from "node:test";
 import { Parser } from "n3";
 import { constructFindabilityMetadata, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions } from "../app/findability-enrichment.js";
 import { constructReusabilityMetadata, getReusabilityEnrichmentInput, getReusabilityEvidenceOptions, getReusabilityLicenseOptions } from "../app/reusability-enrichment.js";
+import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
 const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
 const rendererUrl = new URL("../app/canonical-metadata-renderer.js", import.meta.url);
-
-function embeddedValue(source, key) {
-  const marker = `  ${JSON.stringify(key)}: `;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `${key} is embedded`);
-  const valueStart = start + marker.length;
-  return JSON.parse(source.slice(valueStart, source.indexOf(",\n", valueStart)));
-}
 
 function prefixBlock(source) {
   return source.split("\n\n", 1)[0];
@@ -27,15 +20,15 @@ function comments(source) {
 
 test("complete guided construction is an exact canonical formatting round trip", async () => {
   const page = await readFile(pageUrl, "utf8");
-  const findability = embeddedValue(page, "4/findability.metadata.txt");
-  const reusability = embeddedValue(page, "4/reusability.metadata.txt");
+  const findability = embeddedLogicalValue(page, 4, "findability.metadata.txt");
+  const reusability = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   assert.equal(constructFindabilityMetadata(findability, getFindabilityEnrichmentInput(findability)), findability);
   assert.equal(constructReusabilityMetadata(reusability, getReusabilityEnrichmentInput(reusability)), reusability);
 });
 
 test("incomplete Findability formatting preserves authored document structure", async () => {
   const page = await readFile(pageUrl, "utf8");
-  const canonical = embeddedValue(page, "4/findability.metadata.txt");
+  const canonical = embeddedLogicalValue(page, 4, "findability.metadata.txt");
   const subjects = getFindabilitySubjectOptions(canonical);
   const outputs = getFindabilityOutputTermOptions(canonical);
   const working = constructFindabilityMetadata(canonical, {
@@ -56,7 +49,7 @@ test("incomplete Findability formatting preserves authored document structure", 
 
 test("incomplete Reusability formatting preserves headings and multiline alignment", async () => {
   const page = await readFile(pageUrl, "utf8");
-  const canonical = embeddedValue(page, "4/reusability.metadata.txt");
+  const canonical = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   const working = constructReusabilityMetadata(canonical, {
     scope: 'Use for a declared learner context.\nDo not use outside that scope.',
     licenseIris: getReusabilityLicenseOptions(canonical).map(({ iri }) => iri),

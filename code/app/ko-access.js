@@ -186,7 +186,8 @@ export function createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles, getW
     const content = options.content || "embedded";
     if (!new Set(["embedded", "working"]).has(content)) return failure(object.id, "content-not-supported", "Content must be 'embedded' or 'working'.");
     try {
-      const files = (content === "working" ? getWorkingFiles(object) : getEmbeddedFiles(object)).map((file) => ({ path: safePath(file.path), content: file.content }));
+      const suppliedFiles = await (content === "working" ? getWorkingFiles(object) : getEmbeddedFiles(object));
+      const files = suppliedFiles.map((file) => ({ path: safePath(file.path), content: file.content }));
       if (!files.length) return failure(object.id, "knowledge-object-empty", "The embedded knowledge object contains no files.");
       const archiveName = `${slug(object.id)}${content === "working" ? "-working-copy" : ""}.zip`;
       const bytes = createStoredZip(files, slug(object.id));

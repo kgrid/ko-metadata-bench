@@ -1432,6 +1432,9 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .koReader > header { min-height: 46px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-bottom: 1px solid #d2d2d7; background: #eeeef0; }
 .koReader > header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
 .koReader > header span { margin-left: auto; color: #6e6e73; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.koViewPdfButton { margin-left: auto; flex: 0 0 auto; min-height: 28px; padding: 0 12px; border: 1px solid #6e6e73; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 8px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.koViewPdfButton:hover { background: #f5f5f7; }
+.koViewPdfButton:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
 .koReaderTitle { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 2px; }
 .koReaderTitle small { color: #6e6e73; font-size: 7px; font-weight: 700; letter-spacing: .055em; text-transform: uppercase; }
 .koReader pre { flex: 1; min-height: 0; margin: 0; overflow: auto; padding: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }

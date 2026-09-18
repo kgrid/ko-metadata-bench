@@ -9,7 +9,7 @@ const views = [
   { key: "knowledgeObjects", heading: "Knowledge Objects", control: "Knowledge Objects", background: "rgb(245, 245, 247)" },
   { key: "metadata", heading: "Metadata", control: "Metadata Rig", background: "rgb(228, 237, 244)" },
   { key: "findability", heading: "Findability", control: "F exercise", background: "rgb(245, 245, 247)" },
-  { key: "accessibility", heading: "Accessibility", control: "A exercise", background: "rgb(245, 245, 247)" },
+  { key: "accessibility", heading: "Access", control: "A exercise", background: "rgb(245, 245, 247)" },
   { key: "interoperability", heading: "Interoperability", control: "I exercise", background: "rgb(245, 245, 247)" },
   { key: "reusability", heading: "Reusability", control: "R exercise", background: "rgb(245, 245, 247)" },
 ];
