@@ -1432,9 +1432,12 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .koReader > header { min-height: 46px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-bottom: 1px solid #d2d2d7; background: #eeeef0; }
 .koReader > header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
 .koReader > header span { margin-left: auto; color: #6e6e73; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-.koViewPdfButton { margin-left: auto; flex: 0 0 auto; min-height: 28px; padding: 0 12px; border: 1px solid #6e6e73; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 8px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
-.koViewPdfButton:hover { background: #f5f5f7; }
-.koViewPdfButton:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
+.koReaderActions { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+.koViewPdfButton,.koViewFileButton,.koDownloadFileButton { margin-left: auto; flex: 0 0 auto; min-height: 28px; padding: 0 12px; border: 1px solid #6e6e73; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 8px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.koReaderActions .koViewFileButton,.koReaderActions .koDownloadFileButton { margin-left: 0; }
+.koDownloadFileButton { border-color: #c7c7cc; color: #555559; }
+.koViewPdfButton:hover,.koViewFileButton:hover,.koDownloadFileButton:hover { background: #f5f5f7; }
+.koViewPdfButton:focus-visible,.koViewFileButton:focus-visible,.koDownloadFileButton:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
 .koReaderTitle { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 2px; }
 .koReaderTitle small { color: #6e6e73; font-size: 7px; font-weight: 700; letter-spacing: .055em; text-transform: uppercase; }
 .koReader pre { flex: 1; min-height: 0; margin: 0; overflow: auto; padding: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -1446,6 +1449,28 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 @media (max-width: 780px) { .koGrid { grid-template-columns: 1fr; } .koExplorer, .koExplorer.compact { height: 640px; } .koExplorer.hasGraphicAbstract:not(.compact):not(.showingFiles) { height: clamp(460px,115vw,620px); } .koFilesFace,.koExplorer.compact .koFilesFace { grid-template-columns: 1fr; grid-template-rows: 360px minmax(0,1fr); } .koMap { border-right: 0; border-bottom: 1px solid #d2d2d7; } .koMapCanvas { min-height: 0; } .koMap canvas { max-width: 330px; } .koReader { min-height: 250px; } .graphicAbstractBackdrop { padding: 8px; } .graphicAbstractDialog { width: 100%; height: 96vh; } .graphicAbstractDialog>div { padding: 8px; } .graphicAbstractDialog img { width: 100%; } .koOverviewContent { grid-template-columns: 1fr; grid-template-rows: minmax(0,2fr) minmax(0,1fr); gap: 12px; padding: 8px; } .koOverviewContent.graphicOnly { grid-template-rows: minmax(0,1fr); padding: 8px; } .koOverviewPurpose { align-items: flex-start; padding: 4px 8px 18px; } .koOverviewPurpose p { font-size: clamp(18px,5vw,26px); } .koFullscreenFilesContent { padding: 8px; } .koFullscreenFilesContent > .koExplorer,.koFullscreenFilesContent > .koExplorer.compact { height: 100%; } }
 @media (max-width: 560px) { .koGraphicAbstract { grid-template-columns: 1fr; grid-template-rows: minmax(0,1fr) auto; gap: 12px; } .koPurpose,.koExplorer.compact .koPurpose { padding: 0 4px 8px; } .koPurpose p,.koExplorer.compact .koPurpose p { font-size: 13px; line-height: 1.42; } }
 @media (prefers-reduced-motion: reduce) { .koFlipStage { transition: none; } }
+.documentViewerBackdrop { position: fixed; z-index: 1100; inset: 0; padding: 12px; background: rgba(28,28,30,.46); backdrop-filter: blur(10px); }
+.documentViewerDialog { width: 100%; height: 100%; overflow: hidden; display: grid; grid-template-rows: auto minmax(0,1fr) auto; border: 1px solid #aeaeb2; border-radius: 18px; background: #f5f5f7; box-shadow: 0 28px 80px rgba(0,0,0,.28); }
+.documentViewerDialog > header { min-height: 72px; display: flex; align-items: center; gap: 18px; padding: 12px 18px; border-bottom: 1px solid #d2d2d7; background: rgba(255,255,255,.94); }
+.documentViewerDialog > header > div:first-child { min-width: 0; flex: 1; }
+.documentViewerDialog header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+.documentViewerDialog h2 { margin: 3px 0 2px; overflow: hidden; color: #1d1d1f; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
+.documentViewerDialog header small { display: block; overflow: hidden; color: #8e8e93; font: 9px "SFMono-Regular",Menlo,monospace; text-overflow: ellipsis; white-space: nowrap; }
+.documentViewerActions { display: flex; align-items: center; gap: 9px; }
+.documentViewerActions button { min-height: 34px; padding: 0 14px; border: 1px solid #aeaeb2; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 9px; font-weight: 750; cursor: pointer; }
+.documentViewerActions .documentViewerClose { width: 34px; padding: 0; border-color: #636366; border-radius: 50%; font-size: 20px; font-weight: 400; line-height: 1; }
+.documentViewerBody { overflow: auto; width: min(1040px,calc(100% - 32px)); margin: 16px auto; padding: clamp(28px,5vw,70px); background: #fff; color: #1d1d1f; box-shadow: 0 2px 16px rgba(0,0,0,.08); font: 15px/1.62 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif; }
+.documentViewerBody h1 { margin: 1.7em 0 .65em; font-size: 25px; line-height: 1.2; }
+.documentViewerBody h2 { margin: 1.5em 0 .55em; font-size: 20px; white-space: normal; }
+.documentViewerBody p { margin: .7em 0; }
+.documentViewerBody ul,.documentViewerBody ol { padding-left: 1.5em; }
+.documentViewerBody table { width: 100%; margin: 18px 0; border-collapse: collapse; }
+.documentViewerBody th,.documentViewerBody td { padding: 8px 10px; border: 1px solid #d2d2d7; vertical-align: top; text-align: left; }
+.documentViewerBody th { background: #f5f5f7; }
+.documentViewerBody img { display: block; max-width: 100%; height: auto; margin: 18px auto; }
+.documentViewerBody a { color: #0066cc; }
+.documentViewerDialog > footer { min-height: 34px; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; border-top: 1px solid #d2d2d7; background: #fff; color: #6e6e73; font-size: 9px; }
+@media (max-width: 700px) { .koReaderActions { gap: 4px; } .koViewFileButton,.koDownloadFileButton { padding: 0 7px; font-size: 7px; } .documentViewerBackdrop { padding: 4px; } .documentViewerDialog { border-radius: 12px; } .documentViewerDialog > header { padding: 10px; } .documentViewerActions button:first-child { display: none; } .documentViewerBody { width: calc(100% - 12px); margin: 6px auto; padding: 22px 16px; } }
 .turtleView { flex: 1; min-height: 390px; overflow: auto; padding: 18px; background: #fff; }
 .namespacePanel { margin-bottom: 14px; padding: 11px 13px; border: 1px solid #d2d2d7; border-radius: 8px; background: #f5f5f7; }
 .namespacePanel h3 { margin: 0 0 7px; color: #6e6e73; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }

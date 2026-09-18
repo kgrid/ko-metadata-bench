@@ -3,6 +3,8 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 import { orderWorkshopObjects } from "../app/workshop-ordering.js";
+import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
+import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
@@ -23,21 +25,6 @@ function looksText(buffer) {
   if (buffer.includes(0)) return false;
   const decoded = buffer.toString("utf8");
   return !decoded.includes("\uFFFD");
-}
-
-function extractedDocxText(path) {
-  try {
-    const xml = execFileSync("unzip", ["-p", path, "word/document.xml"], { encoding: "utf8" });
-    const text = xml
-      .replace(/<w:tab\/?\s*>/g, "\t")
-      .replace(/<\/w:p>/g, "\n")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
-      .replace(/\n{3,}/g, "\n\n").trim();
-    return `[Extracted DOCX text]\n\n${text}`;
-  } catch {
-    return "[Extracted DOCX text unavailable]";
-  }
 }
 
 function replaceExactly(source, pattern, replacement, label) {
@@ -74,6 +61,7 @@ try {
   const binaryFiles = {};
   const serverBinaryFiles = {};
   const serverStaticFiles = {};
+  const documentProjections = {};
   const serverKoAssetRoot = join(workspace, "public", "ko-assets");
   rmSync(serverKoAssetRoot, { recursive: true, force: true });
   folders.forEach((folder, index) => {
@@ -97,9 +85,21 @@ try {
         } else {
           serverBinaryFiles[key] = binaryFiles[key];
         }
-        if (/\.docx$/i.test(path)) textFiles[key] = extractedDocxText(path);
+        if (/\.docx$/i.test(path)) {
+          const projection = convertDocxToProjection({
+            docxPath: path,
+            knowledgeObjectId: `workshop-ko-${index + 1}`,
+            originalPath: relative(folderPath, path).split("\\").join("/"),
+          });
+          documentProjections[key] = projection;
+          textFiles[key] = documentProjectionToPlainText(projection);
+        }
       }
     }
+  });
+  const packagedDocumentProjections = packageDocumentProjectionMedia({
+    records: documentProjections,
+    publicRoot: join(workspace, "public", "docx-assets"),
   });
 
   const reactPath = join(workspace, "app/page.tsx");
@@ -108,7 +108,7 @@ try {
   react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
   react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
   react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
-  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst base64ToBytes`, "React binary and static-asset payloads");
+  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nconst base64ToBytes`, "React binary, static-asset, and document-projection payloads");
   writeFileSync(reactPath, react);
 
   const standalonePath = join(workspace, "outputs/Knowledge-Object-Workbench.html");
@@ -121,12 +121,12 @@ try {
   standalone = replaceExactly(
     standalone,
     /^const overrides=\{[\s\S]*?^const base64ToBytes=/m,
-    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst base64ToBytes=`,
+    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst documentProjectionOverrides=${serializeForScript(packagedDocumentProjections.standaloneRecords).replaceAll("</script", "<\\/script")};\nconst base64ToBytes=`,
     "standalone embedded payloads"
   );
   writeFileSync(standalonePath, standalone);
 
-  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length }, null, 2));
+  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length, derivedDocumentImages: packagedDocumentProjections.assets.length }, null, 2));
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }

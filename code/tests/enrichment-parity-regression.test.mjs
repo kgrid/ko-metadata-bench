@@ -46,11 +46,19 @@ function pageBinaryOverrides(source) {
 }
 
 function pageStaticAssetOverrides(source) {
-  return objectLiteralBetween(source, "const objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ", ";\nconst base64ToBytes", "React static-asset bundle");
+  return objectLiteralBetween(source, "const objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ", ";\nconst documentProjectionOverrides", "React static-asset bundle");
 }
 
 function standaloneBinaryOverrides(source) {
-  return objectLiteralBetween(source, "const objectBinaryOverrides=", ";\nconst base64ToBytes", "standalone binary bundle");
+  return objectLiteralBetween(source, "const objectBinaryOverrides=", ";\nconst documentProjectionOverrides", "standalone binary bundle");
+}
+
+function pageDocumentProjectionOverrides(source) {
+  return objectLiteralBetween(source, "const documentProjectionOverrides: Record<string, unknown> = ", ";\nconst base64ToBytes", "React document-projection bundle");
+}
+
+function standaloneDocumentProjectionOverrides(source) {
+  return objectLiteralBetween(source, "const documentProjectionOverrides=", ";\nconst base64ToBytes", "standalone document-projection bundle");
 }
 
 test("React and standalone editions embed identical Findability and Reusability metadata", async () => {
@@ -74,6 +82,8 @@ test("server static KO PDFs and standalone embedded PDFs preserve complete editi
   const pageBinary = pageBinaryOverrides(page);
   const pageStatic = pageStaticAssetOverrides(page);
   const standaloneBinary = standaloneBinaryOverrides(standalone);
+  const pageDocuments = pageDocumentProjectionOverrides(page);
+  const standaloneDocuments = standaloneDocumentProjectionOverrides(standalone);
 
   assert.deepEqual(Object.keys(standaloneText).sort(), Object.keys(pageText).sort(), "all embedded text-file paths match");
   assert.deepEqual(standaloneText, pageText, "all embedded text-file contents match");
@@ -81,6 +91,26 @@ test("server static KO PDFs and standalone embedded PDFs preserve complete editi
   const standaloneNonPdf = Object.fromEntries(Object.entries(standaloneBinary).filter(([key]) => !/\.pdf$/i.test(key)));
   assert.deepEqual(pageBinary, standaloneNonPdf, "non-PDF binary contents remain identical");
   assert.deepEqual(Object.keys(pageStatic).sort(), standalonePdfKeys, "every standalone KO PDF has a server static-asset record");
+  assert.deepEqual(Object.keys(pageDocuments).sort(), Object.keys(standaloneDocuments).sort(), "both editions contain the same DOCX projections");
+  for (const key of Object.keys(pageDocuments)) {
+    const serverDocument = pageDocuments[key];
+    const standaloneDocument = standaloneDocuments[key];
+    const withoutTransport = (document) => ({
+      ...document,
+      embeddedImages: document.embeddedImages.map(({ contentBase64, resourceUrl, ...image }) => image),
+    });
+    assert.deepEqual(withoutTransport(serverDocument), withoutTransport(standaloneDocument), `${key} has edition-neutral document content`);
+    for (let index = 0; index < serverDocument.embeddedImages.length; index += 1) {
+      const serverImage = serverDocument.embeddedImages[index];
+      const standaloneImage = standaloneDocument.embeddedImages[index];
+      assert.equal("contentBase64" in serverImage, false, `${key} server projection contains no image bytes`);
+      assert.match(serverImage.resourceUrl, /^\/docx-assets\//, `${key} server projection uses a same-origin derived image URL`);
+      assert.equal("resourceUrl" in standaloneImage, false, `${key} standalone projection has no server dependency`);
+      const expectedBytes = Buffer.from(standaloneImage.contentBase64, "base64");
+      const servedBytes = await readFile(new URL(`../public${serverImage.resourceUrl}`, import.meta.url));
+      assert.deepEqual(servedBytes, expectedBytes, `${key} derived server image matches its standalone embedded resource`);
+    }
+  }
   assert.equal(Object.keys(pageBinary).some((key) => /\.pdf$/i.test(key)), false, "server client bundle contains no KO PDF bytes");
   assert.match(page, /className="koViewPdfButton"/, "server file reader exposes the generic PDF action");
   assert.match(page, />View PDF<\/button>/, "server PDF action has a clear visible label");
