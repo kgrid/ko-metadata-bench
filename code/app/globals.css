@@ -251,7 +251,11 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .facetLabel:hover::after, .facetLabel:focus-visible::after { opacity: 1; visibility: visible; transform: translateY(0); }
 .facetCopy small, .facetCopy a { overflow-wrap: anywhere; color: #555559; font: 10px/1.4 "SFMono-Regular", "SF Mono", Menlo, monospace; }
 .koSummaryFacetList { background: rgba(255, 255, 255, .72); }
+.koSummaryFacetList .facetCopy { flex: 1; }
 .koSummaryFacetList .facetCopy small { font-size: 11px; line-height: 1.45; }
+.koSummarySpecsButton { min-width: 64px; align-self: center; margin-left: auto; padding: 4px 5px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 9px; font-weight: 700; letter-spacing: .04em; line-height: normal; text-transform: uppercase; cursor: pointer; }
+.koSummarySpecsButton:hover { background: #f2f2f4; }
+.koSummarySpecsButton:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
 .facetCopy a { color: #3a3a3c; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .facetCopy .licenseResourceLink { width: fit-content; min-height: 28px; display: inline-flex; align-items: center; gap: 8px; margin-top: 3px; padding: 0 10px; border: 1px solid #8e8e93; border-radius: 7px; background: #fff; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-weight: 650; text-decoration: none; }
 .facetCopy .licenseResourceLink span { color: #6e6e73; font-size: 12px; line-height: 1; }

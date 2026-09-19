@@ -2105,6 +2105,12 @@ function cksSummaryFile(files: readonly FileName[]) {
     return leftPriority - rightPriority || left.localeCompare(right);
   })[0] ?? files[0] ?? "";
 }
+function fullCksDocumentFile(files: readonly FileName[]) {
+  const documents = files.filter((file) => /\.docx$/i.test(file) && /(?:^|[\/_-])cks(?:[\/_-]|$)/i.test(file));
+  return documents.filter((file) => !/(?:one[-_ ]page|summary)/i.test(file)).sort((left, right) => left.localeCompare(right))[0]
+    ?? documents.sort((left, right) => left.localeCompare(right))[0]
+    ?? "";
+}
 function fileLayer(file: FileName) { return FILE_LAYERS.find((layer) => layer.id === fileLayerId(file)) ?? FILE_LAYERS.at(-1)!; }
 
 function radialMapGeometry(width: number, height: number) {
@@ -2326,12 +2332,15 @@ function KnowledgeObjectExplorer({ objectId, drafts, compact = false, preserveFa
 
 function KnowledgeObjectShade({ objectId, drafts }: { objectId: ObjectId; drafts: Drafts }) {
   const [graphicView, setGraphicView] = useState<"overview" | "logic" | "files" | "runner" | null>(null);
+  const [specsOpen, setSpecsOpen] = useState(false);
   const runner = runnerAvailabilityByObject[objectId];
   const graphicAbstract = graphicAbstractFile(filesForObject(objectId));
   const graphicLogic = graphicLogicFile(filesForObject(objectId));
   const abstractSource = graphicAbstract ? `data:${graphicAbstractMimeType(graphicAbstract)};base64,${objectBinaryOverrides[draftKey(objectId, graphicAbstract)]}` : "";
   const logicSource = graphicLogic ? `data:${graphicAbstractMimeType(graphicLogic)};base64,${objectBinaryOverrides[draftKey(objectId, graphicLogic)]}` : "";
   const purpose = knowledgeObjectPurpose(objectId, drafts);
+  const fullCksFile = fullCksDocumentFile(filesForObject(objectId));
+  const fullCksProjection = fullCksFile ? documentProjectionFor(objectId, fullCksFile) : undefined;
   const summaryFacts = [
     ["Size", formatKnowledgeObjectSize(knowledgeObjectByteSize(objectId))],
     ["Knowledge Elements", knowledgeElementCount(objectId, drafts)],
@@ -2339,8 +2348,8 @@ function KnowledgeObjectShade({ objectId, drafts }: { objectId: ObjectId; drafts
   ];
   return <><details className="koObjectShade">
     <summary><strong>{objectName(objectId)}</strong>{graphicAbstract && <button type="button" className="koShadeGraphic" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setGraphicView("overview"); }} aria-label={`Open ${objectName(objectId)} overview`}>Overview</button>}{graphicLogic && <button type="button" className="koShadeGraphic" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setGraphicView("logic"); }} aria-label={`Open ${objectName(objectId)} logic`}>Logic</button>}<button type="button" className="koShadeGraphic koShadeRun" disabled={!runner?.available} title={runner?.available ? "Run this knowledge object's declared browser operation" : runner?.validationError ?? "No browser Runner is supplied by this knowledge object."} onClick={(event) => { event.preventDefault(); event.stopPropagation(); if (runner?.available) setGraphicView("runner"); }} aria-label={runner?.available ? `Run ${objectName(objectId)}` : `${objectName(objectId)} Runner unavailable`}>Run</button><button type="button" className="koShadeFileCount" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setGraphicView("files"); }} aria-label={`Open ${objectName(objectId)} files`}>{filesForObject(objectId).length} Files</button></summary>
-    <div className="facetList koSummaryFacetList">{summaryFacts.map(([label, value], index) => <div className="facetRow declared" key={label}><span className="facetNumber">{index + 1}</span><span className="facetCopy"><strong>{label}</strong><small>{value}</small></span></div>)}</div>
-  </details>{graphicView === "runner" && runner?.bundleSource && runner.manifest?.knowledgeObjectId ? createPortal(<KnowledgeObjectRunnerView objectId={objectId} bundleSource={runner.bundleSource} knowledgeObjectId={runner.manifest.knowledgeObjectId} onClose={() => setGraphicView(null)} />, document.body) : graphicView === "files" ? createPortal(<KnowledgeObjectFilesView objectId={objectId} drafts={drafts} onClose={() => setGraphicView(null)} />, document.body) : graphicView && graphicView !== "runner" && createPortal(<KnowledgeObjectGraphicView objectId={objectId} source={graphicView === "overview" ? abstractSource : logicSource} purpose={purpose} kind={graphicView} onClose={() => setGraphicView(null)} />, document.body)}</>;
+    <div className="facetList koSummaryFacetList">{summaryFacts.map(([label, value], index) => <div className="facetRow declared" key={label}><span className="facetNumber">{index + 1}</span><span className="facetCopy"><strong>{label}</strong><small>{value}</small></span>{label === "Knowledge Elements" && fullCksProjection?.sanitizedHtml && <button type="button" className="koSummarySpecsButton" aria-label={`Open ${objectName(objectId)} full CKS specification`} onClick={() => setSpecsOpen(true)}>Specs</button>}</div>)}</div>
+  </details>{specsOpen && fullCksProjection && createPortal(<DocumentProjectionDialog objectId={objectId} file={fullCksFile} projection={fullCksProjection} onClose={() => setSpecsOpen(false)} />, document.body)}{graphicView === "runner" && runner?.bundleSource && runner.manifest?.knowledgeObjectId ? createPortal(<KnowledgeObjectRunnerView objectId={objectId} bundleSource={runner.bundleSource} knowledgeObjectId={runner.manifest.knowledgeObjectId} onClose={() => setGraphicView(null)} />, document.body) : graphicView === "files" ? createPortal(<KnowledgeObjectFilesView objectId={objectId} drafts={drafts} onClose={() => setGraphicView(null)} />, document.body) : graphicView && graphicView !== "runner" && createPortal(<KnowledgeObjectGraphicView objectId={objectId} source={graphicView === "overview" ? abstractSource : logicSource} purpose={purpose} kind={graphicView} onClose={() => setGraphicView(null)} />, document.body)}</>;
 }
 
 function FindabilityGuidedEditor({ value, canonicalSource, state, onEdit }: { value: string; canonicalSource: string; state: ReturnType<typeof evaluateFindabilityEnrichment>; onEdit: (value: string) => void }) {
