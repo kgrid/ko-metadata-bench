@@ -1502,24 +1502,58 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .humanRdfChild > strong { color: #3a3a3c; font-size: 9px; }
 .rdfTermButton { max-width: 100%; margin: 0; padding: 0; border: 0; border-bottom: 1px dotted #aeaeb2; background: transparent; color: inherit; font: inherit; font-weight: inherit; text-align: left; white-space: normal; overflow-wrap: anywhere; word-break: break-word; cursor: pointer; }
 .rdfTermButton:hover, .rdfTermButton:focus-visible { border-bottom-color: #1d1d1f; color: #000; }
+.rdfTermPreview { position: fixed; z-index: 1200; width: min(284px,calc(100vw - 20px)); padding: 11px 12px; border: 1px solid #d2d2d7; border-radius: 10px; background: rgba(255,255,255,.98); box-shadow: 0 7px 24px rgba(0,0,0,.14); color: #1d1d1f; pointer-events: auto; }
+.rdfTermPreview > span { display: block; margin-bottom: 3px; color: #6e6e73; font-size: 8px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.rdfTermPreview > strong { display: block; font-size: 11px; line-height: 1.3; }
+.rdfTermPreview > p { margin: 6px 0 9px; color: #515154; font-size: 9px; line-height: 1.45; }
+.rdfTermPreview > footer { display: flex; align-items: center; justify-content: space-between; gap: 9px; padding-top: 7px; border-top: 1px solid #ececef; }
+.rdfTermPreview > footer b { font-size: 8px; }
+.rdfTermPreview > footer small { color: #6e6e73; font-size: 7px; text-align: right; }
 .humanRdfChild > div:first-child > .rdfTermButton { align-self: start; color: #3a3a3c; font-size: 9px; font-weight: 700; }
 .humanRdfSubordinateRow td { background: #f5f5f7; border-top-color: #c7c7cc; }
 .humanRdfSubordinateRow td:first-child { position: relative; }
 .humanRdfSubordinateRow td:first-child::after { content: "↳"; position: absolute; right: 12px; top: 9px; color: #8e8e93; font-size: 13px; }
 .humanRdfSubordinateRow td:nth-child(2) { padding-left: 14px; font-weight: 700; }
 .humanRdfSubordinateRow td:last-child > code { display: block; margin-top: 4px; color: #6e6e73; font: 8px/1.4 "SFMono-Regular", "SF Mono", Menlo, monospace; overflow-wrap: anywhere; }
-.rdfTermDetails { position: sticky; top: 0; z-index: 2; margin-bottom: 12px; overflow: hidden; border: 1px solid #aeaeb2; border-radius: 9px; background: rgba(250,250,252,.98); box-shadow: 0 4px 14px rgba(0,0,0,.09); }
-.rdfTermDetails header { min-height: 45px; display: flex; align-items: center; padding: 8px 10px 8px 13px; border-bottom: 1px solid #d2d2d7; }
+.rdfTermDetailsBackdrop { position: fixed; inset: 0; z-index: 1250; padding: 14px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; background: #6f8296; }
+.rdfTermDetails { width: 100%; min-height: calc(100vh - 28px); overflow: visible; border: 1px solid #aeaeb2; border-radius: 12px; background: rgba(250,250,252,.99); box-shadow: 0 18px 55px rgba(0,0,0,.18); }
+.rdfTermDetails > header { position: sticky; top: -14px; z-index: 2; min-height: 72px; display: flex; align-items: center; padding: 10px 22px 10px 28px; border-bottom: 1px solid #d2d2d7; border-radius: 12px 12px 0 0; background: rgba(250,250,252,.98); }
 .rdfTermDetails header div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.rdfTermDetails header span { color: #6e6e73; font-size: 8px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
-.rdfTermDetails header strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-.rdfTermDetails header button { width: 25px; height: 25px; margin-left: auto; border: 0; border-radius: 50%; background: #e8e8ed; color: #3a3a3c; font-size: 17px; cursor: pointer; }
+.rdfTermDetails header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+.rdfTermDetails header h2 { margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(18px,2vw,26px); font-weight: 650; letter-spacing: -.02em; }
+.rdfTermDetails > header > button { width: 42px; height: 42px; margin-left: auto; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
+.rdfTermDetailsBody { width: min(1120px,calc(100% - 48px)); margin: 0 auto; padding: 28px 0 42px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-content: start; }
+.rdfTermDetailsBackdrop::-webkit-scrollbar { width: 10px; }
+.rdfTermDetailsBackdrop::-webkit-scrollbar-track { background: transparent; }
+.rdfTermDetailsBackdrop::-webkit-scrollbar-thumb { border: 3px solid transparent; border-radius: 999px; background: #a9adb2; background-clip: padding-box; }
+.termInsightMeaning, .termInsightStatement, .termInsightIdentifiers, .termInsightRelationships { min-width: 0; overflow: hidden; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
+.termInsightMeaning, .termInsightStatement { min-height: 150px; padding: 22px 24px; }
+.termInsightMeaning > span, .termInsightStatement > span { display: block; margin-bottom: 10px; color: #6e6e73; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.termInsightMeaning p, .termInsightStatement p, .termInsightRelationships p { margin: 0; color: #3a3a3c; font-size: 12px; line-height: 1.6; }
+.termInsightMeaning small { display: inline-block; margin-top: 14px; padding: 4px 8px; border-radius: 999px; background: #f0f0f2; color: #6e6e73; font-size: 9px; }
+.termInsightStatement strong { display: inline-block; max-width: 100%; margin-bottom: 14px; padding: 7px 11px; border: 1px solid #9bb7d0; border-radius: 8px; background: #e8f0f7; color: #263f55; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.termInsightStatement p b { color: #8e8e93; font-weight: 500; }
+.termInsightIdentifiers h4, .termInsightRelationships h4 { margin: 0; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.termInsightIdentifiers h4 { padding: 18px 20px 12px; border-bottom: 1px solid #e5e5e8; color: #3a3a3c; }
 .rdfTermDetails dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin: 0; }
-.rdfTermDetails dl div { min-width: 0; padding: 8px 12px; border-top: 1px solid #e5e5e8; }
+.rdfTermDetails dl div { min-width: 0; padding: 15px 20px; border-top: 1px solid #e5e5e8; }
 .rdfTermDetails dl div:nth-child(-n+2) { border-top: 0; }
-.rdfTermDetails dt { margin-bottom: 3px; color: #6e6e73; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
-.rdfTermDetails dd { margin: 0; color: #3a3a3c; font-size: 9px; overflow-wrap: anywhere; }
+.rdfTermDetails dl div:nth-child(odd) { border-right: 1px solid #e5e5e8; }
+.rdfTermDetails dt { margin-bottom: 6px; color: #6e6e73; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+.rdfTermDetails dd { margin: 0; color: #3a3a3c; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.rdfTermDetails dd code { display: block; margin-top: 5px; color: #6e6e73; font-size: 10px; line-height: 1.5; }
 .rdfTermDetails code { font-family: "SFMono-Regular","SF Mono",Menlo,monospace; }
+.termInsightRelationships > header { min-height: 52px; padding: 14px 18px; border-bottom: 1px solid #e5e5e8; }
+.termInsightRelationships > header span { margin-left: auto; padding: 4px 8px; border-radius: 999px; background: #f0f0f2; font-size: 9px; letter-spacing: .02em; }
+.termInsightRelationshipGroups > section + section { border-top: 1px solid #d8d8dc; }
+.termInsightRelationshipGroups > section > header { display: grid; grid-template-columns: 74px minmax(0,1fr) auto; align-items: center; gap: 12px; min-height: 42px; padding: 9px 18px; background: #f7f7f9; }
+.termInsightRelationshipGroups > section > header b { color: #6e6e73; font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+.termInsightRelationshipGroups > section > header strong { color: #3a3a3c; font-size: 11px; }
+.termInsightRelationshipGroups > section > header span { min-width: 24px; padding: 3px 7px; border-radius: 999px; background: #e8e8ed; color: #515154; font-size: 9px; text-align: center; }
+.termInsightRelationships ul { display: grid; margin: 0; padding: 0; list-style: none; }
+.termInsightRelationships li { padding: 11px 18px 11px 104px; border-top: 1px solid #ececef; color: #515154; font-size: 11px; line-height: 1.45; }
+.termInsightRelationships > p { padding: 18px; }
+@media (max-width: 760px) { .rdfTermDetailsBackdrop { padding: 8px; } .rdfTermDetailsBody { width: min(100% - 24px,680px); grid-template-columns: 1fr; gap: 12px; padding: 16px 10px 28px 0; } .termInsightMeaning, .termInsightStatement { min-height: 0; padding: 18px; } .rdfTermDetails dl { grid-template-columns: 1fr; } .rdfTermDetails dl div:nth-child(odd) { border-right: 0; } .rdfTermDetails dl div:nth-child(2) { border-top: 1px solid #e5e5e8; } }
 .invalidRdfSource { margin: 0; padding: 18px; border: 1px solid #c7c7cc; border-radius: 9px; background: #f5f5f7; color: #3a3a3c; }
 .invalidRdfSource strong { display: block; margin-bottom: 6px; font-size: 12px; }
 .invalidRdfSource p { margin: 0 0 10px; color: #6e6e73; font-size: 10px; line-height: 1.5; }

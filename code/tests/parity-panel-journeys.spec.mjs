@@ -76,11 +76,21 @@ async function runJourney(page, url) {
   };
 
   expect(await panelIsOpen(panel)).toBe(false);
+
+  await page.getByRole("button", { name: "F exercise", exact: true }).click();
+  const prognosticPanel = await panelFor(page, "DFU Prognostic Indicator KO");
+  await prognosticPanel.getByRole("button", { name: "Audit", exact: true }).click();
+  const auditDialog = page.getByRole("dialog", { name: "DFU Prognostic Indicator KO", exact: true });
+  await expect(auditDialog).toBeVisible();
+  await expect(auditDialog.getByText("4 of 10", { exact: false })).toBeVisible();
+  await auditDialog.getByRole("button", { name: "Close findability audit", exact: true }).click();
+
   expect(errors, `${url} produced no uncaught browser errors`).toEqual([]);
-  return { panelCount: await panels.count(), summaryFacts: 3, views };
+  return { panelCount: await panels.count(), summaryFacts: 3, degradedFindabilityAudit: "4 of 10", views };
 }
 
 test("server and standalone editions share panel and full-screen-view journeys", async ({ browser }) => {
+  test.setTimeout(60_000);
   const serverPage = await browser.newPage();
   const standalonePage = await browser.newPage();
   const server = await runJourney(serverPage, editions.server);

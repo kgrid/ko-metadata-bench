@@ -29,7 +29,7 @@ async function documentJourney(page, url) {
   await specsButton.click();
   const specsDialog = page.getByRole("dialog", { name: /\.docx$/ });
   await expect(specsDialog).toBeVisible();
-  const specsTitle = await specsDialog.getByRole("heading", { level: 2 }).textContent();
+  const specsTitle = await specsDialog.locator("#document-viewer-title").textContent();
   expect(specsTitle).toContain(".docx");
   expect(specsTitle).not.toMatch(/One-Page|Summary/i);
   await expect(specsDialog.getByRole("button", { name: "Download Original", exact: true })).toBeVisible();

@@ -64,7 +64,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(embeddedParser, /<!doctype html>|const embeddedAbstractPdf|RDF relationship explorer/);
   assert.match(html, /minObjectCount=1,maxObjectCount=10/);
   assert.match(html, /objectIds=Array\.from\(\{length:embeddedObjectCount\}/);
-  assert.match(html, /findabilityFilesForObject=id=>filesForObject\(id\)\.filter/);
+  assert.match(html, /findabilityFilesForObject=id=>resolveObjectResource\(id,"findability\.metadata\.txt"\)\?\["findability\.metadata\.txt"\]:\[\]/);
   assert.match(html, /for\(const objectId of objectIds\)for\(const file of findabilityFilesForObject\(objectId\)\)/);
   assert.doesNotMatch(html, /function searchAll\(query\)[\s\S]{0,300}for\(const file of filesForObject\(objectId\)\)/);
   assert.match(html, /<input type="search" aria-label="Search knowledge objects" aria-keyshortcuts="Enter" enterkeyhint="search"/);
