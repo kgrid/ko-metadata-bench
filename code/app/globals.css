@@ -1177,7 +1177,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .rdfViewControl { display: flex; padding: 2px; border: 1px solid #d2d2d7; border-radius: 7px; background: #ededf0; }
 .rdfViewControl button { height: 21px; padding: 0 7px; border: 0; border-radius: 5px; background: transparent; color: #6e6e73; font-size: 8px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .rdfViewControl button.active { background: #fff; color: #1d1d1f; box-shadow: 0 1px 3px rgba(0,0,0,.14); }
-.relationshipBackdrop { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 28px; background: rgba(29,29,31,.32); backdrop-filter: blur(10px); }
+.relationshipBackdrop { position: fixed; inset: 0; z-index: 1050; display: grid; place-items: center; padding: 28px; background: rgba(29,29,31,.32); backdrop-filter: blur(10px); }
 .relationshipDialog { width: min(900px, 94vw); height: min(680px, 86vh); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #8e8e93; border-radius: 16px; background: rgba(250,250,252,.98); box-shadow: 0 24px 70px rgba(0,0,0,.22); }
 .relationshipDialog > header { min-height: 66px; display: flex; align-items: center; padding: 11px 14px 11px 20px; border-bottom: 1px solid #d2d2d7; }
 .relationshipDialog > header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
@@ -1501,7 +1501,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .humanRdfChildValue > code { display: block; margin-top: 4px; color: #6e6e73; font: 8px/1.4 "SFMono-Regular", "SF Mono", Menlo, monospace; overflow-wrap: anywhere; }
 .humanRdfChild > strong { color: #3a3a3c; font-size: 9px; }
 .rdfTermButton { max-width: 100%; margin: 0; padding: 0; border: 0; border-bottom: 1px dotted #aeaeb2; background: transparent; color: inherit; font: inherit; font-weight: inherit; text-align: left; white-space: normal; overflow-wrap: anywhere; word-break: break-word; cursor: pointer; }
-.rdfTermButton:hover, .rdfTermButton:focus-visible { border-bottom-color: #1d1d1f; color: #000; }
+.rdfTermButton:hover { border-bottom-color: #1d1d1f; color: #000; }
+.rdfTermButton:focus-visible { border-radius: 3px; outline: 3px solid #79a7d3; outline-offset: 3px; border-bottom-color: #1d1d1f; color: #000; }
 .rdfTermPreview { position: fixed; z-index: 1200; width: min(284px,calc(100vw - 20px)); padding: 11px 12px; border: 1px solid #d2d2d7; border-radius: 10px; background: rgba(255,255,255,.98); box-shadow: 0 7px 24px rgba(0,0,0,.14); color: #1d1d1f; pointer-events: auto; }
 .rdfTermPreview > span { display: block; margin-bottom: 3px; color: #6e6e73; font-size: 8px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .rdfTermPreview > strong { display: block; font-size: 11px; line-height: 1.3; }
@@ -1521,7 +1522,10 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .rdfTermDetails header div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .rdfTermDetails header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
 .rdfTermDetails header h2 { margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(18px,2vw,26px); font-weight: 650; letter-spacing: -.02em; }
-.rdfTermDetails > header > button { width: 42px; height: 42px; margin-left: auto; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
+.rdfTermSourceLink { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-left: auto; padding: 0 13px; border: 1px solid #b8b8bd; border-radius: 9px; background: #fff; color: #1d1d1f; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.rdfTermSourceLink:hover { border-color: #7c8fa1; background: #f5f7f9; }
+.rdfTermSourceLink:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
+.rdfTermDetails > header > button { width: 42px; height: 42px; margin-left: 10px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
 .rdfTermDetailsBody { width: min(1120px,calc(100% - 48px)); margin: 0 auto; padding: 28px 0 42px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-content: start; }
 .rdfTermDetailsBackdrop::-webkit-scrollbar { width: 10px; }
 .rdfTermDetailsBackdrop::-webkit-scrollbar-track { background: transparent; }

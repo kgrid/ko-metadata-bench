@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
-import { deriveSafeIriFallback, resolveLocalGraphTermInsight, resolveLocalGraphTermInsightInput } from "../app/term-insight-local.js";
+import { deriveSafeIriFallback, isTermInsightEligible, resolveLocalGraphTermInsight, resolveLocalGraphTermInsightInput, safeExternalHttpUrl } from "../app/term-insight-local.js";
 import { EMBEDDED_VOCABULARY_REGISTRY } from "../app/term-vocabulary-registry.js";
 
 const term = (id, termType, value, compact = value, humanLabel = "") => ({ id, termType, value, compact, humanLabel, language: "", datatype: "" });
@@ -79,9 +79,68 @@ test("IRI fallback derivation does not perform network resolution", () => {
   assert.equal(deriveSafeIriFallback("urn:example:term"), null);
 });
 
+test("external source navigation accepts only credential-free HTTP and HTTPS URLs", () => {
+  assert.equal(safeExternalHttpUrl("https://schema.org/termCode"), "https://schema.org/termCode");
+  assert.equal(safeExternalHttpUrl("http://example.org/source"), "http://example.org/source");
+  assert.equal(safeExternalHttpUrl("HTTPS://EXAMPLE.ORG/source"), "https://example.org/source");
+  assert.equal(safeExternalHttpUrl("javascript:alert(1)"), null);
+  assert.equal(safeExternalHttpUrl("data:text/html,unsafe"), null);
+  assert.equal(safeExternalHttpUrl("mailto:user@example.org"), null);
+  assert.equal(safeExternalHttpUrl("file:///tmp/source"), null);
+  assert.equal(safeExternalHttpUrl("https://user:secret@example.org/source"), null);
+  assert.equal(safeExternalHttpUrl("not a URL"), null);
+});
+
+test("previews and details exclude literals and blank structural nodes", () => {
+  assert.equal(isTermInsightEligible(term("named", "NamedNode", "https://example.org/term")), true);
+  assert.equal(isTermInsightEligible(term("literal", "Literal", "ordinary text")), false);
+  assert.equal(isTermInsightEligible(term("blank", "BlankNode", "b1")), false);
+  assert.equal(isTermInsightEligible(null), false);
+});
+
+test("unsupported named terms remain usable without invented descriptions", () => {
+  const unsupported = term("unsupported", "NamedNode", "urn:example:unsupported", "urn:example:unsupported", "Unsupported term");
+  const insight = resolveLocalGraphTermInsight({ namespaces: [], statements: [] }, unsupported, { registry: {} });
+  assert.equal(insight.label, "Unsupported term");
+  assert.equal(insight.explanation, "");
+  assert.equal(insight.descriptionStatus, "unavailable");
+  assert.equal(insight.vocabulary, null);
+  assert.equal(insight.externalUrl, null);
+});
+
+test("Term Insight resolution remains fully offline", () => {
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  globalThis.fetch = () => { fetchCalls += 1; throw new Error("Network access is forbidden in this test."); };
+  try {
+    const insight = resolveLocalGraphTermInsight(graph, resource, { statement: graph.statements[4], role: "subject" });
+    assert.equal(insight.label, "Superficial ulcer");
+    assert.equal(insight.explanation, "An ulcer limited to superficial tissue.");
+    assert.equal(fetchCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("preview and full-page details consume one identical resolved label and explanation", () => {
+  const previewInsight = resolveLocalGraphTermInsight(graph, resource, { statement: graph.statements[4], role: "subject" });
+  const detailsInsight = resolveLocalGraphTermInsight(graph, resource, { statement: graph.statements[4], role: "subject" });
+  assert.deepEqual(
+    { label: previewInsight.label, explanation: previewInsight.explanation },
+    { label: detailsInsight.label, explanation: detailsInsight.explanation },
+  );
+  assert.equal(previewInsight.label, "Superficial ulcer");
+  assert.equal(previewInsight.explanation, "An ulcer limited to superficial tissue.");
+  const reactSource = fs.readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(reactSource, /rdfTermPreview[\s\S]*?<strong>\{insight!\.label\}<\/strong><p>\{insight!\.explanation/);
+  assert.match(reactSource, /rdfTermDetailsBackdrop[\s\S]*?<h2 id="rdf-term-details-title">\{insight\.label\}<\/h2>[\s\S]*?\{insight\.explanation \? <p>\{insight\.explanation\}<\/p>/);
+});
+
 test("standalone edition embeds the exact local-first resolver", () => {
   const standalone = fs.readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.ok(standalone.includes(`const deriveSafeIriFallback=${deriveSafeIriFallback.toString()};`));
+  assert.ok(standalone.includes(`const safeExternalHttpUrl=${safeExternalHttpUrl.toString()};`));
+  assert.ok(standalone.includes(`const isTermInsightEligible=${isTermInsightEligible.toString()};`));
   assert.ok(standalone.includes(`const resolveLocalGraphTermInsightInput=${resolveLocalGraphTermInsightInput.toString()};`));
   const detailsStart = standalone.indexOf("/* LOCAL_TERM_DETAILS_START */");
   const applicationEnd = standalone.indexOf("    openKnowledgeObjects();updateHeader();\n})();");
@@ -111,6 +170,15 @@ test("standalone edition embeds the exact local-first resolver", () => {
   assert.match(details, /setTimeout\(hideRdfTermPreview,140\)/);
   assert.match(details, /pointerenter/);
   assert.match(details, /event\.key==="Escape"/);
+  assert.match(details, /aria-haspopup="dialog"/);
+  assert.match(details, /aria-describedby/);
+  assert.match(details, /role","tooltip"/);
+  assert.match(details, /removeAttribute\("aria-describedby"\)/);
+  assert.match(details, /button\.focus\(\)/);
+  assert.match(details, /rdf-term-button:focus-visible/);
+  assert.match(details, /if\(!isTermInsightEligible\(\{termType:button\.dataset\.termType\}\)\)return/);
   assert.match(details, /Embedded vocabulary description/);
   assert.match(details, /External source identified/);
+  assert.match(details, /Open Source/);
+  assert.match(details, /noopener noreferrer/);
 });

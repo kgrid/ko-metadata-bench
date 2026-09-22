@@ -1,6 +1,20 @@
 import { createTermInsightRecord } from "./term-insight.js";
 import { EMBEDDED_VOCABULARY_REGISTRY } from "./term-vocabulary-registry.js";
 
+/** Only linked, named RDF resources receive preview and details controls. */
+export function isTermInsightEligible(term) {
+  return term?.termType === "NamedNode";
+}
+
+/** Return a normalized user-navigable URL without fetching it. */
+export function safeExternalHttpUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  let parsed;
+  try { parsed = new URL(value.trim()); } catch { return null; }
+  if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password) return null;
+  return parsed.href;
+}
+
 /** Derive display-only IRI facts without dereferencing the IRI. */
 export function deriveSafeIriFallback(iri) {
   if (typeof iri !== "string" || !/^https?:\/\//.test(iri)) return null;
@@ -83,7 +97,7 @@ export function resolveLocalGraphTermInsightInput(graph, selectedTerm, options =
     localRelationships: { incoming: incoming.map((statement) => relationship(statement, statement.subject)), outgoing: outgoing.map((statement) => relationship(statement, statement.object)) },
     statementContext: selectedStatement && role ? { statementId: selectedStatement.id, role, subjectLabel: termLabel(selectedStatement.subject), relationshipLabel: predicateLabel(selectedStatement.predicate), valueLabel: termLabel(selectedStatement.object) } : null,
     iriFallback: iriFallback ? { applied: !registered, descriptionAvailable: Boolean(explanation), namespaceLabel: iriFallback.namespaceLabel, namespaceIri: iriFallback.namespaceIri, host: iriFallback.host, resourceCategory: iriFallback.resourceCategory } : null,
-    externalUrl: registered?.externalUrl ?? (selectedTerm.termType === "NamedNode" && /^https?:\/\//.test(selectedTerm.value) ? selectedTerm.value : null),
+    externalUrl: safeExternalHttpUrl(registered?.externalUrl) ?? (selectedTerm.termType === "NamedNode" ? safeExternalHttpUrl(selectedTerm.value) : null),
   };
 }
 

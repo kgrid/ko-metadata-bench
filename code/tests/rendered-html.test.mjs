@@ -489,6 +489,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(html, /relateButton\.textContent="Relate"|button\.textContent==="Relate"/);
   assert.match(html, /openRelationshipDialog/);
   assert.match(html, /RDF relationship explorer/);
+  assert.match(html, /\.relationship-backdrop\{z-index:1050\}/);
   assert.match(html, /Node-and-edge graph/);
   assert.doesNotMatch(html, /data-presentation="graph"|data-presentation="lanes"/);
   assert.doesNotMatch(html, /state=\{detail,presentation:"graph"/);
