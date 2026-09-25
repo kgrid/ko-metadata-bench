@@ -7,8 +7,8 @@ const editions = {
 
 const objectNames = [
   "DFU Severity Score KO",
-  "HBOT Treatment Decision KO",
-  "HBOT Regimen Burden KO",
+  "HBOT-Treatment-Decision-KO",
+  "HBOT-Regimen-Burden-KO",
   "DFU Prognostic Indicator KO",
 ];
 

@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
+import { Parser } from "n3";
 import { orderWorkshopObjects } from "../app/workshop-ordering.js";
 import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
 import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
@@ -41,6 +42,16 @@ function serializeForScript(value, indent) {
     .replaceAll("\u2029", "\\u2029");
 }
 
+function declaredObjectName(object) {
+  const source = object.readText(object.workshop.findabilityPath);
+  const statements = new Parser({ format: "text/turtle" }).parse(source);
+  const identifier = `workshop-ko-${object.workshop.number}`;
+  const subject = statements.find((statement) => statement.predicate.value === "https://schema.org/identifier" && statement.object.value === identifier)?.subject;
+  const names = statements.filter((statement) => subject && statement.subject.equals(subject) && statement.predicate.value === "https://schema.org/name" && statement.object.termType === "Literal").map((statement) => statement.object.value.trim());
+  if (names.length !== 1 || !names[0]) throw new Error(`${object.folderName}: expected one nonempty schema:name for ${identifier} in findability metadata`);
+  return names[0];
+}
+
 try {
   execFileSync("unzip", ["-q", zipPath, "-d", temp]);
   let root = temp;
@@ -48,14 +59,16 @@ try {
   if (rootEntries.length === 1 && rootEntries[0].isDirectory()) root = join(root, rootEntries[0].name);
 
   const candidates = readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !ignored(entry.name));
-  const folders = orderWorkshopObjects(candidates.map((entry) => {
+  const orderedObjects = orderWorkshopObjects(candidates.map((entry) => {
     const folderPath = join(root, entry.name);
     const paths = walk(folderPath);
     const files = paths.map((path) => relative(folderPath, path).split("\\").join("/"));
     return { entry, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
-  })).map((object) => object.entry);
+  }));
+  const folders = orderedObjects.map((object) => object.entry);
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);
   const folderNames = folders.map((folder) => folder.name);
+  const displayNames = orderedObjects.map(declaredObjectName);
 
   const textFiles = {};
   const binaryFiles = {};
@@ -106,6 +119,7 @@ try {
   let react = readFileSync(reactPath, "utf8");
   react = react.replace(/Math\.max\(MIN_OBJECT_COUNT, \d+\)/, `Math.max(MIN_OBJECT_COUNT, ${folders.length})`);
   react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
+  react = replaceExactly(react, /^const OBJECT_DISPLAY_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_DISPLAY_NAMES = ${JSON.stringify(displayNames)} as const;`, "React metadata display names");
   react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
   react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
   react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nconst base64ToBytes`, "React binary, static-asset, and document-projection payloads");
@@ -115,6 +129,7 @@ try {
   let standalone = readFileSync(standalonePath, "utf8");
   standalone = standalone.replace(/Math\.max\(minObjectCount,\d+\)/, `Math.max(minObjectCount,${folders.length})`);
   standalone = standalone.replace(/const objectFolderNames=\[[^\n]+\];/, `const objectFolderNames=${JSON.stringify(folderNames)};`);
+  standalone = replaceExactly(standalone, /^const objectDisplayNames=\[[^\n]+\];/m, `const objectDisplayNames=${JSON.stringify(displayNames)};`, "standalone metadata display names");
   standalone = standalone.replace(/const dataVersion="[^"]+"/, `const dataVersion="${version}"`);
   const safeText = serializeForScript(textFiles).replaceAll("</script", "<\\/script");
   const safeBinary = serializeForScript(binaryFiles);
@@ -126,7 +141,7 @@ try {
   );
   writeFileSync(standalonePath, standalone);
 
-  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length, derivedDocumentImages: packagedDocumentProjections.assets.length }, null, 2));
+  console.log(JSON.stringify({ version, objects: folders.map((folder, index) => ({ folder: folder.name, displayName: displayNames[index] })), textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length, derivedDocumentImages: packagedDocumentProjections.assets.length }, null, 2));
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }

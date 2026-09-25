@@ -225,7 +225,7 @@ test("both editions retain the same guided-editor contract", async () => {
     "Select both declared records supporting the knowledge represented by this object.",
     "Resetting will discard edits in progress.",
     "Guided metadata entry",
-    "Simulated AI Support",
+    "Assist Me",
     "This knowledge object uses a diabetic foot ulcer’s initial wound area and duration to place it into a published prognostic group and estimate its probability of healing within 16 weeks.",
     "diabetic foot ulcer healing prognosis",
     "16-week wound healing probability",

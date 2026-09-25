@@ -32,10 +32,12 @@ test("complete canonical KO 4 metadata satisfies all Findability unlock requirem
 test("KO 4 full name is canonical and can only be confirmed, not renamed", async () => {
   const canonical = await canonicalTargetSource();
   const baseline = createFindabilityEnrichmentBaseline(canonical);
-  assert.equal(getCanonicalFindabilityName(canonical), "Two-Factor Prognostic Model for Diabetic Foot Ulcer Healing by 16 Weeks");
+  const canonicalName = getCanonicalFindabilityName(canonical);
+  assert.ok(canonicalName, "canonical metadata supplies the name to confirm");
+  assert.ok(!baseline.includes(`schema:name "${canonicalName}"`));
   const confirmed = confirmFindabilityFullName(baseline, canonical);
   assert.equal(evaluateFindabilityEnrichment(confirmed).fullName, true);
-  assert.match(confirmed, /schema:name "Two-Factor Prognostic Model for Diabetic Foot Ulcer Healing by 16 Weeks"/);
+  assert.ok(confirmed.includes(`schema:name "${canonicalName}"`));
 });
 
 test("Findability working baseline generation is deterministic", async () => {

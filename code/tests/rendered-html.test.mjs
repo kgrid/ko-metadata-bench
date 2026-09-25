@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { Parser } from "n3";
 import { createKnowledgeObjectAccessApi } from "../app/ko-access.js";
+import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 import { loadInteroperabilityExerciseKit, projectInteroperabilityExerciseState } from "../app/interoperability-exercise.js";
 import { createInteroperabilitySimulationHost, fixtureReplaySimulationBinding } from "../app/interoperability-simulation.js";
 
@@ -224,7 +226,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /data-ko-access-id/);
   assert.match(html, /FDO Bench KO Access API 1\.0/);
   assert.match(html, /relationship:\{\.\.\.getPredicatePresentation\(statement\.predicate\),human:name\.object\.value\}/);
-  assert.match(html, /objectName=id=>formatFolderName\(objectFolderName\(id\)\)/);
+  assert.match(html, /objectName=id=>objectDisplayNames\[id-1\]/);
   assert.match(html, /fileNamesByObject/);
   assert.match(html, /Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx/);
   assert.match(html, /\[Extracted DOCX text\]/);
@@ -631,6 +633,24 @@ test("KO replacement orders objects by workshop identifier metadata", async () =
   assert.match(script, /orderWorkshopObjects/);
   assert.match(script, /relative\(folderPath, path\)/);
   assert.doesNotMatch(script, /join\(root, folderName, "findability\.metadata\.txt"\)/);
+});
+
+test("both editions display each KO's declared findability schema:name", async () => {
+  const react = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  const declaredNames = [1, 2, 3, 4].map((id) => {
+    const statements = new Parser({ format: "text/turtle" }).parse(embeddedLogicalValue(react, id, "findability.metadata.txt"));
+    const subject = statements.find((statement) => statement.predicate.value === "https://schema.org/identifier" && statement.object.value === `workshop-ko-${id}`)?.subject;
+    const names = statements.filter((statement) => subject && statement.subject.equals(subject) && statement.predicate.value === "https://schema.org/name").map((statement) => statement.object.value);
+    assert.equal(names.length, 1);
+    return names[0];
+  });
+  const reactNames = JSON.parse(react.match(/^const OBJECT_DISPLAY_NAMES = (\[[^\n]+\]) as const;/m)?.[1] ?? "null");
+  const standaloneNames = JSON.parse(standalone.match(/^const objectDisplayNames=(\[[^\n]+\]);/m)?.[1] ?? "null");
+  assert.deepEqual(reactNames, declaredNames);
+  assert.deepEqual(standaloneNames, declaredNames);
+  assert.match(react, /const objectName = \(id: ObjectId\) => OBJECT_DISPLAY_NAMES\[id - 1\]/);
+  assert.match(standalone, /objectName=id=>objectDisplayNames\[id-1\]/);
 });
 
 test("keeps published metadata, exercise kit, and simulation session as explicit models", async () => {

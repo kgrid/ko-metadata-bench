@@ -1482,6 +1482,13 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .namespacePanel strong { color: #3a3a3c; }
 .namespacePanel code { overflow-wrap: anywhere; color: #6e6e73; font-family: "SFMono-Regular", "SF Mono", Menlo, monospace; }
 .tripleTableWrap { overflow: hidden; border: 1px solid #c7c7cc; border-radius: 8px; }
+.metadataAddedLinks { margin-bottom: 16px; padding: 14px 16px; border: 1px solid #b9cfe0; border-radius: 10px; background: #f1f7fb; }
+.metadataAddedLinks > header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.metadataAddedLinks > header strong { font-size: 14px; color: #243f55; }
+.metadataAddedLinks > header span { font-size: 11px; color: #5a6d7c; }
+.metadataAddedLinks ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 16px; margin: 0; padding: 0; list-style: none; }
+.metadataAddedLinks li { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: 12px; line-height: 1.45; }
+.metadataAddedLinks li > span { flex: 0 0 auto; color: #5a6d7c; font-weight: 650; }
 .tripleTable { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .tripleTable th { padding: 9px 11px; background: #eeeef0; color: #6e6e73; font-size: 9px; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
 .tripleTable th:nth-child(1) { width: 38%; }.tripleTable th:nth-child(2) { width: 24%; }.tripleTable th:nth-child(3) { width: 38%; }
