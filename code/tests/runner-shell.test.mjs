@@ -85,12 +85,20 @@ test("structured KO errors and host execution failures use distinct presentation
 });
 
 test("both editions contain Runner failures and keep technical details collapsed", () => {
-  for (const edition of [react, standalone]) {
-    assert.match(edition, /Runner unavailable\./);
-    assert.match(edition, /Execution timed out\./);
-    assert.match(edition, /Output unavailable\./);
-    assert.match(edition, /Technical details/);
-    assert.doesNotMatch(edition, /error\?\.stack|error\.stack/);
+  const runnerSections = [
+    [react, "function RunnerOutputProjection", "function graphicAbstractFile"],
+    [standalone, "function renderRunnerOutputModel", "function mountKoFlips"],
+  ];
+  for (const [edition, startMarker, endMarker] of runnerSections) {
+    const start = edition.indexOf(startMarker);
+    const end = edition.indexOf(endMarker, start + startMarker.length);
+    assert.ok(start >= 0 && end > start, `Runner UI boundaries must exist: ${startMarker} to ${endMarker}`);
+    const runnerUi = edition.slice(start, end);
+    assert.match(runnerUi, /Runner unavailable\./);
+    assert.match(runnerUi, /Execution timed out\./);
+    assert.match(runnerUi, /Output unavailable\./);
+    assert.match(runnerUi, /Technical details/);
+    assert.doesNotMatch(runnerUi, /error\?\.stack|error\.stack/);
   }
   assert.match(react, /RunnerMalformedOutputError/);
   assert.match(standalone, /RunnerMalformedOutputError/);

@@ -58,6 +58,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .contextDestinationsLeft { justify-self: start; }
 .contextDestinations .filesReturnButton { margin-left: 0; }
 .contextDestinations .filesReturnButton[aria-disabled="true"] { cursor: default; }
+.contextDestinations .filesReturnButton:disabled { cursor: default; opacity: .55; }
 .filesReturnButton.activeDestination { background: #3a3a3c; border-color: #3a3a3c; color: #fff; }
 .searchExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 34px 24px 48px; }
 .searchInstrumentMark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: #5c5c5f; color: #fff; font-size: 17px; font-weight: 600; }
@@ -1283,6 +1284,10 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .abstractDialog > iframe { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
 .knowledgeObjectsExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
 .koInstrumentMark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: #3a3a3c; color: #fff; font-size: 11px; font-weight: 700; }
+.assemblyOverview { width: min(760px, 100%); margin-top: 30px; padding: 28px; border: 1px solid #d2d2d7; border-radius: 16px; background: #fff; }
+.assemblyOverview h3 { margin: 0 0 14px; font-size: 20px; line-height: 1.3; }
+.assemblyOverview p { margin: 0 0 20px; color: #555; font-size: 14px; line-height: 1.6; }
+.assemblyOverview span { color: #6e6e73; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .knowledgeObjectsExercise > h2 { margin: 18px 0 0; color: #1d1d1f; font-size: 28px; font-weight: 600; letter-spacing: -.03em; }
 .knowledgeObjectsExercise > p { margin: 7px 0 22px; color: #8e8e93; font-size: 12px; }
 .koSingle { width: min(940px, 100%); margin-top: 18px; }
