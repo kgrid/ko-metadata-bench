@@ -256,6 +256,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .koSummarySpecsButton { min-width: 64px; align-self: center; margin-left: auto; padding: 4px 5px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #1d1d1f; font-size: 9px; font-weight: 700; letter-spacing: .04em; line-height: normal; text-transform: uppercase; cursor: pointer; }
 .koSummarySpecsButton:hover { background: #f2f2f4; }
 .koSummarySpecsButton:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
+.koNotebookActions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.koNotebookActions .koSummarySpecsButton { box-sizing: border-box; width: 64px; margin-left: 0; text-align: center; text-decoration: none; }
 .facetCopy a { color: #3a3a3c; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .facetCopy .licenseResourceLink { width: fit-content; min-height: 28px; display: inline-flex; align-items: center; gap: 8px; margin-top: 3px; padding: 0 10px; border: 1px solid #8e8e93; border-radius: 7px; background: #fff; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-weight: 650; text-decoration: none; }
 .facetCopy .licenseResourceLink span { color: #6e6e73; font-size: 12px; line-height: 1; }
