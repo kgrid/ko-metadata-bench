@@ -9,6 +9,7 @@
   --green: #424245;
   --lime: #f5f5f7;
   --rust: #555559;
+  --status-red: #b42318;
 }
 
 * { box-sizing: border-box; }
@@ -101,7 +102,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .resultGroup summary button.resultCount:hover { background: #cfcfd4; }
 .resultGroup summary .facetCount { width: 100%; margin: 0; padding-left: 3px; padding-right: 3px; text-align: center; white-space: nowrap; }
 .resultGroup summary .facetCount.hasFacets { padding: 3px 8px; border-radius: 10px; background: #e5f3e8; color: #356b43; }
-.resultGroup summary .facetCount.incompleteFacets { padding: 3px 8px; border-radius: 10px; background: #fff8f7; color: #b42318; }
+.resultGroup summary .facetCount.incompleteFacets { padding: 3px 8px; border-radius: 10px; background: #fff8f7; color: var(--status-red); }
 .resultGroupBody { overflow: hidden; border-radius: 0 0 8px 8px; }
 .findabilityFacetList { padding: 7px 10px 10px; }
 .findabilityFacetRow { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 8px; padding: 10px 6px; border-bottom: 1px solid #e5e5ea; }
@@ -197,7 +198,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 @media (prefers-reduced-motion: reduce) { .findabilityAuditAcquisition, .findabilityAuditAcquisition > i > b, .auditResultsReveal { animation-duration: 1ms; } }
 .auditStatus { display: inline-block; padding: 3px 7px; border: 1px solid #c7c7cc; border-radius: 999px; background: #f5f5f7; font-size: 9px; font-weight: 700; white-space: nowrap; }
 .findabilityAuditTable tr.expected-found .auditStatus { border-color: #9fc7a9; background: #eef8f0; color: #356b43; }
-.findabilityAuditTable tr.expected-missed .auditStatus { border-color: #e6aaa5; background: #fff0ef; color: #a42d27; }
+.findabilityAuditTable tr.expected-missed .auditStatus { border-color: #e6aaa5; background: #fff0ef; color: var(--status-red); }
 .findabilityAuditTable tr.unexpected-found .auditStatus { border-color: #cabf9a; background: #faf7ed; color: #6f5d25; }
 .findabilityAuditTable tr.correctly-absent { background: #fbfbfc; }
 .findabilityAuditTable .auditTableSectionGap td { height: 14px; padding: 0; border-top: 1px solid #d2d2d7; border-bottom: 1px solid #d2d2d7; background: #f5f5f7; }
@@ -216,7 +217,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .accessibilityCard > summary strong { font-size: 12px; font-weight: 650; }
 .accessibilityCard > summary span { margin-left: auto; color: #6e6e73; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .accessibilityCard > summary span.hasLinks, .reusabilityCard > summary span.hasFacets, .interoperabilityPanel > summary span.hasFacets { padding: 3px 8px; border-radius: 10px; background: #e5f3e8; color: #356b43; }
-.reusabilityCard > summary span.incompleteFacets, .interoperabilityPanel > summary span.incompleteFacets { padding: 3px 8px; border-radius: 10px; background: #fff8f7; color: #b42318; }
+.reusabilityCard > summary span.incompleteFacets, .interoperabilityPanel > summary span.incompleteFacets { padding: 3px 8px; border-radius: 10px; background: #fff8f7; color: var(--status-red); }
 .accessibilityCard[open] > summary { border-bottom: 1px solid #d2d2d7; }
 .accessibilityCardBody { padding: 8px; }
 .accessibilityCardBody .accessPoint { width: 100%; min-height: 52px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #1d1d1f; text-align: left; text-decoration: none; cursor: pointer; }
@@ -952,7 +953,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .receivedValue, .acceptedValues { padding: 13px; border: 1px solid #d2d2d7; border-radius: 10px; background: #fafafa; }
 .receivedValue { border-color: #c94b45; background: #fff8f7; }
 .receivedValue span, .acceptedValues > span, .bindingDiagram > div > span, .completionComparison span { display: block; color: #6e6e73; font-size: 7px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-.receivedValue strong { display: block; margin-top: 7px; color: #b4231c; font: 24px/1 ui-monospace,SFMono-Regular,Menlo,monospace; }
+.receivedValue strong { display: block; margin-top: 7px; color: var(--status-red); font: 24px/1 ui-monospace,SFMono-Regular,Menlo,monospace; }
 .acceptedValues > div { display: flex; gap: 7px; margin-top: 8px; }
 .acceptedValues b { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 8px; border-radius: 7px; background: #f0f0f2; }
 .acceptedValues code { font-size: 13px; }
@@ -960,13 +961,13 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .plainFailure, .plainCorrection { display: grid; grid-template-columns: 92px 1fr; gap: 10px; margin: 7px 0!important; padding: 9px 11px; border-radius: 7px; background: #f2f2f4; color: #3a3a3c!important; font-size: 8px!important; line-height: 1.45!important; }
 .correctionPreviewButton { margin-top: 4px; padding: 6px 10px; border: 1px solid #a9a9ae; border-radius: 7px; background: #fff; color: #1d1d1f; font-size: 8px; font-weight: 750; }
 .correctionPreview { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px; border-radius: 8px; background: #f2f6fb; }
-.correctionPreview code { font-size: 14px; }.correctionPreview code:first-child { color: #b4231c; }.correctionPreview span { color: #007aff; font-size: 15px; }.correctionPreview strong { margin-left: auto; font-size: 8px; }
+.correctionPreview code { font-size: 14px; }.correctionPreview code:first-child { color: var(--status-red); }.correctionPreview span { color: #007aff; font-size: 15px; }.correctionPreview strong { margin-left: auto; font-size: 8px; }
 .stopMessage { margin: 10px 0 0!important; color: #515154!important; font-size: 8px!important; font-weight: 700; }
 .storyLead { margin: 0 0 12px!important; color: #3a3a3c!important; font-size: 10px!important; line-height: 1.5!important; }
 .bindingDiagram { display: grid; gap: 8px; margin-bottom: 11px; }
 .bindingDiagram > div { display: grid; grid-template-columns: 55px 1fr 22px 1fr 18px; align-items: center; gap: 8px; padding: 11px; border: 1px solid #d2d2d7; border-radius: 9px; }
 .bindingWrong { border-color: #c94b45!important; background: #fff8f7; }.bindingRight { background: #f7f7f8; }
-.bindingDiagram strong { font-size: 8px; }.bindingDiagram i { color: #6e6e73; font-size: 14px; font-style: normal; text-align: center; }.bindingDiagram code { overflow-wrap: anywhere; font-size: 8px; }.bindingDiagram > div > b { font-size: 13px; }.bindingWrong > b { color: #b4231c; }
+.bindingDiagram strong { font-size: 8px; }.bindingDiagram i { color: #6e6e73; font-size: 14px; font-style: normal; text-align: center; }.bindingDiagram code { overflow-wrap: anywhere; font-size: 8px; }.bindingDiagram > div > b { font-size: 13px; }.bindingWrong > b { color: var(--status-red); }
 .validObjectNotice { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding: 9px 11px; border-radius: 8px; background: #f2f2f4; }
 .validObjectNotice span { color: #515154; font-size: 8px; }.validObjectNotice strong { font-size: 9px; }
 .invocationComparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin: 10px 0; }
@@ -982,7 +983,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .argumentList p b { grid-row: 1 / span 2; color: #6e6e73; text-transform: capitalize; }.argumentList p strong { overflow-wrap: anywhere; }.argumentList p small { color: #6e6e73; font-size: 7px; overflow-wrap: anywhere; }
 .invocationComparison section > small { display: block; color: #6e6e73; font-size: 7px; }
 .operationFailurePath { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin: 10px 0; }
-.operationFailurePath span { padding: 12px; border: 1px solid #d2d2d7; border-radius: 9px; background: #f7f7f8; font-size: 9px; font-weight: 700; }.operationFailurePath span:last-child { border-color: #c94b45; background: #fff8f7; }.operationFailurePath b { float: right; }.operationFailurePath span:last-child b { color: #b4231c; }
+.operationFailurePath span { padding: 12px; border: 1px solid #d2d2d7; border-radius: 9px; background: #f7f7f8; font-size: 9px; font-weight: 700; }.operationFailurePath span:last-child { border-color: #c94b45; background: #fff8f7; }.operationFailurePath b { float: right; }.operationFailurePath span:last-child b { color: var(--status-red); }
 .completionComparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }.completionComparison > div { padding: 10px; border-radius: 8px; background: #f2f2f4; }.completionComparison strong { display: block; margin-top: 5px; font-size: 9px; }
 .simulationTechnical { margin-top: 11px; border-top: 1px solid #e5e5ea; }.simulationTechnical summary { padding: 9px 0 2px; color: #6e6e73; cursor: pointer; font-size: 8px; font-weight: 700; }.simulationTechnical dl { margin-top: 8px; }
 .interfaceFocusPanel { margin-top: 10px; padding: 12px; overflow: hidden; border: 1px solid #c7c7cc; border-radius: 10px; background: #fff; }
@@ -1055,7 +1056,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .metadataRigCard > summary .metadataInteractButton { width: 100%; padding: 4px 7px; border: 1px solid #718395; border-radius: 999px; background: #fff; color: #42576a; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .metadataRigCard > summary .metadataInteractButton:hover { background: #edf2f6; }
 .metadataRigCard > summary > span { padding: 3px 6px; border-radius: 10px; color: #356b43; background: #e5f3e8; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-align: center; text-transform: uppercase; white-space: nowrap; }
-.metadataRigCard > summary > span.incompleteFiles { color: #b42318; background: #fff0ef; }
+.metadataRigCard > summary > span.incompleteFiles { color: var(--status-red); background: #fff0ef; }
 .metadataRigCard[open] > summary { border-bottom: 1px solid #d2d2d7; }
 .metadataRigInventory { padding: 8px; display: grid; gap: 1px; }
 .metadataRigInventory > div { min-height: 39px; display: grid; grid-template-columns: 22px minmax(0,1fr) auto; align-items: center; gap: 9px; padding: 6px 9px; border-radius: 7px; background: rgba(245,247,249,.82); }
@@ -1064,7 +1065,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .metadataRigInventory > div > small { color: #607b68; font-size: 9px; }
 .metadataRigInventory > div.missing { background: #fff0ef; }
 .metadataRigInventory > div.missing > span { background: #b42318; }
-.metadataRigInventory > div.missing > small { color: #b42318; }
+.metadataRigInventory > div.missing > small { color: var(--status-red); }
 .metadataInteractBackdrop { position: fixed; inset: 0; z-index: 700; background: #6f8296; }
 .metadataInteractDialog { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .metadataInteractDialog > header { min-height: 72px; display: flex; align-items: center; gap: 18px; padding: 10px 22px 10px 28px; border-bottom: 1px solid #c7c7cc; background: rgba(250,250,252,.97); }
@@ -1118,7 +1119,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .findabilityEnrichmentGate > div { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
 .findabilityEnrichmentGate article { min-height: 66px; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #c8d1da; border-radius: 9px; background: #eef2f5; }
 .findabilityEnrichmentGate article strong { font-size: 11px; }
-.findabilityEnrichmentGate article span { color: #9a4a43; font-size: 9px; font-weight: 750; }
+.findabilityEnrichmentGate article span { color: var(--status-red); font-size: 9px; font-weight: 750; }
 .findabilityEnrichmentGate article.complete span { color: #3f725a; }
 .findabilityEnrichmentGate article.fullNameRequirement { grid-column: 1 / -1; }
 .findabilityEnrichmentGate article.fullNameRequirement > div { min-width: 0; display: grid; gap: 5px; }
@@ -1287,6 +1288,16 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .assemblyExercise .viewStickyControls { position: relative; top: auto; z-index: auto; width: 100%; margin: 0; padding: 0 0 10px; }
 main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden; }
 .assemblyExercise { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 20px; }
+.assemblyLanding, .assemblyLanding .viewStickyControls { background: #e5eae5; }
+.assemblyObjectBar { width: min(760px,100%); min-height: 42px; margin-top: 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 12px; background: #eeeef0; color: #1d1d1f; }
+.assemblyObjectBar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
+.assemblyObjectBar button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.assemblyObjectBar button:hover { background: #f5f5f7; }
+.assemblyObjectBar button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
+.assemblyCaseBackdrop { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; min-height: 0; background: #e5eae5; }
+.assemblyCaseBackdrop .assemblyExercise { width: 100%; height: 100%; }
+.assemblyCaseClose { position: absolute; top: 18px; right: 22px; z-index: 2; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
+.assemblyCaseClose:hover { background: #dcdce1; }
 .koInstrumentMark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: #3a3a3c; color: #fff; font-size: 11px; font-weight: 700; }
 .assemblyWorkspace { width: min(1240px, 100%); min-width: 0; min-height: 0; flex: 1; margin-top: 18px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: stretch; }
 .assemblyCaseSelector, .assemblyCaseDetail { min-width: 0; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
@@ -1298,45 +1309,68 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyCaseSelector button:hover { background: #f0f0f2; }
 .assemblyCaseSelector button.selected { border-color: #3a3a3c; background: #3a3a3c; color: #fff; }
 .assemblyCaseSelector button:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
-.assemblyCaseDetail { min-height: 0; padding: 16px 24px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; container-type: inline-size; }
-.assemblyCaseSummary { display: grid; gap: 10px; }
+.assemblyCaseDetail { min-height: 0; padding: 8px 16px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; container-type: inline-size; }
+.assemblyCaseSummary { display: grid; gap: 6px; }
 .assemblyCaseSummary section { min-width: 0; padding: 18px; border: 1px solid #e1e1e5; border-radius: 10px; }
-.assemblyCaseSummary .assemblyInputsPanel { padding: 10px 18px; background: #fff; }
+.assemblyCaseSummary .assemblyInputsPanel { padding: 7px 18px; background: #fff; }
 .assemblyInputFacts { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; margin: 0; }
 .assemblyInputFacts div { min-width: 0; }
 .assemblyInputFacts dt { color: #6e6e73; font-size: 11px; }
-.assemblyInputFacts dd { margin: 5px 0 0; color: #1d1d1f; font-size: 12px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
-.assemblyCaseSummary .assemblyOrchestration { padding: 10px 18px 3px; background: #f9f9fa; }
+.assemblyInputFacts dd { margin: 3px 0 0; color: #1d1d1f; font-size: 12px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.assemblyInputFacts dd.notConfirmed { color: var(--status-red); }
+.assemblyCaseSummary .assemblyOrchestration { padding: 6px 18px 1px; background: #f9f9fa; }
 .assemblyKoModules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; gap: 28px; }
-.assemblyKoModule { min-width: 0; display: flex; flex-direction: column; padding: 10px 12px; border: 1px solid #c7c7cc; border-radius: 9px; background: #fff; }
+.assemblyKoModule { min-width: 0; display: flex; flex-direction: column; padding: 6px 12px; border: 1px solid #c7c7cc; border-radius: 9px; background: #fff; }
+.assemblyKoInspectButton { align-self: flex-end; min-width: 40px; min-height: 25px; margin-top: auto; padding: 3px 8px; border: 1px solid #3a3a3c; border-radius: 6px; background: #fff; color: #3a3a3c; font-size: 11px; font-weight: 700; line-height: 1.2; cursor: pointer; }
+.assemblyKoInspectButton:hover { background: #f0f0f2; }
+.assemblyKoInspectButton:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
+.assemblyKoExchangeBackdrop { position: fixed; inset: 0; z-index: 510; display: flex; flex-direction: column; min-height: 0; padding: 16px 24px; background: #e5eae5; }
+.assemblyKoExchangeHeader { position: relative; width: min(1180px,100%); margin: 0 auto; padding: 0 56px 8px; text-align: center; }
+.assemblyKoExchangeHeader span { color: #6e6e73; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.assemblyKoExchangeHeader h2 { margin: 5px 0 0; color: #1d1d1f; font-size: 27px; font-weight: 600; }
+.assemblyKoExchangeHeader button { position: absolute; top: 0; right: 0; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
+.assemblyKoExchangeHeader button:focus-visible, .assemblyKoExchangeControls button:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
+.assemblyKoExchangeControls { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; }
+.assemblyKoExchangeControls button { min-width: 82px; padding: 6px 12px; border: 1px solid #c7c7cc; border-radius: 7px; background: #fff; color: #3a3a3c; font-size: 12px; font-weight: 650; cursor: pointer; }
+.assemblyKoExchangeControls button.selected { border-color: #3a3a3c; background: #3a3a3c; color: #fff; }
+.assemblyKoExchangeBody { width: min(1180px,100%); min-height: 0; margin: 0 auto; padding: 12px; display: grid; grid-template-columns: minmax(0,1.55fr) minmax(0,1fr); gap: 10px; align-content: start; align-items: start; overflow: auto; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
+.assemblyKoExchangeSecondary { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.assemblyKoExchangeSection { min-width: 0; padding: 12px; border: 1px solid #e1e1e5; border-radius: 10px; background: #f9f9fa; }
+.assemblyKoExchangeSection h3 { margin: 0 0 4px; color: #1d1d1f; font-size: 17px; }
+.assemblyKoExchangeSection p { margin: 0 0 7px; color: #555; font-size: 13px; line-height: 1.4; }
+.assemblyKoExchangeGroup h4 { margin: 8px 0 5px; color: #3a3a3c; font-size: 12px; }
+.assemblyKoExchangeGroup dl { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 5px; margin: 0; }
+.assemblyKoExchangeGroup dl > div { min-width: 0; padding: 7px 9px; border: 1px solid #e1e1e5; border-radius: 7px; background: #fff; }
+.assemblyKoExchangeGroup dt { color: #6e6e73; font-size: 11px; font-weight: 700; }
+.assemblyKoExchangeGroup dd { margin: 2px 0 0; overflow-wrap: anywhere; color: #1d1d1f; font-size: 13px; line-height: 1.35; }
+.assemblyKoExchangeSection pre { max-width: 100%; margin: 0; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+@media (max-width: 760px) { .assemblyKoExchangeBody { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 600px) { .assemblyKoExchangeBackdrop { padding: 14px; } .assemblyKoExchangeHeader h2 { font-size: 21px; } .assemblyKoExchangeBody { padding: 8px; } .assemblyKoExchangeSection { padding: 10px; } }
 .assemblyKoModule:first-child { position: relative; }
 .assemblyKoModule:first-child::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 12px); right: -26px; width: 24px; height: 24px; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2356645b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E"); }
-.assemblyFlowToAssembly { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; height: 25px; }
+.assemblyFlowToAssembly { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; height: 22px; }
 .assemblyFlowArrow { justify-self: center; width: 24px; height: 24px; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2356645b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E"); transform: rotate(90deg); }
 .assemblyDecisionCard .assemblyOwnerLabel { display: block; color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
-.assemblyKoModule h5 { margin: 0 0 7px; color: #3a3a3c; font-size: 12px; font-weight: 700; }
+.assemblyKoModule h5 { margin: 0 0 7px; padding-bottom: 6px; border-bottom: 1px solid #d2d2d7; color: #3a3a3c; font-size: 12px; font-weight: 700; }
 .assemblyKoModule strong { display: block; color: #1d1d1f; font-size: 13px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
-.assemblyCaseSummary .assemblyKoDetail { margin: 4px 0 0; color: #555; font-size: 11px; line-height: 1.35; overflow-wrap: anywhere; }
-.assemblyCaseSummary .assemblyDecisionSequence { padding: 12px 18px; background: #fff; }
+.assemblyCaseSummary .assemblyKoDetail { margin: 2px 0 0; color: #555; font-size: 11px; line-height: 1.35; overflow-wrap: anywhere; }
+.assemblyCaseSummary .assemblyDecisionSequence { padding: 8px 18px; background: #fff; }
 .assemblyDecisionLayout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 14px; align-items: start; }
-.assemblyIntermediateCard, .assemblyMatrixCard { min-width: 0; padding: 12px 14px; border: 1px solid #d2d2d7; border-radius: 9px; background: #fff; }
-.assemblyIntermediateCard h5, .assemblyMatrixCard h5 { margin: 0 0 8px; color: #3a3a3c; font-size: 12px; font-weight: 750; }
-.assemblyIntermediateCard ol { margin: 0; padding: 0; list-style: none; counter-reset: assembly-step; }
-.assemblyIntermediateCard li { display: grid; gap: 2px; padding: 7px 0; border-top: 1px solid #e5e5e9; counter-increment: assembly-step; }
-.assemblyIntermediateCard li:first-child { padding-top: 0; border-top: 0; }
-.assemblyIntermediateCard li span { color: #6e6e73; font-size: 11px; font-weight: 650; }
-.assemblyIntermediateCard li span::before { content: counter(assembly-step) ". "; }
-.assemblyIntermediateCard li strong { color: #1d1d1f; font-size: 13px; line-height: 1.35; }
-.assemblyIntermediateCard li small { color: #6e6e73; font-size: 10px; line-height: 1.35; }
+.assemblyIntermediateCard, .assemblyMatrixCard { min-width: 0; padding: 8px 10px; border: 1px solid #d2d2d7; border-radius: 9px; background: #fff; }
+.assemblyIntermediateCard h5, .assemblyMatrixCard h5 { margin: 0 0 5px; color: #3a3a3c; font-size: 12px; font-weight: 750; }
+.assemblyStageGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.assemblyStageCard { display: grid; align-content: start; gap: 3px; min-width: 0; padding: 7px; border: 1px solid #e1e1e5; border-radius: 7px; background: #f9f9fa; }
+.assemblyStageCard span { color: #6e6e73; font-size: 11px; font-weight: 650; }
+.assemblyStageCard strong { color: #1d1d1f; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+.assemblyStageSelection { grid-column: 1 / -1; }
 .assemblyMatrixColumns, .assemblyMatrixRow { display: grid; grid-template-columns: minmax(92px, 1fr) repeat(3, minmax(0, 1fr)); gap: 6px; align-items: center; }
 .assemblyMatrixColumns { margin-bottom: 4px; color: #6e6e73; font-size: 10px; font-weight: 650; text-align: center; }
 .assemblyMatrixGrid { display: grid; gap: 4px; }
 .assemblyMatrixRowLabel { color: #555; font-size: 10px; line-height: 1.3; text-transform: capitalize; }
-.assemblyMatrixCell { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 42px; padding: 5px; border: 1px solid #d2d2d7; border-radius: 7px; background: #f9f9fa; text-align: center; }
-.assemblyMatrixCell strong { color: #555; font-size: 10px; font-weight: 650; line-height: 1.2; text-transform: capitalize; overflow-wrap: anywhere; }
+.assemblyMatrixCell { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 32px; padding: 3px; border: 1px solid #d2d2d7; border-radius: 7px; background: #f9f9fa; text-align: center; }
+.assemblyMatrixCell strong { display: grid; color: #6e6e73; font-size: 10px; font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
 .assemblyMatrixCell.selected { border: 2px solid #354c3b; background: #e3ece4; box-shadow: 0 0 0 3px #c8d8cb; }
 .assemblyMatrixCell.selected strong { color: #24382b; }
-.assemblyMatrixNoSelection { margin: 11px 0 0; color: #6e6e73; font-size: 11px; line-height: 1.4; }
 .assemblyDecisionSteps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .assemblyDecisionCard { padding: 13px 15px; border: 1px solid #d2d2d7; border-left: 3px solid #8e8e93; border-radius: 8px; background: #fff; }
 .assemblyDecisionCard h5 { margin: 0 0 7px; color: #6e6e73; font-size: 11px; font-weight: 650; }
@@ -1354,7 +1388,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 @container (max-width: 500px) { .assemblyKoModules { grid-template-columns: minmax(0, 1fr); } .assemblyInputFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .assemblyKoModule:first-child::after { display: none; } }
 .assemblyCaseSummary p { margin: 0; color: #3a3a3c; font-size: 13px; line-height: 1.5; }
 .assemblyCaseSummary .assemblyCaseNext { margin-top: 12px; color: #6e6e73; font-size: 12px; }
-.assemblyWorkspaceError { width: min(760px, 100%); margin-top: 24px; padding: 16px 18px; border: 1px solid #dfa7a2; border-radius: 10px; background: #fff0ef; color: #9f2922; font-size: 14px; }
+.assemblyWorkspaceError { width: min(760px, 100%); margin-top: 24px; padding: 16px 18px; border: 1px solid #dfa7a2; border-radius: 10px; background: #fff0ef; color: var(--status-red); font-size: 14px; }
 @media (max-width: 680px) { .assemblyWorkspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px; } .assemblyCaseSelector { padding: 8px; overflow-x: auto; } .assemblyCaseSelector h3 { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; } .assemblyCaseButtons { display: flex; gap: 6px; min-width: max-content; } .assemblyCaseSelector button { width: auto; min-width: 66px; text-align: center; } .assemblyCaseDetail { padding: 22px 18px; } .assemblyBandPair { grid-template-columns: minmax(0, 1fr); } }
 .knowledgeObjectsExercise > h2 { margin: 18px 0 0; color: #1d1d1f; font-size: 28px; font-weight: 600; letter-spacing: -.03em; }
 .knowledgeObjectsExercise > p { margin: 7px 0 22px; color: #8e8e93; font-size: 12px; }
@@ -1393,7 +1427,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .koGraphicAbstract img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
 .koPurpose { min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 18px 18px 18px 0; }
 .koPurpose p { margin: 0; color: #2c2c2e; font-size: clamp(15px,1.6vw,20px); font-weight: 520; letter-spacing: -.015em; line-height: 1.48; text-wrap: pretty; }
-.koPurpose.purposeMissing p { color: #b42318; }
+.koPurpose.purposeMissing p { color: var(--status-red); }
 .koExplorer.compact .koGraphicAbstract { gap: 14px; }
 .koExplorer.compact .koPurpose { padding: 12px 10px 12px 0; }
 .koExplorer.compact .koPurpose p { font-size: 13px; line-height: 1.42; }
@@ -1421,7 +1455,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .koOverviewGraphic img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .koOverviewPurpose { min-width: 0; min-height: 0; display: flex; align-items: center; overflow: auto; padding-right: clamp(10px,3vw,44px); }
 .koOverviewPurpose p { margin: 0; color: #2c2c2e; font-size: clamp(20px,2.2vw,34px); font-weight: 520; letter-spacing: -.025em; line-height: 1.42; text-wrap: pretty; }
-.koOverviewPurpose.purposeMissing p { color: #b42318; }
+.koOverviewPurpose.purposeMissing p { color: var(--status-red); }
 .koFullscreenFilesContent { flex: 1; height: calc(100dvh - 72px); min-height: 0; padding: 12px 16px 16px; overflow: hidden; }
 .koFullscreenFilesContent > .koExplorer { width: 100%; height: 100%; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
 .koRunnerBackdrop { position: fixed; inset: 0; z-index: 500; background: #f5f5f7; }
@@ -1465,7 +1499,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .koRunnerStatus { display: inline-flex; min-height: 25px; align-items: center; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 999px; background: #f2f2f4; color: #5b5b60; font-size: 9px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .koRunnerStatus.success { border-color: #a9c9b1; background: #edf7ef; color: #376544; }
 .koRunnerStatus.attention { border-color: #d7c99f; background: #faf7ed; color: #6b5b2d; }
-.koRunnerStatus.error { border-color: #dfa7a2; background: #fff0ef; color: #9f2922; }
+.koRunnerStatus.error { border-color: #dfa7a2; background: #fff0ef; color: var(--status-red); }
 .koRunnerConclusion { margin-top: 12px; padding: 18px; border: 1px solid #d2d2d7; border-radius: 11px; background: #fafafa; }
 .koRunnerConclusion > span,.koRunnerResultSection h4,.koRunnerNotices h4,.koRunnerErrors h4 { display: block; margin: 0 0 7px; color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; }
 .koRunnerConclusion strong { display: block; font-size: clamp(20px,2.2vw,30px); line-height: 1.08; letter-spacing: -.025em; overflow-wrap: anywhere; }
@@ -1483,9 +1517,9 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .koRunnerNotices.warning { border-color: #d7c99f; background: #faf7ed; }
 .koRunnerErrors { border-color: #dfa7a2; background: #fff5f4; }
 .koRunnerErrors article + article { margin-top: 10px; padding-top: 10px; border-top: 1px solid #ebc6c3; }
-.koRunnerErrors article strong { color: #9f2922; font-size: 12px; }
+.koRunnerErrors article strong { color: var(--status-red); font-size: 12px; }
 .koRunnerErrors article p { margin: 4px 0; color: #3a3a3c; font-size: 11px; line-height: 1.45; }
-.koRunnerErrors article small { color: #7f4a46; font: 9px/1.4 "SFMono-Regular","SF Mono",Menlo,monospace; }
+.koRunnerErrors article small { color: var(--status-red); font: 9px/1.4 "SFMono-Regular","SF Mono",Menlo,monospace; }
 .koRunnerFailure { flex: 1; min-height: 0; display: grid; align-content: center; justify-items: center; padding: 28px; color: #6e6e73; text-align: center; }
 .koRunnerFailure strong { color: #3a3a3c; font-size: 17px; font-weight: 650; }
 .koRunnerFailure p { max-width: 430px; margin: 8px 0 0; font-size: 12px; line-height: 1.5; }
@@ -1701,7 +1735,7 @@ textarea:focus { outline-offset: -3px; }
 .koAccessAuthDialog input { width: 100%; height: 40px; padding: 0 11px; border: 1px solid #aeaeb2; border-radius: 8px; outline: 0; background: #fff; color: #1d1d1f; font: 14px "SFMono-Regular", "SF Mono", Menlo, monospace; }
 .koAccessAuthDialog input:focus { border-color: #3a3a3c; box-shadow: 0 0 0 3px rgba(60,60,67,.14); }
 .koAccessAuthDialog input[aria-invalid="true"] { border-color: #d84a44; box-shadow: 0 0 0 3px rgba(216,74,68,.10); }
-.koAccessAuthDialog .koAccessAuthError { margin: 0; color: #b42318; font-size: 10px; font-weight: 650; line-height: 1.35; }
+.koAccessAuthDialog .koAccessAuthError { margin: 0; color: var(--status-red); font-size: 10px; font-weight: 650; line-height: 1.35; }
 .koAccessAuthDialog small { display: block; margin-top: 7px; color: #8e8e93; font-size: 9px; }
 .koAccessAuthActions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
 .koAccessAuthActions button { min-width: 82px; height: 32px; border: 1px solid #c7c7cc; border-radius: 8px; background: #fff; color: #3a3a3c; font-size: 10px; font-weight: 700; cursor: pointer; }
@@ -1709,7 +1743,7 @@ textarea:focus { outline-offset: -3px; }
 .koAccessAuthActions button.primary { border-color: #3a3a3c; background: #3a3a3c; color: #fff; }
 .koAccessAuthActions button.primary:hover { background: #1d1d1f; }
 .koAccessAuthActions button:disabled { cursor: wait; opacity: .62; }
-.accessDownloadError { margin: 6px 10px 8px; padding: 8px 10px; border-left: 2px solid #d84a44; border-radius: 6px; background: #fff3f2; color: #8f1d18; font-size: 9px; line-height: 1.45; }
+.accessDownloadError { margin: 6px 10px 8px; padding: 8px 10px; border-left: 2px solid #d84a44; border-radius: 6px; background: #fff3f2; color: var(--status-red); font-size: 9px; line-height: 1.45; }
 
 @media (max-width: 900px) {
   .workspaces { grid-template-columns: 1fr; gap: 12px; }

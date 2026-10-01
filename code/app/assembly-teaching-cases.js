@@ -113,6 +113,126 @@ export function projectAssemblyKoContributions(trace) {
   };
 }
 
+// A shared exchange contract: each KO can supply readable sections alongside its exact records.
+// Only Wagner has a learner-facing projection today; other roles can be added without changing the viewer.
+export function projectAssemblyKoExchange(caseRecord, role) {
+  if (!caseRecord?.request || !caseRecord?.semanticTrace) return null;
+  if (role !== "wagner") {
+    const dependencies = { decision: "DEP-HBOT-DECISION", margolis: "DEP-MARGOLIS", burden: "DEP-BURDEN" };
+    const outputKeys = { decision: "hbot_decision", margolis: "margolis", burden: "burden" };
+    const dependency = dependencies[role];
+    if (!dependency) return null;
+    const handoffs = caseRecord.semanticTrace.handoffs;
+    const incoming = handoffs.find((item) => item.to === dependency);
+    const outgoing = handoffs.find((item) => String(item.from).startsWith(`${dependency}.`));
+    const output = caseRecord.semanticTrace.ko_outputs?.[outputKeys[role]]?.native_output;
+    if (!isRecord(incoming?.value) || !isRecord(output)) return null;
+    const input = incoming.value;
+    const yesNo = (value) => value === "true" || value === true ? "Yes" : value === "false" || value === false ? "No" : String(value ?? "Not recorded");
+    const range = (value) => Array.isArray(value) ? value.join("–") : String(value ?? "Not recorded");
+    const stopped = "Not passed to synthesis; the HBOT use gate ended this path.";
+    if (role === "decision") return { role,
+      input: { summary: "The KA combines the Wagner grade with clinical assertions for the HBOT decision.", sections: [{ heading: "Decision inputs", items: [
+        { label: "Wagner grade", value: String(input.wagner_grade ?? "Not recorded") },
+        { label: "Diabetic foot ulcer confirmed", value: yesNo(input.dfu_confirmed) },
+        { label: "Acute surgical intervention", value: yesNo(input.acute_surgical_intervention) },
+        { label: "Not healed after 30 days", value: yesNo(input.not_healed_after_30_days) },
+      ] }], source: input },
+      output: { summary: output.display_text ?? "Decision result recorded.", sections: [{ heading: "Decision result", items: [
+        { label: "Status", value: output.status ?? "Not recorded" },
+        { label: "Result", value: output.result_id ?? "Not recorded" },
+        { label: "Evidence quality", value: output.evidence_quality ?? "Not declared" },
+        { label: "Recommendation strength", value: output.recommendation_strength ?? "Not declared" },
+      ] }], source: output },
+      handoff: { summary: "The KA supplies the Wagner grade and clinical assertions, then uses this KO's result at the HBOT gate.", sections: [{ heading: "Recorded handoffs", items: [
+        { label: "Into HBOT Decision", value: `Wagner grade ${input.wagner_grade} with clinical assertions` },
+        { label: "To HBOT use gate", value: String(outgoing?.value ?? "No result handed off") },
+      ] }], source: [incoming, outgoing].filter(Boolean) },
+    };
+    if (role === "margolis") return { role,
+      input: { summary: "The KA supplies first-visit wound measurements for the prognostic calculation.", sections: [{ heading: "First-visit measurements", items: [
+        { label: "Wound area", value: `${input.wound_area?.value ?? "Not recorded"} ${input.wound_area?.ucum_code ?? ""}`.trim() },
+        { label: "Wound duration", value: `${input.wound_duration?.value ?? "Not recorded"} ${input.wound_duration?.ucum_code ?? ""}`.trim() },
+      ] }], source: input },
+      output: { summary: `${output.display_probability_percent ?? "Unknown"} estimated 16-week healing probability.`, sections: [{ heading: "Prognostic result", items: [
+        { label: "Prognostic group", value: output.prognostic_group ?? "Not recorded" },
+        { label: "16-week healing probability", value: output.display_probability_percent ?? "Not recorded" },
+        { label: "Result", value: output.result_id ?? "Not recorded" },
+      ] }], source: output },
+      handoff: { summary: outgoing ? "The KA projects the KO's prognostic group into a synthesis band." : stopped, sections: [{ heading: "Recorded handoffs", items: [
+        { label: "Into prognostic KO", value: "First-visit wound area and duration" },
+        { label: "To assembly synthesis", value: outgoing ? `${outgoing.native_value} → ${outgoing.projected_value}` : stopped },
+      ] }], source: [incoming, outgoing].filter(Boolean) },
+    };
+    const questionnaire = input.questionnaire_response ?? {};
+    const regimen = input.fixed_regimen_range ?? {};
+    const level = output.execution_burden_level ?? {};
+    return { role,
+      input: { summary: "The KA supplies the completed burden questionnaire and a fixed planning regimen range.", sections: [{ heading: "Burden inputs", items: [
+        { label: "HBOT facility", value: String(questionnaire.hyperbaric_oxygen_therapy_location ?? "Not recorded").split("/").at(-1) },
+        { label: "One-way travel", value: `${questionnaire.one_way_miles ?? "?"} miles · ${questionnaire.one_way_travel_minutes ?? "?"} minutes` },
+        { label: "Weekday attendance difficulty", value: questionnaire.weekday_attendance_difficulty ?? "Not recorded" },
+        { label: "Regimen", value: `${range(regimen.episodes)} episodes · ${regimen.sessions_per_week ?? "?"}/week · ${range(regimen.course_weeks)} weeks` },
+      ] }], source: input },
+      output: { summary: level.display_text ?? "Burden result recorded.", sections: [{ heading: "Computed burden", items: [
+        { label: "Burden level", value: level.display_text ?? "Not recorded" },
+        { label: "Primary driver", value: level.primary_driver ?? "Not recorded" },
+        { label: "Total patient time", value: `${range(output.objective_burden?.overall_burden_range?.total_patient_hours)} hours` },
+        { label: "Result", value: output.result_code ?? "Not recorded" },
+      ] }], source: output },
+      handoff: { summary: outgoing ? "The KA projects the KO's execution burden into a synthesis band." : stopped, sections: [{ heading: "Recorded handoffs", items: [
+        { label: "Into burden KO", value: "Questionnaire responses and fixed regimen range" },
+        { label: "To assembly synthesis", value: outgoing ? `${outgoing.native_value} → ${outgoing.projected_value}` : stopped },
+      ] }], source: [incoming, outgoing].filter(Boolean) },
+    };
+  }
+  const input = caseRecord.request.wagner_response_artifact;
+  const output = caseRecord.semanticTrace.ko_outputs?.wagner?.native_output;
+  if (!isRecord(input) || !isRecord(output)) return null;
+  const handoffs = caseRecord.semanticTrace.handoffs.filter((item) =>
+    item.to === "DEP-WAGNER" || item.to === "DEP-HBOT-DECISION" && String(item.from).includes("DEP-WAGNER"));
+  const responseMeaning = { "0": "Absent", "1": "Present", X: "Not asked" };
+  const questions = input.question_ids.map((id, index) => ({
+    label: id,
+    value: `${input.responses[index]} — ${responseMeaning[input.responses[index]] ?? "Recorded response"}`,
+  }));
+  const score = output.wagner_score?.[0];
+  return {
+    role,
+    input: {
+      summary: "Completed questionnaire response supplied to the DFU Severity Score KO. X means not asked by the adaptive questionnaire.",
+      sections: [
+        { heading: "Questionnaire responses", items: questions },
+        { heading: "Assessment record", items: [
+          { label: "Subject", value: input.subject_identifier?.value ?? "Not recorded" },
+          { label: "Ulcer / site", value: input.ulcer_identifier?.value ?? "Not recorded" },
+          { label: "Completed", value: input.completed_at ?? "Not recorded" },
+        ] },
+      ],
+      source: input,
+    },
+    output: {
+      summary: Number.isFinite(score) ? `Wagner grade ${score}: ${output.grade_label?.[0] ?? "Grade computed"}` : "Assessment result recorded.",
+      sections: [{ heading: "Computed result", items: [
+        { label: "Status", value: output.analysis_status ?? "Not recorded" },
+        { label: "Wagner score", value: Number.isFinite(score) ? String(score) : "Not recorded" },
+        { label: "Grade description", value: output.grade_label?.[0] ?? "Not recorded" },
+      ] }],
+      source: output,
+    },
+    handoff: {
+      summary: "The KA supplied the questionnaire response to Wagner, then passed the resulting grade to HBOT Treatment Decision.",
+      sections: [{ heading: "Recorded handoffs", items: handoffs.map((item) => ({
+        label: item.to === "DEP-WAGNER" ? "Into Wagner" : "Into HBOT Decision",
+        value: item.to === "DEP-WAGNER"
+          ? "Completed questionnaire responses"
+          : `Wagner grade ${item.value?.wagner_grade ?? score} with clinical assertions`,
+      })) }],
+      source: handoffs,
+    },
+  };
+}
+
 export function projectAssemblyKaDecisions(trace) {
   const decisions = trace.ka_decisions;
   const states = decisions.mandatory_join.dependency_states;

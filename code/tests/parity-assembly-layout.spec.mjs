@@ -13,10 +13,23 @@ for (const edition of editions) {
       page.on("pageerror", (error) => pageErrors.push(error.message));
       await page.goto(edition.url, { waitUntil: "domcontentloaded" });
       await page.getByRole("button", { name: "Knowledge Assembly", exact: true }).click();
+      await expect(page.getByRole("navigation", { name: "Teaching cases" })).toHaveCount(0);
+      await page.getByRole("button", { name: "Orchestration", exact: true }).click();
+      await expect(page.getByRole("dialog", { name: "Orchestration" })).toBeVisible();
       const casePane = page.locator(".assemblyCaseDetail, .assembly-case-detail");
       const cases = page.getByRole("navigation", { name: "Teaching cases" });
       await expect(casePane).toHaveAttribute("aria-label", "Case 1 details");
       await expect(cases.getByRole("button", { name: /^Case / })).toHaveCount(5);
+      await casePane.getByRole("button", { name: /Inspect DFU Severity Score KO input, output, and handoff for Case 1/ }).click();
+      const exchange = page.getByRole("dialog", { name: "DFU Severity Score KO Case 1 contribution" });
+      await expect(exchange.getByRole("heading", { name: "Input" })).toBeVisible();
+      await expect(exchange.getByRole("heading", { name: "Output" })).toBeVisible();
+      await expect(exchange.getByRole("heading", { name: "Handoff" })).toBeVisible();
+      await expect(exchange.getByText("Wagner grade 3:", { exact: false })).toBeVisible();
+      await exchange.getByRole("button", { name: "Source" }).click();
+      await expect(exchange.getByText('"wagner_score"', { exact: false })).toBeVisible();
+      await exchange.getByRole("button", { name: "Close KO contribution" }).click();
+      await expect(exchange).toHaveCount(0);
       const initial = await page.evaluate(() => {
         const pane = document.querySelector(".assemblyCaseDetail, .assembly-case-detail");
         const selector = document.querySelector(".assemblyCaseSelector, .assembly-case-selector");
@@ -24,17 +37,27 @@ for (const edition of editions) {
         return { paneClient: pane.clientHeight, paneScroll: pane.scrollHeight, bodyScroll: document.scrollingElement.scrollHeight,
           viewport: innerHeight, buttonTops: buttons.map((box) => box.top), buttonLefts: buttons.map((box) => box.left) };
       });
-      expect(initial.paneScroll).toBeGreaterThan(initial.paneClient);
+      if (viewport.name === "desktop") expect(initial.paneScroll).toBeLessThanOrEqual(initial.paneClient + 1);
+      else expect(initial.paneScroll).toBeGreaterThan(initial.paneClient);
       expect(initial.bodyScroll).toBeLessThanOrEqual(initial.viewport + 2);
       if (viewport.name === "narrow") {
         expect(Math.max(...initial.buttonTops) - Math.min(...initial.buttonTops)).toBeLessThan(2);
         expect(initial.buttonLefts[4]).toBeGreaterThan(initial.buttonLefts[0]);
       }
-      await casePane.evaluate((pane) => { pane.scrollTop = pane.scrollHeight; });
-      await expect(casePane.getByRole("heading", { name: "Final classification" })).toBeVisible();
-      await cases.getByRole("button", { name: "Case 4" }).click();
-      await expect(casePane.getByText("Synthesis stops here")).toBeVisible();
-      await expect(casePane.getByRole("heading", { name: "Synthesis rule" })).toHaveCount(0);
+      await expect(casePane.getByRole("heading", { name: "Assembly output" })).toBeVisible();
+      for (let index = 2; index <= 5; index++) {
+        await cases.getByRole("button", { name: `Case ${index}` }).click();
+        await expect(casePane).toHaveAttribute("aria-label", `Case ${index} details`);
+        await expect(casePane.getByRole("heading", { name: "Assembly output" })).toBeVisible();
+        if (viewport.name === "desktop") {
+          const dimensions = await casePane.evaluate((pane) => ({ client: pane.clientHeight, scroll: pane.scrollHeight }));
+          expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.client + 1);
+        }
+      }
+      await expect(casePane.getByText("No synthesis cell selected", { exact: false })).toHaveCount(0);
+      await page.getByRole("button", { name: "Close orchestration" }).click();
+      await expect(page.getByRole("dialog", { name: "Orchestration" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Orchestration", exact: true })).toBeVisible();
       expect(pageErrors).toEqual([]);
     });
   }

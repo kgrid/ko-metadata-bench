@@ -21,7 +21,7 @@ import { createRunnerInput, projectRunnerOutput, runnerExampleState, runnerInput
 import { EMBEDDED_VOCABULARY_REGISTRY } from "./term-vocabulary-registry.js";
 import { isTermInsightEligible, resolveLocalGraphTermInsight } from "./term-insight-local.js";
 import { placeTermPreview } from "./term-preview-placement.js";
-import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKoContributions, projectAssemblyKaDecisions, projectAssemblySynthesisMatrix } from "./assembly-teaching-cases.js";
+import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKoContributions, projectAssemblyKoExchange, projectAssemblyKaDecisions, projectAssemblySynthesisMatrix } from "./assembly-teaching-cases.js";
 
 const FILES = [
   "file 1.txt",
@@ -2673,11 +2673,33 @@ class MetadataInteractionErrorBoundary extends Component<{ children: ReactNode }
   state = { error: null as Error | null };
   static getDerivedStateFromError(error: Error) { return { error }; }
   componentDidCatch(error: Error, info: ErrorInfo) { console.error("Metadata Interaction failed", error, info); }
-  render() { return this.state.error ? <div role="alert" style={{ margin: 24, padding: 24, background: "white", color: "#8b1e17", whiteSpace: "pre-wrap" }}><strong>Metadata Interaction unavailable</strong><p>{this.state.error.message}</p></div> : this.props.children; }
+  render() { return this.state.error ? <div role="alert" style={{ margin: 24, padding: 24, background: "white", color: "var(--status-red)", whiteSpace: "pre-wrap" }}><strong>Metadata Interaction unavailable</strong><p>{this.state.error.message}</p></div> : this.props.children; }
 }
 
-function KnowledgeAssemblyWorkspace() {
+function AssemblyKoExchangeView({ exchange, name, caseNumber, onClose }: { exchange: NonNullable<ReturnType<typeof projectAssemblyKoExchange>>; name: string; caseNumber: number; onClose: () => void }) {
+  const [mode, setMode] = useState<"table" | "source">("table");
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const returnFocus = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onEscape = (event: globalThis.KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onEscape);
+    return () => { document.removeEventListener("keydown", onEscape); returnFocus?.focus(); };
+  }, [onClose]);
+  const renderPart = (part: "input" | "output" | "handoff") => <section className="assemblyKoExchangeSection" aria-label={part}>
+    <h3>{part === "handoff" ? "Handoff" : part === "input" ? "Input" : "Output"}</h3>
+    {mode === "table" ? <><p>{exchange[part].summary}</p>{exchange[part].sections.map((section) => <div key={section.heading} className="assemblyKoExchangeGroup"><h4>{section.heading}</h4><dl>{section.items.map((item) => <div key={`${section.heading}-${item.label}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></div>)}</> : <pre>{JSON.stringify(exchange[part].source, null, 2)}</pre>}
+  </section>;
+  return createPortal(<div className="assemblyKoExchangeBackdrop" role="dialog" aria-modal="true" aria-label={`${name} Case ${caseNumber} contribution`}>
+    <div className="assemblyKoExchangeHeader"><span>Case {caseNumber} · KO contribution</span><h2>{name}</h2><button ref={closeRef} type="button" aria-label="Close KO contribution" onClick={onClose}>×</button></div>
+    <div className="assemblyKoExchangeControls" aria-label="Contribution display"><button type="button" className={mode === "table" ? "selected" : ""} aria-pressed={mode === "table"} onClick={() => setMode("table")}>Table</button><button type="button" className={mode === "source" ? "selected" : ""} aria-pressed={mode === "source"} onClick={() => setMode("source")}>Source</button></div>
+    <div className="assemblyKoExchangeBody">{renderPart("input")}<div className="assemblyKoExchangeSecondary">{renderPart("output")}{renderPart("handoff")}</div></div>
+  </div>, document.body);
+}
+
+function KnowledgeAssemblyCaseView() {
   const [selectedCaseId, setSelectedCaseId] = useState("case-1");
+  const [selectedKoRole, setSelectedKoRole] = useState<string | null>(null);
   if (!EMBEDDED_ASSEMBLY) return null;
   const loaded = loadAssemblyTeachingCases(EMBEDDED_ASSEMBLY);
   const selectedCase = loaded.cases.find((item) => item.id === selectedCaseId) ?? loaded.cases[0];
@@ -2687,10 +2709,10 @@ function KnowledgeAssemblyWorkspace() {
   const kaDecisions = selectedCase ? projectAssemblyKaDecisions(selectedCase.semanticTrace) : null;
   const synthesisMatrix = selectedCase ? projectAssemblySynthesisMatrix(EMBEDDED_ASSEMBLY, selectedCase.semanticTrace) : null;
 
-  return <section className="knowledgeObjectsExercise assemblyExercise" aria-label="Knowledge Assembly explorer">
+  const exchange = selectedKoRole && selectedCase ? projectAssemblyKoExchange(selectedCase, selectedKoRole) : null;
+  return <><section className="knowledgeObjectsExercise assemblyExercise" aria-label="Knowledge Assembly explorer">
     <div className="viewStickyControls">
-      <div className="viewTitle"><div className="koInstrumentMark">KA</div><h2>Knowledge Assembly</h2></div>
-      <p>Explore the assembly of Knowledge Objects</p>
+      <div className="viewTitle"><h2>Assembly Orchestration</h2></div>
     </div>
     {loaded.error ? <div className="assemblyWorkspaceError" role="alert">{loaded.error}</div> :
       <div className="assemblyWorkspace">
@@ -2700,7 +2722,7 @@ function KnowledgeAssemblyWorkspace() {
             {loaded.cases.map((item, index) => <button type="button" key={item.id}
               className={item.id === selectedCase?.id ? "selected" : ""}
               aria-pressed={item.id === selectedCase?.id}
-              onClick={() => setSelectedCaseId(item.id)}>
+              onClick={() => { setSelectedKoRole(null); setSelectedCaseId(item.id); }}>
               Case {index + 1}
             </button>)}
           </div>
@@ -2709,27 +2731,31 @@ function KnowledgeAssemblyWorkspace() {
           <div className="assemblyCaseSummary">
             {inputs && <section className="assemblyInputsPanel" aria-label="Case inputs">
               <dl className="assemblyInputFacts">
-                <div><dt>Person</dt><dd>{inputs.subject}</dd></div>
-                <div><dt>Ulcer / site</dt><dd>{inputs.ulcer}</dd></div>
-                {inputs.facts.map((fact) => <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
+                <div><dt>Person</dt><dd>Person {selectedIndex}</dd></div>
+                <div><dt>Ulcer / site</dt><dd>Ulcer {selectedIndex}</dd></div>
+                {inputs.facts.map((fact) => <div key={fact.label}><dt>{fact.label}</dt><dd className={fact.label === "Diabetic foot ulcer" && fact.value === "Not confirmed" ? "notConfirmed" : undefined}>{fact.value}</dd></div>)}
               </dl>
             </section>}
             {contributions && <section className="assemblyOrchestration" aria-label="KO contributions and handoffs">
               <div className="assemblyKoModules">
-                <article className="assemblyKoModule">
-                  <h5>Wagner</h5><strong>{contributions.wagner.result}</strong><p className="assemblyKoDetail">{contributions.wagner.detail}</p>
+                <article className="assemblyKoModule assemblyKoModuleInteractive">
+                  <h5>{objectName(1)}</h5><strong>{contributions.wagner.result}</strong><p className="assemblyKoDetail">{contributions.wagner.detail}</p>
+                  <button type="button" className="assemblyKoInspectButton" aria-label={`Inspect ${objectName(1)} input, output, and handoff for Case ${selectedIndex}`} onClick={() => setSelectedKoRole("wagner")}>I/O</button>
                   <span className="srOnly">{contributions.wagner.entry}. The Wagner grade is handed to HBOT Decision.</span>
                 </article>
-                <article className="assemblyKoModule">
-                  <h5>HBOT Decision</h5><strong>{contributions.decision.result}</strong><p className="assemblyKoDetail">{contributions.decision.detail}</p>
+                <article className="assemblyKoModule assemblyKoModuleInteractive">
+                  <h5>{objectName(2)}</h5><strong>{contributions.decision.result}</strong><p className="assemblyKoDetail">{contributions.decision.detail}</p>
+                  <button type="button" className="assemblyKoInspectButton" aria-label={`Inspect ${objectName(2)} input, output, and handoff for Case ${selectedIndex}`} onClick={() => setSelectedKoRole("decision")}>I/O</button>
                   <span className="srOnly">{contributions.decision.entry}. {contributions.decision.exit}.</span>
                 </article>
-                <article className="assemblyKoModule">
-                  <h5>Margolis</h5><strong>{contributions.margolis.result}</strong><p className="assemblyKoDetail">{contributions.margolis.detail}</p>
+                <article className="assemblyKoModule assemblyKoModuleInteractive">
+                  <h5>{objectName(4)}</h5><strong>{contributions.margolis.result}</strong><p className="assemblyKoDetail">{contributions.margolis.detail}</p>
+                  <button type="button" className="assemblyKoInspectButton" aria-label={`Inspect ${objectName(4)} input, output, and handoff for Case ${selectedIndex}`} onClick={() => setSelectedKoRole("margolis")}>I/O</button>
                   <span className="srOnly">{contributions.margolis.entry}. {contributions.margolis.exit ?? "No synthesis handoff in this case"}.</span>
                 </article>
-                <article className="assemblyKoModule">
-                  <h5>Burden</h5><strong>{contributions.burden.result}</strong><p className="assemblyKoDetail">{contributions.burden.detail}</p>
+                <article className="assemblyKoModule assemblyKoModuleInteractive">
+                  <h5>{objectName(3)}</h5><strong>{contributions.burden.result}</strong><p className="assemblyKoDetail">{contributions.burden.detail}</p>
+                  <button type="button" className="assemblyKoInspectButton" aria-label={`Inspect ${objectName(3)} input, output, and handoff for Case ${selectedIndex}`} onClick={() => setSelectedKoRole("burden")}>I/O</button>
                   <span className="srOnly">{contributions.burden.entry}. {contributions.burden.exit ?? "No synthesis handoff in this case"}.</span>
                 </article>
               </div>
@@ -2741,12 +2767,11 @@ function KnowledgeAssemblyWorkspace() {
               <div className="assemblyDecisionLayout">
                 <article className="assemblyIntermediateCard">
                   <h5>Assembly stages</h5>
-                  <ol>
-                    <li><span>Four-KO join</span><strong>{kaDecisions.join.result}</strong><small>{kaDecisions.join.detail}</small></li>
-                    <li><span>HBOT gate</span><strong>{kaDecisions.gate.result}</strong><small>{kaDecisions.gate.detail}</small></li>
-                    <li><span>Band projections</span><strong>{kaDecisions.bands ? kaDecisions.bands.map((band) => `${band.source}: ${band.result}`).join(" · ") : "Not applied"}</strong></li>
-                    <li><span>Synthesis rule</span><strong>{kaDecisions.synthesis?.result ?? "Not applied"}</strong></li>
-                  </ol>
+                  <div className="assemblyStageGrid">
+                    <div className="assemblyStageCard"><span>1. Four KO Output Checks</span><strong>{kaDecisions.join.result === "Four-KO join passed" ? "Passed" : kaDecisions.join.result}</strong></div>
+                    <div className="assemblyStageCard"><span>2. HBOT use</span><strong>{kaDecisions.gate.result}</strong></div>
+                    <div className="assemblyStageCard assemblyStageSelection"><span>3. Matrix selection</span><strong>{kaDecisions.bands ? `${kaDecisions.bands[0].result} + ${kaDecisions.bands[1].result}` : "Not applied"}</strong></div>
+                  </div>
                 </article>
                 <article className="assemblyMatrixCard">
                   <h5>Assembly output</h5>
@@ -2756,11 +2781,10 @@ function KnowledgeAssemblyWorkspace() {
                       {["VERY_UNFAVORABLE", "UNFAVORABLE", "INTERMEDIATE", "RELATIVELY_FAVORABLE"].map((band) => <div className="assemblyMatrixRow" role="row" key={band}>
                         <span className="assemblyMatrixRowLabel">{band.toLowerCase().replaceAll("_", " ")} prognosis</span>
                         {synthesisMatrix?.cells.filter((cell) => cell.prognosis === `${band}_PROGNOSIS_BAND`).map((cell) => <div role="gridcell" aria-selected={cell.rule === synthesisMatrix.selectedRule} className={`assemblyMatrixCell ${cell.rule === synthesisMatrix.selectedRule ? "selected" : ""}`} key={cell.rule}>
-                          <strong>{cell.classification.toLowerCase().replaceAll("_", " ")}</strong>
+                          <strong><span>{cell.classification.toLowerCase().replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase())} for</span><span>HBOT Therapy</span></strong>
                         </div>)}
                       </div>)}
                     </div>
-                    {!synthesisMatrix?.selectedRule && <p className="assemblyMatrixNoSelection">No synthesis cell selected; this path stopped at the HBOT gate. Outcome: {kaDecisions.final.result}.</p>}
                   </>}
                 </article>
               </div>
@@ -2768,7 +2792,35 @@ function KnowledgeAssemblyWorkspace() {
           </div>
         </article>}
       </div>}
-  </section>;
+  </section>{exchange && <AssemblyKoExchangeView exchange={exchange} name={objectName(({ wagner: 1, decision: 2, margolis: 4, burden: 3 } as Record<string, number>)[exchange.role])} caseNumber={selectedIndex} onClose={() => setSelectedKoRole(null)} />}</>;
+}
+
+function KnowledgeAssemblyWorkspace() {
+  const [caseViewOpen, setCaseViewOpen] = useState(false);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const assemblyTitle = typeof EMBEDDED_ASSEMBLY?.metadata["dc:title"] === "string" ? EMBEDDED_ASSEMBLY.metadata["dc:title"] : "Knowledge Assembly";
+  useEffect(() => {
+    if (!caseViewOpen) return;
+    const returnFocus = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onEscape = (event: KeyboardEvent) => { if (event.key === "Escape" && !document.querySelector(".assemblyKoExchangeBackdrop")) setCaseViewOpen(false); };
+    document.addEventListener("keydown", onEscape);
+    return () => { document.removeEventListener("keydown", onEscape); returnFocus?.focus(); };
+  }, [caseViewOpen]);
+  if (!EMBEDDED_ASSEMBLY) return null;
+  return <>
+    <section className="knowledgeObjectsExercise assemblyLanding" aria-label="Knowledge Assembly explorer">
+      <div className="viewStickyControls">
+        <div className="viewTitle"><div className="koInstrumentMark">KA</div><h2>Knowledge Assembly</h2></div>
+        <p>Explore the assembly of Knowledge Objects</p>
+      </div>
+      <article className="assemblyObjectBar"><strong>{assemblyTitle}</strong><button type="button" onClick={() => setCaseViewOpen(true)}>Orchestration</button></article>
+    </section>
+    {caseViewOpen && createPortal(<div className="assemblyCaseBackdrop" role="dialog" aria-modal="true" aria-label="Orchestration">
+      <button ref={closeRef} type="button" className="assemblyCaseClose" aria-label="Close orchestration" onClick={() => setCaseViewOpen(false)}>×</button>
+      <KnowledgeAssemblyCaseView />
+    </div>, document.body)}
+  </>;
 }
 
 export default function Home() {

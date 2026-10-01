@@ -205,7 +205,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /\$\{declaredFacets\} Facets/);
   assert.match(html, /\.result-group\.zero-facets,\.result-group\.zero-facets>summary\{background:#fff8f7\}/);
   assert.match(html, /\.result-group>summary \.facet-count\.has-facets\{background:#e5f3e8;color:#356b43\}/);
-  assert.match(html, /\.result-group>summary \.facet-count\.incomplete-facets\{background:#fff8f7;color:#b42318\}/);
+  assert.match(html, /\.result-group>summary \.facet-count\.incomplete-facets\{background:#fff8f7;color:var\(--status-red\)\}/);
   assert.match(html, /\.result-group>summary \.result-count\.match-positive\{border:1px solid #34c759\}/);
   assert.match(html, /\.result-group>summary \.result-count\.match-zero\{border:1px solid #ff3b30\}/);
   assert.match(html, /\.findability-facet-row\.missing,\.facet-row\.missing,\.boundary-questions details\.missing-facet\{background:#fff8f7\}/);
