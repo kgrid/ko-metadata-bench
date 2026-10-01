@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 import { Parser } from "n3";
@@ -92,7 +92,11 @@ try {
   const serverStaticFiles = {};
   const documentProjections = {};
   const serverKoAssetRoot = join(workspace, "public", "ko-assets");
-  rmSync(serverKoAssetRoot, { recursive: true, force: true });
+  // Clear generated files in place. Some managed workspaces allow file writes
+  // but do not allow removing and recreating the asset directory itself.
+  if (existsSync(serverKoAssetRoot)) {
+    for (const oldAsset of walk(serverKoAssetRoot)) rmSync(oldAsset, { force: true });
+  }
   folders.forEach((folder, index) => {
     const folderPath = join(root, folder.name);
     for (const path of walk(folderPath).sort()) {

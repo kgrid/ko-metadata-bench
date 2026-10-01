@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { createDocumentProjectionRecord } from "./document-projection-contract.js";
 
@@ -16,7 +16,18 @@ export function packageDocumentProjectionMedia({ records, publicRoot, publicUrlR
   if (typeof publicRoot !== "string" || !publicRoot) throw new TypeError("publicRoot must be a non-empty path.");
   if (publicUrlRoot !== "/docx-assets") throw new TypeError("publicUrlRoot must use the fixed /docx-assets boundary.");
 
-  rmSync(publicRoot, { recursive: true, force: true });
+  // Replace generated media without removing the directory itself; managed
+  // workspaces may deny directory removal while allowing file replacement.
+  if (existsSync(publicRoot)) {
+    const removeGeneratedFiles = (directory) => {
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const path = join(directory, entry.name);
+        if (entry.isDirectory()) removeGeneratedFiles(path);
+        else rmSync(path, { force: true });
+      }
+    };
+    removeGeneratedFiles(publicRoot);
+  }
   const serverRecords = {};
   const standaloneRecords = {};
   const assets = [];

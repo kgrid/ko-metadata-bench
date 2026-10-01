@@ -1283,11 +1283,79 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .abstractDialog > header button { width: 30px; height: 30px; margin-left: auto; border: 0; border-radius: 50%; background: #e8e8ed; color: #3a3a3c; font-size: 20px; line-height: 1; cursor: pointer; }
 .abstractDialog > iframe { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
 .knowledgeObjectsExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
+.assemblyExercise, .assemblyExercise .viewStickyControls { background: #e5eae5; }
+.assemblyExercise .viewStickyControls { position: relative; top: auto; z-index: auto; width: 100%; margin: 0; padding: 0 0 10px; }
+main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden; }
+.assemblyExercise { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 20px; }
 .koInstrumentMark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: #3a3a3c; color: #fff; font-size: 11px; font-weight: 700; }
-.assemblyOverview { width: min(760px, 100%); margin-top: 30px; padding: 28px; border: 1px solid #d2d2d7; border-radius: 16px; background: #fff; }
-.assemblyOverview h3 { margin: 0 0 14px; font-size: 20px; line-height: 1.3; }
-.assemblyOverview p { margin: 0 0 20px; color: #555; font-size: 14px; line-height: 1.6; }
-.assemblyOverview span { color: #6e6e73; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.assemblyWorkspace { width: min(1240px, 100%); min-width: 0; min-height: 0; flex: 1; margin-top: 18px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: stretch; }
+.assemblyCaseSelector, .assemblyCaseDetail { min-width: 0; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
+.assemblyCaseSelector { padding: 16px 12px; }
+.assemblyCaseButtons { display: grid; gap: 3px; }
+.assemblyCaseSelector h3 { margin: 0 8px 12px; color: #6e6e73; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.assemblyCaseSelector button { width: 100%; min-height: 32px; padding: 6px 12px; border: 1px solid #c7c7cc; border-radius: 7px; background: #fff; color: #3a3a3c; font-size: 12px; font-weight: 650; line-height: 1.35; text-align: left; cursor: pointer; }
+.assemblyCaseSelector button { white-space: nowrap; }
+.assemblyCaseSelector button:hover { background: #f0f0f2; }
+.assemblyCaseSelector button.selected { border-color: #3a3a3c; background: #3a3a3c; color: #fff; }
+.assemblyCaseSelector button:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
+.assemblyCaseDetail { min-height: 0; padding: 16px 24px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; container-type: inline-size; }
+.assemblyCaseSummary { display: grid; gap: 10px; }
+.assemblyCaseSummary section { min-width: 0; padding: 18px; border: 1px solid #e1e1e5; border-radius: 10px; }
+.assemblyCaseSummary .assemblyInputsPanel { padding: 10px 18px; background: #fff; }
+.assemblyInputFacts { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.assemblyInputFacts div { min-width: 0; }
+.assemblyInputFacts dt { color: #6e6e73; font-size: 11px; }
+.assemblyInputFacts dd { margin: 5px 0 0; color: #1d1d1f; font-size: 12px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.assemblyCaseSummary .assemblyOrchestration { padding: 10px 18px 3px; background: #f9f9fa; }
+.assemblyKoModules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; gap: 28px; }
+.assemblyKoModule { min-width: 0; display: flex; flex-direction: column; padding: 10px 12px; border: 1px solid #c7c7cc; border-radius: 9px; background: #fff; }
+.assemblyKoModule:first-child { position: relative; }
+.assemblyKoModule:first-child::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 12px); right: -26px; width: 24px; height: 24px; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2356645b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E"); }
+.assemblyFlowToAssembly { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; height: 25px; }
+.assemblyFlowArrow { justify-self: center; width: 24px; height: 24px; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2356645b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E"); transform: rotate(90deg); }
+.assemblyDecisionCard .assemblyOwnerLabel { display: block; color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+.assemblyKoModule h5 { margin: 0 0 7px; color: #3a3a3c; font-size: 12px; font-weight: 700; }
+.assemblyKoModule strong { display: block; color: #1d1d1f; font-size: 13px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.assemblyCaseSummary .assemblyKoDetail { margin: 4px 0 0; color: #555; font-size: 11px; line-height: 1.35; overflow-wrap: anywhere; }
+.assemblyCaseSummary .assemblyDecisionSequence { padding: 12px 18px; background: #fff; }
+.assemblyDecisionLayout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 14px; align-items: start; }
+.assemblyIntermediateCard, .assemblyMatrixCard { min-width: 0; padding: 12px 14px; border: 1px solid #d2d2d7; border-radius: 9px; background: #fff; }
+.assemblyIntermediateCard h5, .assemblyMatrixCard h5 { margin: 0 0 8px; color: #3a3a3c; font-size: 12px; font-weight: 750; }
+.assemblyIntermediateCard ol { margin: 0; padding: 0; list-style: none; counter-reset: assembly-step; }
+.assemblyIntermediateCard li { display: grid; gap: 2px; padding: 7px 0; border-top: 1px solid #e5e5e9; counter-increment: assembly-step; }
+.assemblyIntermediateCard li:first-child { padding-top: 0; border-top: 0; }
+.assemblyIntermediateCard li span { color: #6e6e73; font-size: 11px; font-weight: 650; }
+.assemblyIntermediateCard li span::before { content: counter(assembly-step) ". "; }
+.assemblyIntermediateCard li strong { color: #1d1d1f; font-size: 13px; line-height: 1.35; }
+.assemblyIntermediateCard li small { color: #6e6e73; font-size: 10px; line-height: 1.35; }
+.assemblyMatrixColumns, .assemblyMatrixRow { display: grid; grid-template-columns: minmax(92px, 1fr) repeat(3, minmax(0, 1fr)); gap: 6px; align-items: center; }
+.assemblyMatrixColumns { margin-bottom: 4px; color: #6e6e73; font-size: 10px; font-weight: 650; text-align: center; }
+.assemblyMatrixGrid { display: grid; gap: 4px; }
+.assemblyMatrixRowLabel { color: #555; font-size: 10px; line-height: 1.3; text-transform: capitalize; }
+.assemblyMatrixCell { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 42px; padding: 5px; border: 1px solid #d2d2d7; border-radius: 7px; background: #f9f9fa; text-align: center; }
+.assemblyMatrixCell strong { color: #555; font-size: 10px; font-weight: 650; line-height: 1.2; text-transform: capitalize; overflow-wrap: anywhere; }
+.assemblyMatrixCell.selected { border: 2px solid #354c3b; background: #e3ece4; box-shadow: 0 0 0 3px #c8d8cb; }
+.assemblyMatrixCell.selected strong { color: #24382b; }
+.assemblyMatrixNoSelection { margin: 11px 0 0; color: #6e6e73; font-size: 11px; line-height: 1.4; }
+.assemblyDecisionSteps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.assemblyDecisionCard { padding: 13px 15px; border: 1px solid #d2d2d7; border-left: 3px solid #8e8e93; border-radius: 8px; background: #fff; }
+.assemblyDecisionCard h5 { margin: 0 0 7px; color: #6e6e73; font-size: 11px; font-weight: 650; }
+.assemblyDecisionCard strong { display: block; color: #1d1d1f; font-size: 14px; font-weight: 650; line-height: 1.35; }
+.assemblyDecisionCard p { margin-top: 5px; color: #555; font-size: 11px; }
+.assemblyBandPair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.assemblyBandPair > div { min-width: 0; padding: 9px 11px; border: 1px solid #e5e5e9; border-radius: 6px; background: #f9f9fa; }
+.assemblyBandPair span { display: block; margin-bottom: 4px; color: #6e6e73; font-size: 11px; }
+.assemblyDecisionStop { grid-column: 1 / -1; padding: 12px 15px; border: 1px dashed #a1a1a6; border-radius: 8px; color: #3a3a3c; font-size: 12px; }
+.assemblyDecisionStop p { margin-top: 5px; color: #6e6e73; font-size: 11px; }
+.assemblyDecisionFinal { grid-column: 1 / -1; border-color: #8e8e93; }
+@container (max-width: 850px) { .assemblyKoModules { grid-template-columns: repeat(2, minmax(0, 1fr)); } .assemblyInputFacts { grid-template-columns: repeat(4, minmax(0, 1fr)); } .assemblyFlowToAssembly { display: flex; justify-content: center; } .assemblyFlowToAssembly span:not(:nth-child(2)) { display: none; } }
+@container (max-width: 760px) { .assemblyDecisionLayout { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 590px) { .assemblyDecisionSteps { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 500px) { .assemblyKoModules { grid-template-columns: minmax(0, 1fr); } .assemblyInputFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .assemblyKoModule:first-child::after { display: none; } }
+.assemblyCaseSummary p { margin: 0; color: #3a3a3c; font-size: 13px; line-height: 1.5; }
+.assemblyCaseSummary .assemblyCaseNext { margin-top: 12px; color: #6e6e73; font-size: 12px; }
+.assemblyWorkspaceError { width: min(760px, 100%); margin-top: 24px; padding: 16px 18px; border: 1px solid #dfa7a2; border-radius: 10px; background: #fff0ef; color: #9f2922; font-size: 14px; }
+@media (max-width: 680px) { .assemblyWorkspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px; } .assemblyCaseSelector { padding: 8px; overflow-x: auto; } .assemblyCaseSelector h3 { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; } .assemblyCaseButtons { display: flex; gap: 6px; min-width: max-content; } .assemblyCaseSelector button { width: auto; min-width: 66px; text-align: center; } .assemblyCaseDetail { padding: 22px 18px; } .assemblyBandPair { grid-template-columns: minmax(0, 1fr); } }
 .knowledgeObjectsExercise > h2 { margin: 18px 0 0; color: #1d1d1f; font-size: 28px; font-weight: 600; letter-spacing: -.03em; }
 .knowledgeObjectsExercise > p { margin: 7px 0 22px; color: #8e8e93; font-size: 12px; }
 .koSingle { width: min(940px, 100%); margin-top: 18px; }
