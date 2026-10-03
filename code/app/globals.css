@@ -1291,12 +1291,16 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyLanding, .assemblyLanding .viewStickyControls { background: #e5eae5; }
 .assemblyObjectBar { width: min(760px,100%); min-height: 42px; margin-top: 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 12px; background: #eeeef0; color: #1d1d1f; }
 .assemblyObjectBar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
-.assemblyObjectBar button, .assemblyLoadControl button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
-.assemblyObjectBar button:hover, .assemblyLoadControl button:not(:disabled):hover { background: #f5f5f7; }
+.assemblyObjectBar button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.assemblyObjectBar button:hover { background: #f5f5f7; }
 .assemblyObjectBar button:focus-visible, .assemblyLoadControl button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
-.assemblyLoadControl { width: min(760px,100%); margin-top: 12px; }
-.assemblyLoadControl button { padding: 7px 14px; font-size: 10px; }
-.assemblyLoadedStatus { display: inline-flex; align-items: center; min-height: 30px; padding: 7px 14px; border: 1px solid #c7c7cc; border-radius: 999px; background: #eeeef0; color: #636366; font-size: 10px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.assemblyLoadControl { flex: 1; min-height: 160px; width: 100%; display: grid; place-items: center; padding: 24px; }
+.assemblyLoadControl button, .assemblyLoadedStatus { box-sizing: border-box; display: inline-grid; place-items: center; min-width: min(310px,100%); min-height: 64px; padding: 15px 24px; border: 2px solid #78877e; border-radius: 10px; background: #d8e0d9; color: #26372c; font-size: 12px; font-weight: 750; letter-spacing: .035em; text-align: center; }
+.assemblyLoadControl button { cursor: pointer; box-shadow: inset 0 2px 0 #f5f8f5, 0 6px 0 #87998a, 0 9px 16px #51605242; transform: translateY(-3px); transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease; }
+.assemblyLoadControl button:not(:disabled):hover { background: #e2e9e3; }
+.assemblyLoadControl button:active, .assemblyLoadControl button.isPressing { transform: translateY(3px); box-shadow: inset 0 4px 8px #53675655, inset 0 1px 2px #35483a66, 0 0 0 #87998a; background: #c5d0c7; }
+.assemblyLoadedStatus { box-shadow: inset 0 5px 9px #53675650, inset 0 1px 2px #35483a66; background: #c5d0c7; color: #334b3a; }
+@media (prefers-reduced-motion: reduce) { .assemblyLoadControl button { transition: none; } }
 .assemblyCaseBackdrop { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; min-height: 0; background: #e5eae5; }
 .assemblyCaseBackdrop .assemblyExercise { width: 100%; height: 100%; }
 .assemblyCaseClose { position: absolute; top: 18px; right: 22px; z-index: 2; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
@@ -1684,6 +1688,10 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .sourceValidation { padding: 8px 12px; border-bottom: 1px solid #c7c7cc; background: #f0f0f2; color: #3a3a3c; font-size: 9px; line-height: 1.4; }
 .sourceValidation strong { margin-right: 8px; }
 .sourceValidation span { color: #6e6e73; }
+.metadataFileError { margin: 18px; padding: 18px; border: 1px solid #c7c7cc; border-radius: 9px; background: #f5f5f7; color: #3a3a3c; overflow-wrap: anywhere; }
+.metadataFileError strong { display: block; margin-bottom: 8px; color: var(--status-red); font-size: 13px; }
+.metadataFileError p { margin: 0 0 12px; font-size: 11px; line-height: 1.5; }
+.metadataFileError small { color: #6e6e73; font-size: 10px; }
 textarea { flex: 1; width: 100%; min-height: 390px; resize: none; border: 0; padding: 24px; background: #fff; color: #1d1d1f; font-family: "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; line-height: 1.65; font-variant-ligatures: none; }
 textarea:focus { outline-offset: -3px; }
 .editorFooter { display: flex; justify-content: space-between; border-top: 1px solid var(--line); background: #fafaf7; padding: 8px 12px; color: #8a908c; font: 9px/1 monospace; text-transform: uppercase; letter-spacing: .06em; }

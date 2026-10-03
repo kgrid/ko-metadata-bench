@@ -7,6 +7,7 @@ import { orderWorkshopObjects } from "../app/workshop-ordering.js";
 import { partitionKnowledgePackages, prepareAssemblyGeneralView } from "../app/assembly-discovery.js";
 import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
 import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
+import { validatePackageMetadata } from "./validate-package-metadata.mjs";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
@@ -67,6 +68,13 @@ try {
     return { entry, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
   });
   const { knowledgeObjects, knowledgeAssembly } = partitionKnowledgePackages(discovered);
+  // Reject unresolved identifiers before clearing assets or rewriting either edition.
+  const metadataErrors = [];
+  for (const object of discovered) {
+    try { validatePackageMetadata(object); }
+    catch (error) { metadataErrors.push(error instanceof Error ? error.message : String(error)); }
+  }
+  if (metadataErrors.length) throw new Error(`Metadata validation failed:\n${metadataErrors.join("\n")}`);
   const orderedObjects = orderWorkshopObjects(knowledgeObjects);
   const folders = orderedObjects.map((object) => object.entry);
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);

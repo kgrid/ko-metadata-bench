@@ -72,13 +72,15 @@ test("both editions present one KA bar and open the unchanged case workspace thr
   assert.match(standalone, /aria-label="Close orchestration"/);
 });
 
-test("both editions place the future loading action below, not inside, the KA bar", () => {
+test("both editions center a distinct press-in loading action below the KA bar", () => {
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const styles = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(page, /Orchestration<\/button><\/article>\s*<div className="assemblyLoadControl">\{assemblyLoaded[\s\S]*?<button type="button" onClick=\{onLoad\}>Load as Knowledge Object<\/button>/);
+  assert.match(page, /Orchestration<\/button><\/article>\s*<div className="assemblyLoadControl">\{assemblyLoaded[\s\S]*?Load as Knowledge Object<\/button>/);
   assert.match(standalone, /Orchestration<\/button><\/article><div class="assembly-load-control">\$\{loaded\?'<span class="assembly-loaded-status" role="status">Loaded as a Knowledge Object<\/span>':'<button type="button" data-load-assembly>Load as Knowledge Object<\/button>'\}/);
-  assert.match(styles, /\.assemblyLoadControl \{ width: min\(760px,100%\); margin-top: 12px;/);
-  assert.match(standalone, /\.assembly-load-control\{width:min\(760px,100%\);margin-top:12px\}/);
+  assert.match(styles, /\.assemblyLoadControl \{ flex: 1; min-height: 160px; width: 100%; display: grid; place-items: center;/);
+  assert.match(styles, /\.assemblyLoadedStatus \{ box-shadow: inset/);
+  assert.match(standalone, /\.assembly-load-control\{flex:1;min-height:160px;width:100%;display:grid;place-items:center;/);
+  assert.match(standalone, /\.assembly-loaded-status\{box-shadow:inset/);
 });
 
 test("both editions keep a compact KA bar and a plain centered Case View title", () => {

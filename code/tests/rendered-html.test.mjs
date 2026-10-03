@@ -179,7 +179,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<th>Searched for<\/th><th>Expected<\/th>/);
   assert.match(html, /<th>Why this result is expected<\/th>/);
   assert.match(html, /class="audit-rationale"/);
-  assert.match(html, /rationale:definition\.rationales\[objectId-1\]/);
+  assert.match(html, /objectId===assemblyVirtualId\|\|definition\.expectedObjects\.includes\(objectId\)/);
+  assert.match(html, /rationale=objectId===assemblyVirtualId\?/);
   assert.match(html, /Unexpected match—the term appears in this KO’s findability metadata despite being outside its declared discovery focus\./);
   assert.match(html, /This KO classifies DFU severity; HBOT is not its declared subject or purpose\./);
   assert.doesNotMatch(html, /rationale:"Tests /);

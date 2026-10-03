@@ -54,4 +54,6 @@ test("the standalone edition completes startup and mounts all four embedded KO p
   vm.createContext(context);
   assert.doesNotThrow(() => vm.runInContext(scripts[1], context, { timeout: 30_000 }));
   assert.equal((workspace.innerHTML.match(/class="ko-object-shade"/g) ?? []).length, 4);
+  assert.match(scripts[1], /renderHumanRdfForFiles=function\(source\)/);
+  assert.match(scripts[1], /Select another file or close Metadata Interaction/);
 });

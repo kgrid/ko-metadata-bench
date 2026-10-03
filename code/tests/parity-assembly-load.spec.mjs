@@ -49,6 +49,21 @@ async function journey(page, url) {
   await page.getByRole("button", { name: "Close orchestration", exact: true }).click();
 
   const after = await rosters(page, [...koNames, assemblyName]);
+  await page.getByRole("button", { name: "F exercise", exact: true }).click();
+  const kaFindabilityPanel = page.locator("details.resultGroup, details.result-group").last();
+  const auditButton = kaFindabilityPanel.getByRole("button", { name: "Audit", exact: true });
+  await expect(auditButton).toBeEnabled();
+  await auditButton.click();
+  const audit = page.getByRole("dialog", { name: assemblyName, exact: true });
+  await expect(audit).toBeVisible();
+  const auditRows = audit.locator("tbody tr:not(.auditTableSectionGap):not(.audit-table-section-gap)");
+  await expect(auditRows).toHaveCount(16);
+  expect(await auditRows.locator("td:nth-child(2)").allTextContents()).toEqual(Array(16).fill("Yes"));
+  await expect(audit.locator(".auditTableSectionGap, .audit-table-section-gap")).toHaveCount(0);
+  const auditResults = await auditRows.locator("td:nth-child(3)").allTextContents();
+  expect(auditResults).toContain("Found");
+  await expect(auditRows.first().locator("td:last-child")).toContainText("this assembly");
+  await audit.getByRole("button", { name: "Close findability audit", exact: true }).click();
   await page.getByRole("button", { name: "Knowledge Objects", exact: true }).click();
   const unavailableRun = page.getByRole("button", { name: `${assemblyName} Runner unavailable`, exact: true });
   await expect(unavailableRun).toBeDisabled();
@@ -83,7 +98,7 @@ async function journey(page, url) {
   await page.getByRole("button", { name: "Knowledge Assembly", exact: true }).click();
   await expect(page.getByRole("button", { name: "Load as Knowledge Object", exact: true })).toBeEnabled();
   expect(errors, `${url} produced no uncaught browser errors`).toEqual([]);
-  return { before, after, reset, assemblyName, metadataFiles: Object.keys(assembly.generalView.metadataPaths) };
+  return { before, after, reset, auditResults, assemblyName, metadataFiles: Object.keys(assembly.generalView.metadataPaths) };
 }
 
 test("both editions keep four KOs before load, project the KA fifth, and reset on reload", async ({ browser }) => {
