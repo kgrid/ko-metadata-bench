@@ -331,9 +331,10 @@ test("both editions place existence metadata between reusability metadata and me
     readFile(standaloneUrl, "utf8"),
   ]);
   for (const source of [page, standalone]) {
-    const reusability = source.indexOf('"reusability.metadata.txt"');
-    const existence = source.indexOf('"existence.metadata.txt"');
-    const information = source.indexOf('"metadata.json"', existence);
+    const fileList = source.match(/(?:FILTERED_FILES|filteredFiles)\s*=\s*\[([^\]]+)\]/)?.[1] ?? "";
+    const reusability = fileList.indexOf('"reusability.metadata.txt"');
+    const existence = fileList.indexOf('"existence.metadata.txt"');
+    const information = fileList.indexOf('"metadata.json"', existence);
     assert.ok(reusability >= 0 && existence > reusability && information > existence);
     assert.ok(source.includes('"existence.metadata.txt":"Existence"') || source.includes('"existence.metadata.txt": "Existence"'));
   }

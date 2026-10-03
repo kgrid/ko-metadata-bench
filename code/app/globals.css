@@ -1291,9 +1291,12 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyLanding, .assemblyLanding .viewStickyControls { background: #e5eae5; }
 .assemblyObjectBar { width: min(760px,100%); min-height: 42px; margin-top: 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 12px; background: #eeeef0; color: #1d1d1f; }
 .assemblyObjectBar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
-.assemblyObjectBar button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
-.assemblyObjectBar button:hover { background: #f5f5f7; }
-.assemblyObjectBar button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
+.assemblyObjectBar button, .assemblyLoadControl button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.assemblyObjectBar button:hover, .assemblyLoadControl button:not(:disabled):hover { background: #f5f5f7; }
+.assemblyObjectBar button:focus-visible, .assemblyLoadControl button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
+.assemblyLoadControl { width: min(760px,100%); margin-top: 12px; }
+.assemblyLoadControl button { padding: 7px 14px; font-size: 10px; }
+.assemblyLoadedStatus { display: inline-flex; align-items: center; min-height: 30px; padding: 7px 14px; border: 1px solid #c7c7cc; border-radius: 999px; background: #eeeef0; color: #636366; font-size: 10px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
 .assemblyCaseBackdrop { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; min-height: 0; background: #e5eae5; }
 .assemblyCaseBackdrop .assemblyExercise { width: 100%; height: 100%; }
 .assemblyCaseClose { position: absolute; top: 18px; right: 22px; z-index: 2; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }

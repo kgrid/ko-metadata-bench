@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 import { Parser } from "n3";
 import { orderWorkshopObjects } from "../app/workshop-ordering.js";
-import { partitionKnowledgePackages } from "../app/assembly-discovery.js";
+import { partitionKnowledgePackages, prepareAssemblyGeneralView } from "../app/assembly-discovery.js";
 import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
 import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
 
@@ -73,6 +73,7 @@ try {
   const folderNames = folders.map((folder) => folder.name);
   const displayNames = orderedObjects.map(declaredObjectName);
   const assemblyPayload = knowledgeAssembly ? (() => {
+    const generalView = prepareAssemblyGeneralView(knowledgeAssembly);
     const folderPath = join(root, knowledgeAssembly.folderName);
     const textFiles = {};
     const binaryFiles = {};
@@ -83,7 +84,7 @@ try {
       if (looksText(buffer)) textFiles[file] = buffer.toString("utf8");
       else binaryFiles[file] = buffer.toString("base64");
     }
-    return { folderName: knowledgeAssembly.folderName, metadata: knowledgeAssembly.metadata, textFiles, binaryFiles, byteLength };
+    return { folderName: knowledgeAssembly.folderName, metadata: knowledgeAssembly.metadata, generalView, textFiles, binaryFiles, byteLength };
   })() : null;
 
   const textFiles = {};

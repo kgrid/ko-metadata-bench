@@ -44,7 +44,7 @@ test("both editions expose a ready state and an in-view error state", () => {
 
 test("case selection uses neutral labels and updates only the selected pane", () => {
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
-  const reactWorkspace = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace()")[0];
+  const reactWorkspace = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace(")[0];
   const standaloneWorkspace = standalone.split("function renderAssemblyCaseDetail(")[1].split("for(const control of [knowledgeObjectsButton")[0];
   assert.match(reactWorkspace, /setSelectedCaseId\(item.id\)/);
   assert.match(reactWorkspace, /Case \{index \+ 1\}/);
@@ -72,10 +72,19 @@ test("both editions present one KA bar and open the unchanged case workspace thr
   assert.match(standalone, /aria-label="Close orchestration"/);
 });
 
+test("both editions place the future loading action below, not inside, the KA bar", () => {
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(page, /Orchestration<\/button><\/article>\s*<div className="assemblyLoadControl">\{assemblyLoaded[\s\S]*?<button type="button" onClick=\{onLoad\}>Load as Knowledge Object<\/button>/);
+  assert.match(standalone, /Orchestration<\/button><\/article><div class="assembly-load-control">\$\{loaded\?'<span class="assembly-loaded-status" role="status">Loaded as a Knowledge Object<\/span>':'<button type="button" data-load-assembly>Load as Knowledge Object<\/button>'\}/);
+  assert.match(styles, /\.assemblyLoadControl \{ width: min\(760px,100%\); margin-top: 12px;/);
+  assert.match(standalone, /\.assembly-load-control\{width:min\(760px,100%\);margin-top:12px\}/);
+});
+
 test("both editions keep a compact KA bar and a plain centered Case View title", () => {
   const styles = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
-  const reactCaseView = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace()")[0];
+  const reactCaseView = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace(")[0];
   const portableCaseView = standalone.split("function openAssemblyCaseView(trigger){")[1].split("function openKnowledgeAssembly(){")[0];
   assert.match(styles, /\.assemblyObjectBar \{ width: min\(760px,100%\)/);
   assert.match(standalone, /\.assembly-object-bar\{width:min\(760px,100%\)/);
@@ -122,7 +131,7 @@ test("all four KO exchanges use each case's actual inputs, native outputs, and K
 test("both editions use a lower-right I/O button on each Case View KO card", () => {
   const styles = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
-  const caseView = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace()")[0];
+  const caseView = page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace(")[0];
   assert.equal((caseView.match(/className="assemblyKoInspectButton"/g) ?? []).length, 4);
   assert.equal((caseView.match(/>I\/O<\/button>/g) ?? []).length, 4);
   assert.match(standalone, /class="assembly-ko-inspect-button"[^>]+>I\/O<\/button>/);
@@ -190,7 +199,7 @@ test("both editions project four KO contributions and recorded handoffs without 
   assert.equal(projectAssemblyKoContributions(loaded.cases[4].semanticTrace).burden.exit, null);
   assert.match(page, /className="assemblyKoModules"/);
   assert.match(standalone, /class="assembly-ko-modules"/);
-  assert.equal((page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace()")[0].match(/className="assemblyKoModule(?: assemblyKoModuleInteractive)?"/g) ?? []).length, 4);
+  assert.equal((page.split("function KnowledgeAssemblyCaseView() {")[1].split("function KnowledgeAssemblyWorkspace(")[0].match(/className="assemblyKoModule(?: assemblyKoModuleInteractive)?"/g) ?? []).length, 4);
   assert.match(standalone, /module\(objectName\(1\).*module\(objectName\(2\).*module\(objectName\(4\).*module\(objectName\(3\)/);
 });
 

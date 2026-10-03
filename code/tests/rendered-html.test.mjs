@@ -165,7 +165,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<span>Searched for<\/span><q>\$\{escapeHtml\(query\)\}<\/q>/);
   assert.match(html, /class="result-count match-idle" disabled>Matches<\/button>/);
   assert.match(html, /class="result-count match-zero" disabled>0 matches<\/button>/);
-  assert.match(html, /class="findability-audit-button" data-findability-audit="\$\{objectId\}">Audit<\/button>/);
+  assert.match(html, /class="findability-audit-button".*data-findability-audit="\$\{objectId\}".*>Audit<\/button>/);
   assert.match(html, /const findabilityAuditDefinitions=\[/);
   assert.match(html, /function runFindabilityAudit\(objectId\)/);
   assert.match(html, /function openFindabilityAudit\(objectId\)/);
@@ -649,8 +649,9 @@ test("both editions display each KO's declared findability schema:name", async (
   const standaloneNames = JSON.parse(standalone.match(/^const objectDisplayNames=(\[[^\n]+\]);/m)?.[1] ?? "null");
   assert.deepEqual(reactNames, declaredNames);
   assert.deepEqual(standaloneNames, declaredNames);
-  assert.match(react, /const objectName = \(id: ObjectId\) => OBJECT_DISPLAY_NAMES\[id - 1\]/);
+  assert.match(react, /const objectName = \(id: ObjectId\) => id === ASSEMBLY_OBJECT_ID.*: OBJECT_DISPLAY_NAMES\[id - 1\]/);
   assert.match(standalone, /objectName=id=>objectDisplayNames\[id-1\]/);
+  assert.match(standalone, /objectDisplayNames\.push\(embeddedAssembly\.generalView/);
 });
 
 test("keeps published metadata, exercise kit, and simulation session as explicit models", async () => {

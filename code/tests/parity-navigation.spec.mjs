@@ -21,6 +21,7 @@ async function visibleObjectRoster(page) {
 
 async function viewState(page, heading, activeControl, sharedControl) {
   await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+  await expect(page.getByText("HBOT Treatment Target Knowledge Assembly", { exact: true })).toHaveCount(0);
   const active = page.getByRole("button", { name: activeControl, exact: true });
   await expect(active).toHaveAttribute("aria-pressed", "true");
   return {
