@@ -92,6 +92,10 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(html, /openKnowledgeObjects\(1,"grid"\)/);
   assert.match(html, /<details class="ko-object-shade" data-ko-object="\$\{objectId\}">/);
   assert.match(html, /class="facet-list ko-summary-facet-list"/);
+  assert.match(html, /facts=\[\["Information Page","A fully metadata-driven overview"\],\["Size",/);
+  assert.match(html, /label==="Information Page"\?`<button type="button" class="ko-summary-specs-button" data-ko-information aria-label="Open /);
+  assert.match(html, /workspace\.querySelectorAll\("\[data-ko-information\]"\)/);
+  assert.match(html, /if\(objectId\)openEmbeddedInformationPage\(objectId\)/);
   assert.match(html, /\["Knowledge Elements",koKnowledgeElementCount\(objectId\)\]/);
   assert.match(html, /\["Method",koMethod\(objectId\)\]/);
   assert.match(html, />Overview<\/button>/);
