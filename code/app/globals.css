@@ -1289,6 +1289,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden; }
 .assemblyExercise { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 20px; }
 .assemblyLanding, .assemblyLanding .viewStickyControls { background: #e5eae5; }
+.assemblyLanding .koInstrumentMark { background: #516052; }
 .assemblyObjectBar { width: min(760px,100%); min-height: 42px; margin-top: 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 12px; background: #eeeef0; color: #1d1d1f; }
 .assemblyObjectBar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
 .assemblyObjectBar button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
