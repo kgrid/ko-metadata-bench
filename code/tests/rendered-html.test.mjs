@@ -34,6 +34,7 @@ test("server-renders FAIR Knowledge Object Bench without a subtitle", async () =
   assert.match(html, /Metadata/);
   assert.match(html, /Knowledge Objects/);
   assert.match(html, /Knowledge Assembly/);
+  assert.match(html, /K exercise/);
   assert.match(html, /F exercise/);
   assert.match(html, /A exercise/);
   assert.match(html, /I exercise/);
@@ -240,6 +241,11 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /id="abstractButton">Workshop Abstract<\/button>/);
   assert.match(html, /class="files-return" id="filesReturn" aria-pressed="false">Metadata Rig<\/button>/);
   assert.match(html, /id="knowledgeObjectsButton"[^>]*>Knowledge Objects<\/button><button[^>]*id="filesReturn"[^>]*>Metadata Rig<\/button><\/div><div class="exercise-control-cluster">/);
+  assert.match(html, /data-exercise="K" aria-label="K exercise" aria-pressed="false">K<\/button><button[^>]*data-exercise="F"/);
+  assert.match(html, /\.exercise-buttons button\.knowledge-exercise-button:not\(\.active\)\{background:#f6f3ee;color:#1d1d1f;opacity:1\}/);
+  assert.match(html, /function renderKnowledge\(\)/);
+  assert.match(html, /Distinguish computable knowledge from the evidence it is based on/);
+  assert.match(html, /class="search-mark knowledge-mark">K<\/div><h2>Knowledge<\/h2>/);
   assert.match(html, /<span class="label">Metadata Exercises<\/span>/);
   assert.doesNotMatch(html, /filesReturn\.hidden/);
   assert.match(html, /filesReturn\.classList\.remove\("active-destination"\)/);

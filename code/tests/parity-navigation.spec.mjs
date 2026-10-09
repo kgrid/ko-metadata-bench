@@ -53,6 +53,7 @@ async function navigateAndRecord(page, url) {
   states.metadata = await viewState(page, "Metadata", "Metadata Rig", "Interact");
 
   for (const exercise of [
+    { key: "knowledge", control: "K exercise", heading: "Knowledge" },
     { key: "findability", control: "F exercise", heading: "Findability", shared: "Audit" },
     { key: "accessibility", control: "A exercise", heading: "Access" },
     { key: "interoperability", control: "I exercise", heading: "Interoperability", shared: "Stages" },
