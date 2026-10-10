@@ -25,6 +25,7 @@ import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKo
 import { addAssemblyToActiveObjects, createInitialActiveObjects, isAssemblyActive } from "./active-knowledge-objects.js";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "./k-view-model.js";
 import { buildKnowledgeRelationshipMap } from "./knowledge-relationship-map.js";
+import { evidenceNexusIndicator } from "./evidence-linking-category.js";
 import { evidenceActionUrl, markVerifiedPassage } from "./passage-navigation.js";
 
 const FILES = [
@@ -3099,8 +3100,9 @@ export default function Home() {
             })));
             const availableFacets = 2 + (model.dependencyCount !== null ? 1 : 0);
             const declaredFacets = Number(model.elements.length > 0) + Number(model.evidenceCount > 0) + Number(model.dependencyCount !== null && model.dependencyCount > 0);
+            const nexus = evidenceNexusIndicator(model.linkingCategory.category);
             return <details className="accessibilityCard knowledgeCard" key={objectId} data-knowledge-elements={model.elements.length} data-evidential-sources={model.evidenceCount}>
-              <summary><strong>{objectName(objectId)}</strong><small className="knowledgeLinkingDetail"><span>Evidence linking</span><b>{model.linkingCategory.label ?? "Unclassified"} · {model.linkingCategory.route ?? model.linkingCategory.reason}</b></small><span className={`knowledgeFacetCount ${declaredFacets === availableFacets ? "hasFacets" : "incompleteFacets"}`}>{declaredFacets} Facets</span></summary>
+              <summary><strong>{objectName(objectId)}</strong><span className="knowledgeTabIndicators"><span className={`knowledgeNexusLabel nexusLevel${nexus.level}`} title={nexus.explanation} tabIndex={0} aria-label={`${nexus.label}: ${nexus.explanation}`}>{nexus.label}</span><span className={`knowledgeFacetCount ${declaredFacets === availableFacets ? "hasFacets" : "incompleteFacets"}`}>{declaredFacets} Facets</span></span></summary>
               <KnowledgeRelationshipMap model={model} />
               <div className="facetList knowledgeCardBody">
                 <section className="facetRow knowledgeFacetRow declared" aria-label="Knowledge Elements facet"><span className="facetNumber">1</span><div className="facetCopy"><div className="knowledgeFacetHeading"><strong>Knowledge Elements</strong><span>{model.elements.length} {model.elements.length === 1 ? "element" : "elements"}</span></div><small className="knowledgeFacetDescription">What this object computes and where it is implemented</small>

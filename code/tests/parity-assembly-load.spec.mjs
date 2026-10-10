@@ -33,17 +33,28 @@ async function rosters(page, expected) {
       expect(await panels.evaluateAll((nodes) => nodes.every((node) => !node.open))).toBe(true);
       const counts = [[2, 2], [1, 1], [3, 3], [1, 1], [1, 0]].slice(0, expected.length);
       const linking = [
-        "KO-wide · Evidence → whole KO",
-        "Element + specification · Evidence → knowledge element → CKS passage",
-        "Elements + code · Evidence → knowledge elements → corresponding code passages",
-        "Element + specification + code · Evidence → knowledge element → CKS passage + code passages",
-        "None · No direct evidence links",
+        "KO-only",
+        "Element-linked",
+        "Element-linked",
+        "Convergent",
+        "None",
+      ];
+      const levels = [2, 3, 3, 5, 1];
+      const explanations = [
+        "Evidence linked to the whole KO, not its elements.",
+        "Evidence linked to an element and a CKS passage.",
+        "Evidence linked across elements; code passages identified.",
+        "Evidence, CKS, and code passages all linked by element.",
+        "No evidence linked directly to this assembly.",
       ];
       for (const [index, [elements, sources]] of counts.entries()) {
         const panel = panels.nth(index);
-        const linkingDetail = panel.locator("summary .knowledgeLinkingDetail, summary .knowledge-linking-detail");
-        await expect(linkingDetail.locator("span")).toHaveText("Evidence linking");
-        await expect(linkingDetail.locator("b")).toHaveText(linking[index]);
+        const linkingDetail = panel.locator("summary .knowledgeNexusLabel, summary .knowledge-nexus-label");
+        await expect(linkingDetail).toHaveText(linking[index]);
+        await expect(linkingDetail).toHaveAttribute("title", explanations[index]);
+        await expect(linkingDetail).toHaveAttribute("tabindex", "0");
+        await expect(linkingDetail).toHaveClass(new RegExp(`nexus(?:Level|[-]level[-])${levels[index]}`));
+        await expect(panel.locator("summary .knowledgeTabIndicators, summary .knowledge-tab-indicators").locator(".knowledgeFacetCount, .knowledge-facet-count")).toHaveCount(1);
         await expect(panel.locator("summary .knowledgeCounts, summary .knowledge-counts")).toHaveCount(0);
         const facetCounter = panel.locator("summary .knowledgeFacetCount, summary .knowledge-facet-count");
         await expect(facetCounter).toHaveText("2 Facets");
@@ -57,7 +68,7 @@ async function rosters(page, expected) {
         expect(await visibleText(panel.locator(".knowledgeOpenButton"))).toEqual(Array(await panel.locator(".knowledgeOpenButton").count()).fill("Explore"));
         knowledgeProjection.push({
           name: expected[index],
-          linking: await linkingDetail.locator("b").textContent(),
+          linking: await linkingDetail.textContent(),
           facetLabels: await visibleText(panel.locator(".knowledgeFacetHeading, .knowledge-facet-heading")),
           elementCards: await visibleText(panel.locator(".knowledgeElementCard, .knowledge-element-card")),
           evidenceGroups: await visibleText(panel.locator(".knowledgeEvidenceGroup, .knowledge-evidence-group")),

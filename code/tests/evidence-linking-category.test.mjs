@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { deriveEvidenceLinkingCategory } from "../app/evidence-linking-category.js";
+import { deriveEvidenceLinkingCategory, evidenceNexusIndicator } from "../app/evidence-linking-category.js";
 
 const embedded = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
 const metadataFor = (id) => {
@@ -15,6 +15,23 @@ test("the five embedded objects classify from their own metadata declarations", 
   const assembly = JSON.parse(assemblyLine.slice(assemblyLine.indexOf("= ") + 2).replace(/;$/, ""));
   categories.push(deriveEvidenceLinkingCategory(assembly.metadata).category);
   assert.deepEqual(categories, ["koWide", "elementSpecification", "elementsCode", "elementSpecificationCode", "none"]);
+});
+
+test("five category levels project compact nexus labels without replacing the detailed routes", () => {
+  const categories = ["none", "koWide", "elementSpecification", "elementsCode", "elementSpecificationCode"];
+  assert.deepEqual(categories.map((category) => evidenceNexusIndicator(category)), [
+    { label: "None", level: 1, explanation: "No evidence linked directly to this assembly." },
+    { label: "KO-only", level: 2, explanation: "Evidence linked to the whole KO, not its elements." },
+    { label: "Element-linked", level: 3, explanation: "Evidence linked to an element and a CKS passage." },
+    { label: "Element-linked", level: 3, explanation: "Evidence linked across elements; code passages identified." },
+    { label: "Convergent", level: 5, explanation: "Evidence, CKS, and code passages all linked by element." },
+  ]);
+  assert.deepEqual(evidenceNexusIndicator(null), { label: "Unclassified", level: 0, explanation: "This evidence-linking pattern is unclassified." });
+  const html = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.match(html, /const \{ deriveEvidenceLinkingCategory, evidenceNexusIndicator \} =/);
+  assert.match(html, /knowledge-tab-indicators.*renderKnowledgeLinkingDetail\(model\).*knowledge-facet-count/);
+  assert.match(html, /knowledge-nexus-label[^`]*title="\$\{escapeHtml\(nexus\.explanation\)\}"/);
+  assert.doesNotMatch(html, /knowledge-linking-detail/);
 });
 
 test("names and identifiers do not determine the category", () => {

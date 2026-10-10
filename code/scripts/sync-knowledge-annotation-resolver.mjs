@@ -6,6 +6,8 @@ const source = readFileSync(join(root, "app/knowledge-annotation-resolver.js"), 
   .replace("export function resolveKnowledgeAnnotations", "function resolveKnowledgeAnnotations");
 const categorySource = readFileSync(join(root, "app/evidence-linking-category.js"), "utf8")
   .replace("export const EVIDENCE_LINKING_CATEGORIES", "const EVIDENCE_LINKING_CATEGORIES")
+  .replace("export const EVIDENCE_NEXUS_INDICATORS", "const EVIDENCE_NEXUS_INDICATORS")
+  .replace("export function evidenceNexusIndicator", "function evidenceNexusIndicator")
   .replace("export function deriveEvidenceLinkingCategory", "function deriveEvidenceLinkingCategory");
 const relationshipSource = readFileSync(join(root, "app/knowledge-relationship-map.js"), "utf8")
   .replace("export function buildKnowledgeRelationshipMap", "function buildKnowledgeRelationshipMap");
@@ -29,7 +31,7 @@ if (html.includes(startMarker)) {
 }
 const categoryStart = "/* EVIDENCE_LINKING_CATEGORY_START */";
 const categoryEnd = "/* EVIDENCE_LINKING_CATEGORY_END */";
-const categoryBlock = `${categoryStart}\nconst deriveEvidenceLinkingCategory = (() => {\n${categorySource}\nreturn deriveEvidenceLinkingCategory;\n})();\n${categoryEnd}\n`;
+const categoryBlock = `${categoryStart}\nconst { deriveEvidenceLinkingCategory, evidenceNexusIndicator } = (() => {\n${categorySource}\nreturn { deriveEvidenceLinkingCategory, evidenceNexusIndicator };\n})();\n${categoryEnd}\n`;
 if (html.includes(categoryStart)) {
   const start = html.indexOf(categoryStart);
   const end = html.indexOf(categoryEnd, start) + categoryEnd.length;
@@ -69,8 +71,10 @@ if (!html.includes(replacement) && !html.includes("annotationResolution:{...anno
   if (!html.includes(field)) throw new Error("Standalone K-model projection insertion point not found");
   html = html.replace(field, replacement);
 }
-const linkingHelper = 'function renderKnowledgeLinkingDetail(model){const category=model.linkingCategory;return`<small class="knowledge-linking-detail"><span>Evidence linking</span><b>${escapeHtml(category.label??"Unclassified")} · ${escapeHtml(category.route??category.reason??"Pattern unavailable")}</b></small>`}\n';
-if (!html.includes("function renderKnowledgeLinkingDetail(model)")) {
+const linkingHelper = 'function renderKnowledgeLinkingDetail(model){const nexus=evidenceNexusIndicator(model.linkingCategory.category);return`<span class="knowledge-nexus-label nexus-level-${nexus.level}" title="${escapeHtml(nexus.explanation)}" tabindex="0" aria-label="${escapeHtml(`${nexus.label}: ${nexus.explanation}`)}">${escapeHtml(nexus.label)}</span>`}\n';
+if (html.includes("function renderKnowledgeLinkingDetail(model)")) {
+  html = html.replace(/function renderKnowledgeLinkingDetail\(model\)[^\n]*\n/, linkingHelper);
+} else {
   html = html.replace("function renderKnowledge(){", linkingHelper + "function renderKnowledge(){");
 }
 const relationshipHelper = `function renderKnowledgeRelationshipMap(model){
@@ -99,8 +103,14 @@ if (!html.includes(mapMounted)) {
 }
 const summaryBefore = '<summary><strong>${escapeHtml(objectName(objectId))}</strong><span class="knowledge-facet-count';
 const summaryAfter = '<summary><strong>${escapeHtml(objectName(objectId))}</strong>${renderKnowledgeLinkingDetail(model)}<span class="knowledge-facet-count';
-if (!html.includes(summaryAfter)) {
+const compactSummary = '<summary><strong>${escapeHtml(objectName(objectId))}</strong><span class="knowledge-tab-indicators">${renderKnowledgeLinkingDetail(model)}<span class="knowledge-facet-count';
+if (!html.includes(summaryAfter) && !html.includes(compactSummary)) {
   if (!html.includes(summaryBefore)) throw new Error("Standalone K summary insertion point not found");
   html = html.replace(summaryBefore, summaryAfter);
+}
+if (!html.includes(compactSummary)) {
+  if (!html.includes(summaryAfter)) throw new Error("Standalone K compact-summary insertion point not found");
+  html = html.replace(summaryAfter, compactSummary);
+  html = html.replace('</span></summary>${renderKnowledgeRelationshipMap(model)}', '</span></span></summary>${renderKnowledgeRelationshipMap(model)}');
 }
 writeFileSync(path, html);

@@ -7,6 +7,19 @@ export const EVIDENCE_LINKING_CATEGORIES = Object.freeze({
   elementSpecificationCode: { label: "Element + specification + code", route: "Evidence → knowledge element → CKS passage + code passages" },
 });
 
+// Compact tab labels for the workshop progression; these describe linking structure, not evidence quality.
+export const EVIDENCE_NEXUS_INDICATORS = Object.freeze({
+  none: { label: "None", level: 1, explanation: "No evidence linked directly to this assembly." },
+  koWide: { label: "KO-only", level: 2, explanation: "Evidence linked to the whole KO, not its elements." },
+  elementSpecification: { label: "Element-linked", level: 3, explanation: "Evidence linked to an element and a CKS passage." },
+  elementsCode: { label: "Element-linked", level: 3, explanation: "Evidence linked across elements; code passages identified." },
+  elementSpecificationCode: { label: "Convergent", level: 5, explanation: "Evidence, CKS, and code passages all linked by element." },
+});
+
+export function evidenceNexusIndicator(category) {
+  return EVIDENCE_NEXUS_INDICATORS[category] ?? { label: "Unclassified", level: 0, explanation: "This evidence-linking pattern is unclassified." };
+}
+
 const entries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
 const types = (record) => Array.isArray(record?.["@type"]) ? record["@type"] : [record?.["@type"]];
 const isConstituent = (record) => types(record).includes("koio:KnowledgeObject");
