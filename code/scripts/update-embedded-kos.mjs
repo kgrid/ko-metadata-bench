@@ -8,6 +8,7 @@ import { partitionKnowledgePackages, prepareAssemblyGeneralView } from "../app/a
 import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
 import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
 import { validatePackageMetadata } from "./validate-package-metadata.mjs";
+import { validateAnnotationDestinations } from "../app/annotation-destination-validator.js";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
@@ -80,6 +81,30 @@ try {
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);
   const folderNames = folders.map((folder) => folder.name);
   const displayNames = orderedObjects.map(declaredObjectName);
+  const annotationDestinationRecords = {};
+  for (const [index, object] of [...orderedObjects, ...(knowledgeAssembly ? [knowledgeAssembly] : [])].entries()) {
+    const folderPath = join(root, object.folderName);
+    const metadata = JSON.parse(object.readText("metadata.json"));
+    const passageTextCache = new Map();
+    const results = validateAnnotationDestinations(metadata, {
+      files: object.files,
+      readBytes: (file) => readFileSync(join(folderPath, file)),
+      readPassageText: (file) => {
+        if (!passageTextCache.has(file)) {
+          const sourcePath = join(folderPath, file);
+          const value = /\.docx$/i.test(file)
+            ? documentProjectionToPlainText(convertDocxToProjection({ docxPath: sourcePath, knowledgeObjectId: object.folderName, originalPath: file }))
+            : readFileSync(sourcePath, "utf8");
+          passageTextCache.set(file, value);
+        }
+        return passageTextCache.get(file);
+      },
+    });
+    annotationDestinationRecords[String(index + 1)] = results;
+    for (const result of results.filter((item) => item.status === "unresolved")) {
+      console.warn(`${object.folderName}/metadata.json: annotation ${result.annotationId || result.targetId || "unnamed"}: ${result.reason}`);
+    }
+  }
   const assemblyPayload = knowledgeAssembly ? (() => {
     const generalView = prepareAssemblyGeneralView(knowledgeAssembly);
     const folderPath = join(root, knowledgeAssembly.folderName);
@@ -149,6 +174,7 @@ try {
   react = react.replace(/Math\.max\(MIN_OBJECT_COUNT, \d+\)/, `Math.max(MIN_OBJECT_COUNT, ${folders.length})`);
   react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
   react = replaceExactly(react, /^const OBJECT_DISPLAY_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_DISPLAY_NAMES = ${JSON.stringify(displayNames)} as const;`, "React metadata display names");
+  react = replaceExactly(react, /^const annotationDestinationOverrides:[^\n]+$/m, `const annotationDestinationOverrides: Record<string, Array<{ annotationId: string; targetId: string; kind: string | null; status: string; reason: string | null; filePath?: string }>> = ${serializeForScript(annotationDestinationRecords)};`, "React annotation destinations");
   react = replaceExactly(react, /^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = [^\n]+;/m, `const EMBEDDED_ASSEMBLY: EmbeddedAssembly | null = ${serializeForScript(assemblyPayload)};`, "React assembly payload");
   react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
   react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
@@ -160,6 +186,7 @@ try {
   standalone = standalone.replace(/Math\.max\(minObjectCount,\d+\)/, `Math.max(minObjectCount,${folders.length})`);
   standalone = standalone.replace(/const objectFolderNames=\[[^\n]+\];/, `const objectFolderNames=${JSON.stringify(folderNames)};`);
   standalone = replaceExactly(standalone, /^const objectDisplayNames=\[[^\n]+\];/m, `const objectDisplayNames=${JSON.stringify(displayNames)};`, "standalone metadata display names");
+  standalone = replaceExactly(standalone, /^const annotationDestinationOverrides=[^\n]+;$/m, `const annotationDestinationOverrides=${serializeForScript(annotationDestinationRecords)};`, "standalone annotation destinations");
   standalone = replaceExactly(standalone, /^const embeddedAssembly=[^\n]+;/m, `const embeddedAssembly=${serializeForScript(assemblyPayload).replaceAll("</script", "<\\/script")};`, "standalone assembly payload");
   standalone = standalone.replace(/const dataVersion="[^"]+"/, `const dataVersion="${version}"`);
   const safeText = serializeForScript(textFiles).replaceAll("</script", "<\\/script");

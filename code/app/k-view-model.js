@@ -1,3 +1,6 @@
+import { resolveKnowledgeAnnotations } from "./knowledge-annotation-resolver.js";
+import { deriveEvidenceLinkingCategory } from "./evidence-linking-category.js";
+
 const asEntries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
 
 // Keep the declaration site: KO-level evidence is not attributed to every element.
@@ -20,7 +23,7 @@ const declaredText = (...values) => values.find((value) => typeof value === "str
 const descriptionOf = (record) => declaredText(record?.["dc:description"], record?.["schema:description"]);
 
 // A display projection does not change or infer the underlying evidence links.
-export function projectKnowledgeViewModel(model, metadata) {
+export function projectKnowledgeViewModel(model, metadata, destinationStatuses = []) {
   const documentation = asEntries(metadata?.["koio:hasDocumentation"] ?? metadata?.hasDocumentation);
   const cks = documentation.find((record) =>
     asEntries(record?.["@type"]).includes("Specification Document") &&
@@ -28,6 +31,14 @@ export function projectKnowledgeViewModel(model, metadata) {
   const citedSources = new Map(asEntries(metadata?.["dc:source"] ?? metadata?.source)
     .filter((source) => declaredText(source?.["@id"]))
     .map((source) => [source["@id"], source]));
+  // An evidence resource may be a named part of a cited publication.
+  // In that case its bibliographic citation belongs to the parent source.
+  for (const source of citedSources.values()) {
+    for (const part of asEntries(source?.["schema:hasPart"])) {
+      const id = declaredText(part?.["@id"]);
+      if (id && !citedSources.has(id)) citedSources.set(id, source);
+    }
+  }
   const evidence = (link) => {
     const record = link.record ?? {};
     const source = citedSources.get(record["@id"]) ?? {};
@@ -70,8 +81,18 @@ export function projectKnowledgeViewModel(model, metadata) {
   const dependencyCount = isKnowledgeAssembly
     ? new Set(model.linkedKnowledgeObjects.map((record) => declaredText(record?.["@id"])).filter(Boolean)).size
     : null;
+  const annotationResolution = resolveKnowledgeAnnotations(metadata);
   return {
     elements, linkedKnowledgeObjects: model.linkedKnowledgeObjects, koEvidentialBasis, evidenceCount, dependencyCount,
+    annotationResolution: {
+      ...annotationResolution,
+      annotations: annotationResolution.annotations.map((annotation) => ({
+        ...annotation,
+        destination: destinationStatuses.find((status) => status.annotationId === annotation.id && status.targetId === annotation.targetId)
+          ?? { status: "not-checked", reason: "Passage has not been checked against embedded content" },
+      })),
+    },
+    linkingCategory: deriveEvidenceLinkingCategory(metadata),
     cks: cks ? { path: cks["@id"], name: declaredText(cks["dc:title"], cks["schema:name"]) || cks["@id"] } : null,
   };
 }

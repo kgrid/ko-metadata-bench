@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "build": "node scripts/sync-knowledge-annotation-resolver.mjs && WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "sync:knowledge-annotations": "node scripts/sync-knowledge-annotation-resolver.mjs",
     "build:document-projections": "node scripts/build-document-projections.mjs",
     "sync:vocabulary-registry": "node scripts/sync-embedded-vocabulary-registry.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",

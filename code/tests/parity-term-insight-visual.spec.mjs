@@ -32,6 +32,33 @@ async function openMetadataTable(page, url) {
   return { interaction, table };
 }
 
+async function waitForStablePreviewBox(preview) {
+  await preview.evaluate(async (element) => {
+    let previous = null;
+    let matchingFrames = 0;
+    for (let frame = 0; frame < 90; frame += 1) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const { x, y, width, height } = element.getBoundingClientRect();
+      const current = [x, y, width, height];
+      if (previous && current.every((value, index) => Math.abs(value - previous[index]) < 0.25)) {
+        matchingFrames += 1;
+        if (matchingFrames >= 2) return;
+      } else {
+        matchingFrames = 0;
+      }
+      previous = current;
+    }
+    throw new Error("Term Insight preview did not settle before the screenshot");
+  });
+}
+
+async function resetMetadataTableScroll(table) {
+  await table.locator("xpath=ancestor::*[contains(@class,'tripleTableWrap') or contains(@class,'triple-table-wrap')][1]").evaluate((element) => {
+    element.scrollLeft = 0;
+    element.scrollTop = 0;
+  });
+}
+
 async function verifyPreview(page, interaction, table) {
   const terms = [
     table.getByRole("button", { name: /^Inspect RDF subject:/ }).first(),
@@ -111,8 +138,12 @@ for (const [size, viewport] of Object.entries(viewports)) {
       page.on("pageerror", (error) => pageErrors.push(error.message));
       const { interaction, table } = await openMetadataTable(page, url);
       const previewTerm = table.getByRole("button", { name: /^Inspect RDF subject:/ }).first();
+      await page.evaluate(async () => { await document.fonts.ready; });
+      await resetMetadataTableScroll(table);
       await previewTerm.focus();
-      await expect(page.getByRole("tooltip")).toBeVisible();
+      const preview = page.getByRole("tooltip");
+      await expect(preview).toBeVisible();
+      await waitForStablePreviewBox(preview);
       await expect(page).toHaveScreenshot(`${edition}-term-preview-${size}.png`, {
         animations: "disabled", caret: "hide", fullPage: false, maxDiffPixelRatio: 0.002, scale: "css",
       });

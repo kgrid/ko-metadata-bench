@@ -42,6 +42,24 @@ test("source citations and documentation do not imply evidential basis", () => {
   assert.equal(projection.cks?.path, "specs/clinical-spec.docx");
 });
 
+test("a named evidence part inherits the citation of its containing source", () => {
+  const metadata = {
+    "dc:source": [{
+      "@id": "https://example.org/paper",
+      "dc:bibliographicCitation": "Example authors. Example paper.",
+      "schema:hasPart": { "@id": "https://example.org/paper#figure-6", "dc:title": "Figure 6" },
+    }],
+    "koio:hasKnowledge": [{
+      "@id": "decision-logic",
+      "koio:hasEvidentialBasis": [{ "@id": "https://example.org/paper#figure-6", "dc:title": "Figure 6" }],
+    }],
+  };
+  const projection = projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata);
+  assert.equal(projection.elements[0].evidentialBasis[0].citation, "Example authors. Example paper.");
+  assert.equal(projection.elements[0].evidentialBasis[0].name, "Figure 6");
+  assert.equal(projection.evidenceCount, 1);
+});
+
 test("assembly evidence does not inherit from referenced knowledge objects", () => {
   const metadata = {
     "schema:category": "Knowledge Assembly",
@@ -87,7 +105,7 @@ test("readable projections resolve citations and count distinct sources without 
 
 test("standalone and server editions produce the same readable projection", () => {
   const html = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
-  const start = html.indexOf("function buildKnowledgeViewModel(metadata)");
+  const start = html.indexOf("/* KNOWLEDGE_ANNOTATION_RESOLVER_START */");
   const end = html.indexOf("function renderKnowledge(){", start);
   const context = vm.createContext({});
   vm.runInContext(`${html.slice(start, end)}; globalThis.project = metadata => projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata);`, context);
