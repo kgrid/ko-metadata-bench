@@ -75,7 +75,8 @@ test("standalone embeds the same safe source and passage-navigation rules", () =
   const html = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const block = html.split("/* KNOWLEDGE_PASSAGE_NAVIGATION_START */")[1].split("/* KNOWLEDGE_PASSAGE_NAVIGATION_END */")[0];
   const context = vm.createContext({ URL });
-  vm.runInContext(`${block}\nthis.safe = evidenceActionUrl`, context);
+  vm.runInContext(`${block}\nthis.safe = evidenceActionUrl; this.safeUrl = safeEvidenceUrl`, context);
   const links = resolveKnowledgeAnnotations(metadataFor(4)).basisLinks;
   assert.equal(context.safe({ basisLinks: links }, links[0].evidenceId), evidenceActionUrl({ basisLinks: links }, links[0].evidenceId));
+  assert.equal(context.safeUrl("https://example.org/evidence"), safeEvidenceUrl("https://example.org/evidence"));
 });

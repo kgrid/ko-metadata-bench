@@ -206,11 +206,12 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 @media(max-height:720px){.ko-grid,.search-results,.accessibility-grid,.interoperability-grid,.reusability-grid,.metadata-rig-grid{max-height:calc(100vh - 272px)}}
   .knowledge-exercise{grid-column:1/-1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:34px 24px 28px}
   .knowledge-mark{background:#5c5c5f;color:#fff}
-  .knowledge-grid{width:min(1100px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:18px;flex:0 1 auto;min-height:0;max-height:calc(100vh - 300px);overflow-x:hidden;overflow-y:auto}
+  .knowledge-grid{width:min(1240px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:18px;flex:0 1 auto;min-height:0;max-height:calc(100vh - 300px);overflow-x:hidden;overflow-y:auto}
   .knowledge-card>summary{display:grid;grid-template-columns:14px minmax(0,1fr) auto;column-gap:9px;height:42px;min-height:42px;padding-block:0}
   .knowledge-card>summary::before{grid-column:1;align-self:center}
   .knowledge-card>summary>strong{grid-column:2}
   .knowledge-card>summary .knowledge-tab-indicators{grid-column:3;justify-self:end;display:flex;align-items:center;gap:6px;min-width:0;margin-left:0}
+  .knowledge-card>summary .knowledge-tab-explore{flex:none;box-sizing:border-box;appearance:none;height:21px;min-height:0;margin:0;padding:0 10px;border:1px solid #8e8e93;border-radius:999px;background:#fff;color:#3a3a3c;font:700 9px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
   .knowledge-card>summary .knowledge-nexus-label{flex:none;margin-left:0;padding:3px 8px;border-radius:10px;white-space:nowrap}
   .knowledge-card>summary .knowledge-nexus-label:focus-visible{outline:2px solid #42265e;outline-offset:2px}
   .knowledge-card>summary .knowledge-nexus-label.nexus-level-0{background:#eeeef0;color:#525257}
@@ -221,19 +222,6 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
   .knowledge-card>summary .knowledge-nexus-label.nexus-level-5{background:#6e4295;color:#fff}
   .knowledge-card>summary .knowledge-facet-count{flex:none;margin-left:0;padding:3px 8px;border-radius:10px;white-space:nowrap}
   .knowledge-card-body{padding:7px;border-top:1px solid #d2d2d7;background:rgba(255,255,255,.72)}
-  .knowledgeRelationshipMap{display:grid;gap:6px;padding:9px 10px;border-top:1px solid #d2d2d7;background:#f8f8f9}
-  .knowledgeMapHeading{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 7px}
-  .knowledgeMapHeading small,.knowledgeMapEvidence small,.knowledgeMapElement small,.knowledgeMapPassages small{color:#6e6e73;font-size:9px;font-weight:650;letter-spacing:.03em;text-transform:uppercase}
-  .knowledgeMapHeading strong{color:#1d1d1f;font-size:11px;line-height:1.3}
-  .knowledgeMapBranch{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);gap:4px;min-width:0;padding:7px 8px;border:1px solid #d2d2d7;border-radius:8px;background:#fff}
-  .knowledgeMapEvidence,.knowledgeMapElement,.knowledgeMapPassages{display:grid;align-content:start;gap:3px;min-width:0}
-  .knowledgeMapSource,.knowledgeMapMissing,.knowledgeMapElement strong,.knowledgeMapPassage{font-size:10px;line-height:1.35;overflow-wrap:anywhere}
-  .knowledgeMapMissing{color:#6e6e73}
-  .knowledgeMapArrow{align-self:center;color:#6e6e73;font-size:15px;text-align:center}
-  .knowledgeMapPassages{grid-column:1/-1;padding-top:5px;border-top:1px solid #e5e5e7}
-  .knowledgeMapPassage em{color:var(--status-red);font-style:normal}
-  .knowledgeMapNote,.knowledgeMapNone{margin:0;color:#6e6e73;font-size:10px;line-height:1.4}
-  .knowledgeMapBranch .knowledgeMapNote{grid-column:1/-1}
   .knowledge-card>summary strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .knowledge-card>summary .knowledge-facet-count{flex:none;margin-left:auto;padding:3px 8px;border-radius:10px;white-space:nowrap}
   .knowledge-card>summary .knowledge-facet-count.has-facets{background:#e5f3e8;color:#356b43}
@@ -270,6 +258,71 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeOpenButton:hover, .knowledgeDetailAction:hover { background: #f2f2f4; }
 .knowledgeOpenButton:focus-visible, .knowledgeDetailAction:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
 .knowledgeDetailBackdrop { position: fixed; z-index: 1100; inset: 0; padding: 12px; background: rgba(28,28,30,.46); backdrop-filter: blur(10px); }
+.knowledgeSubgraphBody .knowledgeSubgraphRelations{grid-column:1/-1}
+.knowledgeSubgraphRelations ol{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.knowledgeSubgraphRelations li{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:9px 10px;border:1px solid #e5e5e7;border-radius:8px}
+.knowledgeSubgraphRelations li>small{margin:0;white-space:nowrap}
+.knowledgeSubgraphRelations li>small::after{content:" →";color:#3a3a3c;font-size:15px}
+.knowledgeSubgraphNodes{grid-column:1/-1}
+.knowledgeSubgraphNodes>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.knowledgeSubgraphNodes article{min-width:0;padding:8px 10px;border:1px solid #e5e5e7;border-radius:8px;overflow-wrap:anywhere}
+.knowledgeSubgraphNodes article>strong{display:block;font-size:12px}
+.knowledgeSubgraphBody{display:block}
+.knowledgeSubgraphBody .knowledgeFollowIntro{margin-bottom:12px}
+.knowledgeSubgraphBody .knowledgeGraph{padding:0;overflow:hidden}
+.knowledgeGraphHead,.knowledgeGraphLane{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.78fr) minmax(0,1.3fr)}
+.knowledgeGraphHead{background:#f5f5f7;border-bottom:1px solid #d2d2d7;color:#6e6e73;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.knowledgeGraphHead span{padding:10px 12px}
+.knowledgeGraphLane+.knowledgeGraphLane{border-top:1px solid #d2d2d7;background:#f6f3ee}
+.knowledgeGraphLane>div{min-width:0;padding:12px}
+.knowledgeGraphLane>div+div{border-left:1px solid #ececef}
+.knowledgeGraphEvidence,.knowledgeGraphTargets{display:grid;align-content:center;gap:9px}
+.knowledgeGraphSubject{display:flex;align-items:center}
+.knowledgeGraphNode{min-width:0;padding:8px 10px;border:1px solid #8e8e93;border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04);overflow-wrap:anywhere}
+.knowledgeGraphNode strong{display:block;color:#1d1d1f;font-size:12px;line-height:1.35}
+.knowledgeGraphNode small{margin:0 0 3px;font-size:9px}
+.knowledgeGraphNode small:last-child:not(:first-child){margin:4px 0 0}
+.knowledgePassageGlimpse{margin-top:7px;padding:7px 8px;border:1px solid #e5e5e7;border-radius:5px;background:#f8f8f9;color:#55555a;font:10px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.knowledgePassageGlimpse mark{background:#dedee2;color:#1d1d1f;border-radius:2px}
+.knowledgeGraphBranch,.knowledgeGraphRoute,.knowledgeGraphTarget,.knowledgeGraphPart{display:grid;gap:4px}
+.knowledgeGraphEdge{color:#55555a;font-size:10px;font-weight:600}
+.knowledgeGraphReverse{text-align:right}
+.knowledgeGraphRoute{padding-left:10px;border-left:1px solid #a8a8ad}
+.knowledgeGraphTarget{padding-left:10px;border-left:1px solid #c7c7cc}
+.knowledgeGraphAbsent{padding:9px 10px;border:1px dashed #c7c7cc;border-radius:8px;background:#fafafa;color:#6e6e73;font-size:10px}
+.knowledgeGraphAbsent strong{display:block;margin-top:3px;color:#55555a;font-size:11px}
+.knowledgeGraphEmpty{margin:0;padding:10px 12px;border-top:1px solid #ececef}
+.knowledgeGraphRelationshipList{padding:10px 12px;border-top:1px solid #d2d2d7}
+.knowledgeGraphRelationshipList summary{width:fit-content;cursor:pointer;color:#3a3a3c;font-size:11px;font-weight:700}
+.knowledgeGraphRelationshipList ol{margin:8px 0 0;padding-left:22px}
+.knowledgeGraphRelationshipList li+li{margin-top:4px}
+.knowledgeGraphRelationshipList button{max-width:100%;padding:5px 7px;border:1px solid transparent;border-radius:5px;background:transparent;color:#3a3a3c;font-size:11px;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.knowledgeGraphRelationshipList p{margin-top:8px;font-size:11px}
+.knowledgeSubgraphBody{display:flex;flex-direction:column;overflow:hidden}
+.knowledgeGraphWorkspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 0;border:1px solid #d2d2d7;border-radius:12px;background:#fff;overflow:hidden}
+.knowledgeGraphWorkspace.inspectorOpen{grid-template-columns:minmax(0,1fr) minmax(250px,320px)}
+.knowledgeSubgraphBody .knowledgeGraphWorkspace .knowledgeGraph{border:0;border-radius:0;min-width:0;overflow:auto}
+.knowledgeGraphInspector{min-width:0;min-height:0;overflow:auto;border-left:1px solid #d2d2d7;background:#f8f8f9}
+.knowledgeGraphInspectorHead{display:flex;justify-content:space-between;align-items:start;gap:8px;padding:14px;border-bottom:1px solid #d2d2d7}
+.knowledgeGraphInspectorHead h3{margin:3px 0 0;overflow-wrap:anywhere}
+.knowledgeGraphInspectorHead small{margin:0;text-transform:capitalize}
+.knowledgeGraphInspectorHead button{flex:none;border:1px solid #d2d2d7;border-radius:6px;background:#fff;width:28px;height:28px;cursor:pointer}
+.knowledgeGraphInspector dl{margin:0;padding:4px 14px 14px}
+.knowledgeGraphInspector dl>div{padding:9px 0;border-bottom:1px solid #e5e5e7}
+.knowledgeGraphInspector dt{color:#6e6e73;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.knowledgeGraphInspector dd{margin:3px 0 0;color:#1d1d1f;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.knowledgeGraphInspectorActions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px 16px}
+.knowledgeGraphInspectorActions .knowledgeDetailAction{margin:0}
+.knowledgeGraphInspectorActions p{width:100%;margin:0;color:#6e6e73;font-size:11px;line-height:1.45}
+.document-viewer-body[hidden],.knowledgeImplementationDialog pre[hidden]{display:none}
+.knowledgeDetailBackdrop[hidden]{display:none}
+.knowledgeGraphNode{display:block;width:100%;text-align:left;cursor:pointer}
+.knowledgeGraphNode[aria-pressed="true"],.knowledgeGraphEdge[aria-pressed="true"],.knowledgeGraphRelationshipList button[aria-pressed="true"]{border-color:#1d1d1f;background:#ececef}
+.knowledgeGraphNode:focus-visible,.knowledgeGraphEdge:focus-visible,.knowledgeGraphInspector button:focus-visible,.knowledgeGraphRelationshipList button:focus-visible,.knowledgeGraphRelationshipList summary:focus-visible{outline:2px solid #1d1d1f;outline-offset:2px}
+.knowledgePassageGlimpse{display:block}
+.knowledgeGraphEdge{display:block;width:fit-content;padding:2px 4px;border:1px solid transparent;border-radius:4px;background:transparent;text-align:left;cursor:pointer}
+@media(max-width:900px){.knowledgeGraphWorkspace.inspectorOpen{display:flex;flex-direction:column}.knowledgeGraphInspector{order:-1;flex:none;max-height:34vh;border-left:0;border-bottom:1px solid #d2d2d7}.knowledgeGraphHead{display:none}.knowledgeGraphLane{grid-template-columns:1fr}.knowledgeGraphLane>div+div{border-left:0;border-top:1px solid #ececef}.knowledgeGraphLane>div::before{display:block;margin-bottom:6px;color:#6e6e73;font-size:9px;font-weight:700;text-transform:uppercase}.knowledgeGraphEvidence::before{content:"Evidence"}.knowledgeGraphSubject::before{content:"Declaring subject"}.knowledgeGraphTargets::before{content:"Declared targets"}.knowledgeGraphSubject{display:block}}
+@media(max-width:700px){.knowledgeSubgraphRelations li{grid-template-columns:1fr;gap:2px}.knowledgeSubgraphNodes>div{grid-template-columns:1fr}}
 .knowledgeDetailDialog { width: 100%; height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0,1fr); overflow: hidden; border: 1px solid #aeaeb2; border-radius: 18px; background: #f5f5f7; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
 .knowledgeDetailDialog > header { min-height: 72px; display: flex; align-items: center; gap: 18px; padding: 12px 18px; border-bottom: 1px solid #d2d2d7; background: rgba(255,255,255,.94); }
 .knowledgeDetailDialog > header > div { min-width: 0; flex: 1; }
@@ -860,7 +913,7 @@ return buildKnowledgeRelationshipMap;
 })();
 /* KNOWLEDGE_RELATIONSHIP_MAP_END */
 /* KNOWLEDGE_PASSAGE_NAVIGATION_START */
-const { evidenceActionUrl, markVerifiedPassage } = (() => {
+const { evidenceActionUrl, markVerifiedPassage, safeEvidenceUrl } = (() => {
 // Navigate only after the rendered viewer contains one exact text-quote match.
 // The build-time digest/selector check is separate from this display check.
 function safeEvidenceUrl(value) {
@@ -913,9 +966,379 @@ function markVerifiedPassage(root, selector) {
   return { ok: true, reason: null, highlightedNodes: groups.length };
 }
 
-return { evidenceActionUrl, markVerifiedPassage };
+return { evidenceActionUrl, markVerifiedPassage, safeEvidenceUrl };
 })();
 /* KNOWLEDGE_PASSAGE_NAVIGATION_END */
+/* EVIDENCE_SUBGRAPH_CONTRACT_START */
+// The Explore graph is a projection of declared evidence-linking metadata,
+// not a graph of every KO file or an evidence-quality assessment.
+const EVIDENCE_SUBGRAPH_NODE_KINDS = Object.freeze({
+  KNOWLEDGE_OBJECT: "knowledge-object",
+  KNOWLEDGE_ELEMENT: "knowledge-element",
+  EVIDENTIAL_RESOURCE: "evidential-resource",
+  ANNOTATION: "annotation",
+  SPECIFICATION_PASSAGE: "specification-passage",
+  IMPLEMENTATION_PASSAGE: "implementation-passage",
+});
+
+const EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS = Object.freeze({
+  EVIDENTIAL_BASIS: "evidential-basis",
+  EVIDENCE_PART: "evidence-part",
+  SUBJECT_OF_ANNOTATION: "subject-of-annotation",
+  ANNOTATION_TARGET: "annotation-target",
+});
+
+// Direction follows the declaring metadata subject, not a pedagogical
+// evidence-to-knowledge arrow. File-level implementation/documentation links
+// are contextual facts, never passage-level graph edges.
+const EVIDENCE_SUBGRAPH_RELATIONSHIP_RULES = Object.freeze({
+  [EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS.EVIDENTIAL_BASIS]: Object.freeze({
+    sourceField: "koio:hasEvidentialBasis",
+    subjects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.KNOWLEDGE_OBJECT, EVIDENCE_SUBGRAPH_NODE_KINDS.KNOWLEDGE_ELEMENT]),
+    objects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.EVIDENTIAL_RESOURCE]),
+  }),
+  [EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS.EVIDENCE_PART]: Object.freeze({
+    sourceField: "schema:hasPart",
+    subjects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.EVIDENTIAL_RESOURCE]),
+    objects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.EVIDENTIAL_RESOURCE]),
+  }),
+  [EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS.SUBJECT_OF_ANNOTATION]: Object.freeze({
+    sourceField: "schema:subjectOf",
+    subjects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.KNOWLEDGE_OBJECT, EVIDENCE_SUBGRAPH_NODE_KINDS.KNOWLEDGE_ELEMENT]),
+    objects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.ANNOTATION]),
+  }),
+  [EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS.ANNOTATION_TARGET]: Object.freeze({
+    sourceField: "target",
+    subjects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.ANNOTATION]),
+    objects: Object.freeze([EVIDENCE_SUBGRAPH_NODE_KINDS.SPECIFICATION_PASSAGE, EVIDENCE_SUBGRAPH_NODE_KINDS.IMPLEMENTATION_PASSAGE]),
+  }),
+});
+
+function permitsEvidenceSubgraphRelationship(kind, subjectKind, objectKind) {
+  const rule = EVIDENCE_SUBGRAPH_RELATIONSHIP_RULES[kind];
+  return Boolean(rule && rule.subjects.includes(subjectKind) && rule.objects.includes(objectKind));
+}
+
+/* EVIDENCE_SUBGRAPH_CONTRACT_END */
+/* EVIDENCE_SUBGRAPH_PROJECTION_START */
+const projectEvidenceSubgraph = (() => {
+const N = EVIDENCE_SUBGRAPH_NODE_KINDS, R = EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS;
+
+const entries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
+const idOf = (value) => typeof value === "string" ? value : typeof value?.["@id"] === "string" ? value["@id"] : "";
+const labelOf = (record, fallback) => record?.["dc:title"] || record?.["schema:name"] || fallback;
+const nodeKey = (kind, id) => `${kind}:${id}`;
+
+// This is a declared-metadata projection, not a transitive evidence claim.
+// File-level facts remain context; annotation targets retain their declared kind.
+function projectEvidenceSubgraph(metadata, knowledgeModel, annotationResolution) {
+  const nodes = [];
+  const relationships = [];
+  const fileContext = [];
+  const seen = new Set();
+  const addNode = (kind, id, fields = {}) => {
+    if (!id) return null;
+    const key = nodeKey(kind, id);
+    if (!seen.has(key)) { nodes.push({ key, kind, sourceId: id, ...fields }); seen.add(key); }
+    else {
+      const existing = nodes.find((node) => node.key === key);
+      for (const [field, value] of Object.entries(fields)) {
+        if (value == null) continue;
+        if (existing[field] == null || (field === "label" && existing[field] === id && value !== id)) existing[field] = value;
+      }
+    }
+    return key;
+  };
+  const addEdge = (kind, subject, object, sourceField, declaringSubjectId) => {
+    if (!subject || !object || !permitsEvidenceSubgraphRelationship(kind, subject.kind, object.kind)) return;
+    relationships.push({ kind, from: subject.key, to: object.key, sourceField, declaringSubjectId });
+  };
+  const ref = (kind, key) => key ? { kind, key } : null;
+  const objectId = idOf(metadata);
+  const koKey = addNode(N.KNOWLEDGE_OBJECT, objectId, { label: labelOf(metadata, objectId), declarationSite: objectId });
+  const elementKeys = new Map();
+  for (const element of knowledgeModel.elements) {
+    const id = idOf(element.record);
+    const key = addNode(N.KNOWLEDGE_ELEMENT, id, { label: labelOf(element.record, id), declarationSite: objectId });
+    if (key) elementKeys.set(id, key);
+    for (const implementation of element.implementations) fileContext.push({ kind: "implementation-file", declaringSubjectId: id, sourceId: idOf(implementation), path: idOf(implementation) });
+  }
+  for (const document of entries(metadata?.["koio:hasDocumentation"] ?? metadata?.hasDocumentation)) {
+    if (entries(document?.["@type"]).includes("Specification Document")) fileContext.push({ kind: "specification-file", declaringSubjectId: objectId, sourceId: idOf(document), path: idOf(document) });
+  }
+  const cited = entries(metadata?.["dc:source"] ?? metadata?.source);
+  const citedById = new Map(cited.map((record) => [idOf(record), record]));
+  const basisIds = new Set(annotationResolution.basisLinks.map((link) => link.evidenceId).filter(Boolean));
+  for (const source of cited) {
+    const sourceId = idOf(source);
+    const parts = entries(source?.["schema:hasPart"]);
+    if (!basisIds.has(sourceId) && !parts.some((part) => basisIds.has(idOf(part)))) continue;
+    const parentKey = addNode(N.EVIDENTIAL_RESOURCE, sourceId, { label: labelOf(source, sourceId), declarationSite: sourceId });
+    for (const part of parts) {
+      const partId = idOf(part);
+      if (!basisIds.has(partId)) continue;
+      const partKey = addNode(N.EVIDENTIAL_RESOURCE, partId, { label: labelOf(part, partId), declarationSite: sourceId, parentSourceId: sourceId });
+      addEdge(R.EVIDENCE_PART, ref(N.EVIDENTIAL_RESOURCE, parentKey), ref(N.EVIDENTIAL_RESOURCE, partKey), "schema:hasPart", sourceId);
+    }
+  }
+  for (const basis of annotationResolution.basisLinks) {
+    const subjectKind = basis.declaredOn === N.KNOWLEDGE_OBJECT ? N.KNOWLEDGE_OBJECT : N.KNOWLEDGE_ELEMENT;
+    const subjectKey = subjectKind === N.KNOWLEDGE_OBJECT ? koKey : elementKeys.get(basis.subjectId);
+    const evidenceId = basis.evidenceId;
+    const citedRecord = citedById.get(evidenceId);
+    const evidenceKey = addNode(N.EVIDENTIAL_RESOURCE, evidenceId, {
+      label: basis.title || labelOf(citedRecord, evidenceId), declarationSite: basis.subjectId,
+      sourceUrl: basis.sourceUrl,
+    });
+    addEdge(R.EVIDENTIAL_BASIS, ref(subjectKind, subjectKey), ref(N.EVIDENTIAL_RESOURCE, evidenceKey), "koio:hasEvidentialBasis", basis.subjectId);
+  }
+  for (const annotation of annotationResolution.annotations) {
+    // Evidence-side specificity is already shown by hasPart and hasEvidentialBasis.
+    // Keep evidence-target annotations in metadata for inspection, not as a
+    // duplicate route in this deliberately narrow teaching graph.
+    if (annotation.target?.kind === "evidence") continue;
+    const subjectKind = annotation.declaredOn === N.KNOWLEDGE_OBJECT ? N.KNOWLEDGE_OBJECT : N.KNOWLEDGE_ELEMENT;
+    const subjectKey = subjectKind === N.KNOWLEDGE_OBJECT ? koKey : elementKeys.get(annotation.declaringSubjectId);
+    const annotationKey = addNode(N.ANNOTATION, annotation.id, {
+      label: annotation.id, declarationSite: annotation.declaringSubjectId, bodyId: annotation.bodyId,
+      targetId: annotation.targetId, motivation: annotation.motivation,
+      bodyMatchesDeclaringSubject: annotation.bodyMatchesDeclaringSubject,
+    });
+    addEdge(R.SUBJECT_OF_ANNOTATION, ref(subjectKind, subjectKey), ref(N.ANNOTATION, annotationKey), "schema:subjectOf", annotation.declaringSubjectId);
+    if (!annotation.bodyMatchesDeclaringSubject || !annotation.target) continue;
+    const kind = {
+      evidence: N.EVIDENTIAL_RESOURCE,
+      specification: N.SPECIFICATION_PASSAGE,
+      implementation: N.IMPLEMENTATION_PASSAGE,
+    }[annotation.target.kind];
+    if (!kind) continue;
+    const targetKey = addNode(kind, annotation.targetId, {
+      label: annotation.target.title || annotation.targetId,
+      declarationSite: annotation.target.parentId,
+      parentSourceId: annotation.target.parentId,
+      ...(kind === N.EVIDENTIAL_RESOURCE
+        ? { sourceUrl: annotation.target.filePath }
+        : {
+          parentFile: annotation.target.filePath,
+          selector: annotation.target.selector,
+          digest: annotation.target.digest,
+          verification: annotation.destination ?? { status: "not-checked", reason: "Passage has not been checked against embedded content" },
+        }),
+    });
+    addEdge(R.ANNOTATION_TARGET, ref(N.ANNOTATION, annotationKey), ref(kind, targetKey), "target", annotation.declaringSubjectId);
+  }
+  return { objectId, nodes, relationships, fileContext };
+}
+
+return projectEvidenceSubgraph;
+})();
+/* EVIDENCE_SUBGRAPH_PROJECTION_END */
+/* EVIDENCE_SUBGRAPH_LAYOUT_START */
+// A display layout, not an inference engine: every connector is backed by a
+// relationship in the evidence-subgraph projection.
+function layoutEvidenceSubgraph(graph) {
+  const byKey = new Map(graph.nodes.map((node) => [node.key, node]));
+  const from = (key, kind) => graph.relationships.filter((edge) => edge.from === key && edge.kind === kind);
+  return graph.nodes.filter((node) => node.kind === "knowledge-object" || node.kind === "knowledge-element").map((subject) => {
+    const basis = from(subject.key, "evidential-basis").map((edge) => {
+      const resource = byKey.get(edge.to);
+      const parent = resource?.parentSourceId && graph.nodes.find((node) => node.kind === "evidential-resource" && node.sourceId === resource.parentSourceId);
+      const partEdge = parent && graph.relationships.find((item) => item.kind === "evidence-part" && item.from === parent.key && item.to === resource.key);
+      return { edge, resource, parent: partEdge ? parent : null, partEdge: partEdge || null };
+    });
+    const annotations = from(subject.key, "subject-of-annotation").map((edge) => ({
+      edge,
+      annotation: byKey.get(edge.to),
+      targets: from(edge.to, "annotation-target").map((targetEdge) => ({ edge: targetEdge, node: byKey.get(targetEdge.to) })),
+    }));
+    return { subject, basis, annotations };
+  });
+}
+
+/* EVIDENCE_SUBGRAPH_LAYOUT_END */
+/* EVIDENCE_PASSAGE_GLIMPSE_START */
+// A glimpse is derived from the embedded source, never from the selector alone.
+// Build-time resolution is necessary, then the current source must still have
+// exactly one match (including declared prefix/suffix context).
+function evidencePassageGlimpse(passage, readText, contextSize = 36) {
+  if (!passage || !["specification-passage", "implementation-passage"].includes(passage.kind)
+      || passage.verification?.status !== "resolved" || !passage.parentFile) return null;
+  const { exact, prefix, suffix } = passage.selector ?? {};
+  if (typeof exact !== "string" || !exact.length) return null;
+  const source = readText(passage.parentFile);
+  if (typeof source !== "string") return null;
+  const matches = [];
+  for (let at = source.indexOf(exact); at !== -1; at = source.indexOf(exact, at + 1)) {
+    if ((!prefix || source.slice(0, at).endsWith(prefix))
+        && (!suffix || source.slice(at + exact.length).startsWith(suffix))) matches.push(at);
+  }
+  if (matches.length !== 1) return null;
+  const at = matches[0], end = at + exact.length;
+  const width = Number.isFinite(contextSize) ? Math.max(0, Math.min(120, contextSize)) : 36;
+  return {
+    filePath: passage.parentFile,
+    before: `${at > width ? "…" : ""}${source.slice(Math.max(0, at - width), at)}`,
+    exact: source.slice(at, Math.min(end, at + 180)),
+    truncated: end > at + 180,
+    after: end > at + 180 ? "" : `${source.slice(end, end + width)}${end + width < source.length ? "…" : ""}`,
+  };
+}
+
+/* EVIDENCE_PASSAGE_GLIMPSE_END */
+/* EVIDENCE_SUBGRAPH_INSPECTOR_START */
+// Inspector facts come from the declared graph and its source metadata. This
+// does not add graph edges or imply an evidence-to-code assertion.
+const text = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() ?? null;
+
+function recordsById(metadata) {
+  const records = new Map();
+  const visit = (value) => {
+    if (!value || typeof value !== "object") return;
+    if (Array.isArray(value)) { value.forEach(visit); return; }
+    const id = text(value["@id"], value.id);
+    if (id && Object.keys(value).length >= Object.keys(records.get(id) ?? {}).length) records.set(id, value);
+    Object.values(value).forEach(visit);
+  };
+  visit(metadata);
+  return records;
+}
+
+const row = (label, value) => value === null || value === undefined || value === "" ? null : { label, value: String(value) };
+const rows = (...items) => items.filter(Boolean);
+
+function inspectEvidenceSubgraphNode(graph, metadata, key) {
+  const node = graph.nodes.find((item) => item.key === key);
+  if (!node) return null;
+  const records = recordsById(metadata);
+  const record = records.get(node.sourceId) ?? {};
+  const parent = records.get(node.parentSourceId) ?? {};
+  const fileContext = graph.fileContext.filter((item) => item.declaringSubjectId === node.sourceId);
+  const description = text(record["dc:description"], record["schema:description"]);
+  const citation = text(record["dc:bibliographicCitation"], parent["dc:bibliographicCitation"]);
+  const source = text(node.sourceUrl, record["http://www.w3.org/ns/oa#hasSource"]?.["@id"], record["http://www.w3.org/ns/oa#hasSource"]);
+  const evidenceTargetAnnotations = node.kind === "evidential-resource"
+    ? [...records.values()].filter((item) => item?.target === node.sourceId || item?.target?.["@id"] === node.sourceId).map((item) => text(item.id, item["@id"])).filter(Boolean)
+    : [];
+  const selector = node.selector;
+  return {
+    title: node.label,
+    kind: node.kind.replaceAll("-", " "),
+    rows: rows(
+      row("Identifier", node.sourceId),
+      row("Description", description ?? "Not declared"),
+      row("Citation", node.kind === "evidential-resource" ? citation ?? "Not declared" : citation),
+      row("Evidence-target annotation", evidenceTargetAnnotations.join(" · ")),
+      row("Source", source),
+      row("Contained in", node.parentFile ?? node.parentSourceId),
+      row("File context", fileContext.map((item) => item.path).filter(Boolean).join(" · ")),
+      row("Declaring subject", node.declarationSite),
+      row("Annotation body", node.bodyId),
+      row("Annotation target", node.targetId),
+      row("Motivation", node.motivation),
+      row("Selector type", selector?.type),
+      row("Exact passage", selector?.exact),
+      row("Selector prefix", selector?.prefix),
+      row("Selector suffix", selector?.suffix),
+      row("File digest (SHA-256)", node.digest),
+      row("Passage verification", node.verification?.status),
+      row("Verification detail", node.verification?.reason),
+    ),
+  };
+}
+
+function inspectEvidenceSubgraphRelationship(graph, metadata, edgeIndex) {
+  const edge = graph.relationships[edgeIndex];
+  if (!edge) return null;
+  const byKey = new Map(graph.nodes.map((node) => [node.key, node]));
+  const subject = byKey.get(edge.from), object = byKey.get(edge.to);
+  if (!subject || !object) return null;
+  const records = recordsById(metadata);
+  const annotation = edge.kind === "annotation-target" ? subject
+    : edge.kind === "subject-of-annotation" ? object
+    : graph.nodes.find((node) => node.kind === "annotation" && node.bodyId === subject.sourceId && node.targetId === object.sourceId);
+  const target = annotation && graph.nodes.find((node) => node.sourceId === annotation.targetId);
+  const targetRecord = annotation && records.get(annotation.targetId);
+  const selector = target?.selector ?? targetRecord?.["http://www.w3.org/ns/oa#hasSelector"];
+  const exact = selector?.exact ?? selector?.["http://www.w3.org/ns/oa#exact"];
+  const prefix = selector?.prefix ?? selector?.["http://www.w3.org/ns/oa#prefix"];
+  const suffix = selector?.suffix ?? selector?.["http://www.w3.org/ns/oa#suffix"];
+  return {
+    title: edge.sourceField,
+    kind: "Directed relationship",
+    rows: rows(
+      row("Subject", subject.sourceId),
+      row("Predicate", edge.sourceField),
+      row("Object", object.sourceId),
+      row("Declaring subject", edge.declaringSubjectId),
+      row("Annotation", annotation?.sourceId),
+      row("Annotation body", annotation?.bodyId),
+      row("Annotation target", annotation?.targetId),
+      row("Selector exact", exact),
+      row("Selector prefix", prefix),
+      row("Selector suffix", suffix),
+      row("Target file", target?.parentFile ?? targetRecord?.["http://www.w3.org/ns/oa#hasSource"]?.["@id"]),
+      row("Verification", target?.verification?.status),
+    ),
+  };
+}
+
+/* EVIDENCE_SUBGRAPH_INSPECTOR_END */
+/* EVIDENCE_SUBGRAPH_ACTIONS_START */
+
+const actionIdOf = (value) => typeof value === "string" ? value : value?.["@id"] ?? value?.id ?? null;
+
+function recordFor(metadata, id) {
+  if (!id) return null;
+  let found = null;
+  const visit = (value) => {
+    if (!value || typeof value !== "object") return;
+    if (Array.isArray(value)) { value.forEach(visit); return; }
+    if (actionIdOf(value) === id && Object.keys(value).length > Object.keys(found ?? {}).length) found = value;
+    Object.values(value).forEach(visit);
+  };
+  visit(metadata);
+  return found;
+}
+
+// These are affordances for a selected graph target, not additional graph edges.
+function planEvidenceSubgraphActions(graph, model, metadata, selection, availableFile) {
+  const node = selection?.kind === "node"
+    ? graph.nodes.find((item) => item.key === selection.key)
+    : selection?.kind === "edge"
+      ? graph.nodes.find((item) => item.key === graph.relationships[selection.index]?.to)
+      : null;
+  if (!node) return { actions: [], notice: null };
+  if (node.kind === "evidential-resource") {
+    const record = recordFor(metadata, node.sourceId);
+    const url = safeEvidenceUrl(actionIdOf(record?.["http://www.w3.org/ns/oa#hasSource"]))
+      ?? safeEvidenceUrl(node.sourceUrl)
+      ?? safeEvidenceUrl(node.sourceId);
+    return { actions: url ? [{ kind: "evidence", label: "Open evidence source", url }] : [], notice: url ? null : "No safe HTTP or HTTPS evidence source is declared for this target." };
+  }
+  if (node.kind === "specification-passage" || node.kind === "implementation-passage") {
+    const file = node.parentFile;
+    const status = node.verification?.status ?? "not-checked";
+    if (status === "resolved" && node.selector?.exact && file && availableFile(file, node.kind)) {
+      return { actions: [{ kind: "passage", label: "Follow passage", file, passageKind: node.kind, title: node.label, selector: node.selector }], notice: null };
+    }
+    return { actions: [], notice: `Precise passage navigation unavailable: ${node.verification?.reason ?? status}. No whole-file substitute is shown.` };
+  }
+  if (node.kind === "knowledge-object" || node.kind === "knowledge-element") {
+    const actions = [];
+    const specification = model.cks?.path;
+    if (specification && availableFile(specification, "specification-file")) actions.push({ kind: "specification", label: "View Specification", file: specification });
+    if (node.kind === "knowledge-element") {
+      const element = model.elements.find((item) => item.identifier === node.sourceId);
+      for (const implementation of element?.implementations ?? []) {
+        if (availableFile(implementation.path, "implementation-file")) actions.push({ kind: "implementation", label: "View Implementation", file: implementation.path });
+      }
+    }
+    return { actions, notice: null };
+  }
+  return { actions: [], notice: null };
+}
+
+/* EVIDENCE_SUBGRAPH_ACTIONS_END */
 function buildKnowledgeViewModel(metadata){const entries=value=>Array.isArray(value)?value:value&&typeof value==="object"?[value]:[],knowledge=entries(metadata?.["koio:hasKnowledge"]??metadata?.hasKnowledge),isObjectReference=entry=>entries(entry?.["@type"]).includes("koio:KnowledgeObject")||entry?.["@type"]==="koio:KnowledgeObject",linkedKnowledgeObjects=knowledge.filter(isObjectReference),elements=knowledge.filter(entry=>!isObjectReference(entry)).map((entry,index)=>({index,record:entry,implementations:entries(entry?.implementedBy),evidentialBasis:entries(entry?.["koio:hasEvidentialBasis"]??entry?.hasEvidentialBasis).map(record=>({record,declaredOn:"knowledge-element",elementIndex:index}))})),koEvidentialBasis=entries(metadata?.["koio:hasEvidentialBasis"]??metadata?.hasEvidentialBasis).map(record=>({record,declaredOn:"knowledge-object",elementIndex:null}));return{elements,linkedKnowledgeObjects,koEvidentialBasis}}
 function projectKnowledgeViewModel(model,metadata,destinationStatuses=[]){
   const txt=(...values)=>values.find(value=>typeof value==="string"&&value.trim())?.trim()??"",entries=value=>Array.isArray(value)?value:value&&typeof value==="object"?[value]:[],description=record=>txt(record?.["dc:description"],record?.["schema:description"]);
@@ -927,8 +1350,8 @@ function projectKnowledgeViewModel(model,metadata,destinationStatuses=[]){
   const koEvidentialBasis=model.koEvidentialBasis.map(evidence),seen=new Set();let evidenceCount=0;
   for(const [index,item] of [...koEvidentialBasis,...elements.flatMap(element=>element.evidentialBasis)].entries()){const key=item.identifier||(item.citation!=="Citation not declared"?`citation:${item.citation}`:`anonymous:${index}`);if(!seen.has(key)){seen.add(key);evidenceCount++}}
   const isKnowledgeAssembly=metadata?.["schema:category"]==="Knowledge Assembly",dependencyCount=isKnowledgeAssembly?new Set(model.linkedKnowledgeObjects.map(record=>txt(record?.["@id"])).filter(Boolean)).size:null;
-  const annotationResolution=resolveKnowledgeAnnotations(metadata);
-  return{elements,linkedKnowledgeObjects:model.linkedKnowledgeObjects,koEvidentialBasis,evidenceCount,dependencyCount,annotationResolution:{...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))},linkingCategory:deriveEvidenceLinkingCategory(metadata),cks:cks?{path:cks["@id"],name:txt(cks["dc:title"],cks["schema:name"])||cks["@id"]}:null}
+  const annotationResolution=resolveKnowledgeAnnotations(metadata),resolvedAnnotations={...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))};
+  return{elements,linkedKnowledgeObjects:model.linkedKnowledgeObjects,koEvidentialBasis,evidenceCount,dependencyCount,annotationResolution:resolvedAnnotations,evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations),linkingCategory:deriveEvidenceLinkingCategory(metadata),cks:cks?{path:cks["@id"],name:txt(cks["dc:title"],cks["schema:name"])||cks["@id"]}:null}
 }
 const annotationDestinationOverrides={"1":[],"2":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#annotation-uhms-figure6","declaringSubjectId":"DFU_HBO2_Decision_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#evidence-uhms-figure6","kind":"evidence","status":"external","reason":"Open external publication deliberately"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#annotation-cks-decision-table","declaringSubjectId":"DFU_HBO2_Decision_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#cks-decision-table","kind":"specification","status":"resolved","reason":null,"filePath":"specs/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx"}],"3":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-regimen-range-code","declaringSubjectId":"Regimen_Range","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-regimen-range-scenarios","kind":"implementation","status":"resolved","reason":null,"filePath":"src/regimen-range.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-questionnaire-code","declaringSubjectId":"Burden_Questionnaire_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-questionnaire-response","kind":"implementation","status":"resolved","reason":null,"filePath":"src/questionnaire-logic.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-burden-analysis-code","declaringSubjectId":"Burden_Response_Analysis","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-execution-burden-level","kind":"implementation","status":"resolved","reason":null,"filePath":"src/burden-response-analysis.js"}],"4":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-margolis-table3","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#evidence-margolis-table3","kind":"evidence","status":"external","reason":"Open external publication deliberately"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-cks-decision-table","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#cks-decision-table","kind":"specification","status":"resolved","reason":null,"filePath":"specs/Margolis_2022_DFU_Prognostic_CKS-1_0.docx"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-prognosis-rule-mapping","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#implementation-prognosis-rule-mapping","kind":"implementation","status":"resolved","reason":null,"filePath":"src/prognosis.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-prognosis-rule-selection","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#implementation-prognosis-rule-selection","kind":"implementation","status":"resolved","reason":null,"filePath":"src/prognosis.js"}]};
 function knowledgeViewModel(objectId){try{const metadata=JSON.parse(overrides[`${objectId}/metadata.json`]);return projectKnowledgeViewModel(buildKnowledgeViewModel(metadata),metadata,annotationDestinationOverrides[objectId]||[])}catch{return projectKnowledgeViewModel(buildKnowledgeViewModel(null),null)}}
@@ -948,7 +1371,7 @@ function openKnowledgeImplementationStandalone(objectId,file,onClose,passage=nul
   dialog.innerHTML=`<section class="test-viewer-dialog knowledgeImplementationDialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-implementation-title"><header><div><span>Knowledge implementation</span><h2 id="knowledge-implementation-title">${escapeHtml(objectName(objectId))} · ${escapeHtml(file.split("/").at(-1)||file)}</h2><small>${escapeHtml(file)}</small></div><button type="button" aria-label="Close implementation">×</button></header><pre><code>${escapeHtml(seedValue(objectId,file))}</code></pre><footer>Read-only · Embedded in this knowledge object</footer></section>`;
   dialog.addEventListener("mousedown",event=>{if(event.target===dialog)close()});dialog.querySelector("header button").addEventListener("click",close);
   document.addEventListener("keydown",onKey);document.body.append(dialog);dialog.querySelector("header button").focus();
-  if(passage){const result=markVerifiedPassage(dialog.querySelector("pre code"),passage.selector),status=document.createElement("p");status.className="knowledgePassageStatus";status.setAttribute("role","status");status.textContent=result.ok?`Showing highlighted passage: ${passage.title}`:`Exact navigation could not be verified: ${result.reason}. Showing the whole file.`;dialog.querySelector(".knowledgeImplementationDialog").classList.add("hasPassageStatus");dialog.querySelector("pre").before(status);dialog.querySelector("mark.knowledgePassageHighlight")?.scrollIntoView({block:"center",behavior:"instant"})}
+  if(passage){const result=markVerifiedPassage(dialog.querySelector("pre code"),passage.selector),status=document.createElement("p");status.className="knowledgePassageStatus";status.setAttribute("role","status");status.textContent=result.ok?`Showing highlighted passage: ${passage.title}`:`Exact navigation could not be verified: ${result.reason}. No whole-file substitute is shown.`;dialog.querySelector(".knowledgeImplementationDialog").classList.add("hasPassageStatus");dialog.querySelector("pre").hidden=!result.ok;dialog.querySelector("pre").before(status);dialog.querySelector("mark.knowledgePassageHighlight")?.scrollIntoView({block:"center",behavior:"instant"})}
 }
 function renderKnowledgeFollowElementStandalone(objectId,model,element,cksProjection,implementationRows){
   const branch=buildKnowledgeRelationshipMap(model).branches.find(item=>item.elementIndex===element.index);
@@ -973,25 +1396,55 @@ function openKnowledgeElementStandalone(objectId,elementIndex){
   dialog.querySelector(".knowledgeKoEvidenceOpen")?.addEventListener("click",()=>{close();openKoEvidenceStandalone(objectId)});
   document.addEventListener("keydown",onKey);document.body.append(dialog);dialog.querySelector('button[aria-label="Close knowledge and evidence"]').focus();
 }
-function renderKnowledgeElement(element,objectId){return`<article class="knowledge-element-card"><h3>${escapeHtml(element.name)}</h3><p>${escapeHtml(knowledgePanelSummary(element.description))}</p><div class="knowledge-implementation"><span>Implementation</span>${element.implementations.length?`<code>${escapeHtml(element.implementations[0].path)}</code>${element.implementations.length>1?`<span>+${element.implementations.length-1} more</span>`:""}`:"<span>Implementation path not declared</span>"}</div><button class="knowledgeOpenButton" type="button" data-knowledge-object="${objectId}" data-knowledge-element="${element.index}" aria-label="Explore ${escapeHtml(element.name)}">Explore</button></article>`}
+function openKnowledgeSubgraphStandalone(objectId){
+  const model=knowledgeViewModel(objectId),graph=model.evidenceSubgraph,lanes=layoutEvidenceSubgraph(graph);
+  const graphNodes=new Map(graph.nodes.map(item=>[item.key,item]));
+  const compactLabel=item=>{const label=String(item?.label||item?.sourceId||"");return !/^https?:\/\//.test(label)&&label.length<=52?label:decodeURIComponent(label.split(/[\\/#]/).filter(Boolean).at(-1)||label).slice(0,52)};
+  const relationshipLabel=item=>`${compactLabel(graphNodes.get(item.from))} — ${item.sourceField} — ${compactLabel(graphNodes.get(item.to))}`;
+  let metadata=null;
+  try{metadata=JSON.parse(overrides[`${objectId}/metadata.json`])}catch{}
+  const node=(item,kind)=>{
+    const passage=item.kind==="specification-passage"||item.kind==="implementation-passage";
+    const glimpse=passage?evidencePassageGlimpse(item,file=>filesForObject(objectId).includes(file)?seedValue(objectId,file):null):null;
+    return `<button type="button" class="knowledgeGraphNode${glimpse?" hasPassageGlimpse":""}" data-node-key="${escapeHtml(item.key)}" aria-label="Inspect ${escapeHtml(kind)}: ${escapeHtml(item.label)}" aria-pressed="false" title="${escapeHtml(item.sourceId)}"><small>${escapeHtml(kind)}</small><strong>${escapeHtml(compactLabel(item))}</strong>${glimpse?`<span class="knowledgePassageGlimpse" aria-label="Verified passage within ${escapeHtml(glimpse.filePath)}"><mark>${escapeHtml(glimpse.exact.slice(0,80))}${glimpse.exact.length>80||glimpse.truncated?"…":""}</mark></span>`:item.verification?`<small>${escapeHtml(item.verification.status==="resolved"?"Verified passage preview unavailable":`Passage ${item.verification.status}`)}</small>`:""}</button>`;
+  };
+  const edge=(item,reverse=false)=>`<button type="button" class="knowledgeGraphEdge${reverse?" knowledgeGraphReverse":""}" data-edge-index="${graph.relationships.indexOf(item)}" aria-label="Inspect relationship: ${escapeHtml(item.sourceField)}" aria-pressed="false">${reverse?"← ":""}${escapeHtml(item.sourceField)}${reverse?"":" →"}</button>`;
+  const rows=lanes.map(lane=>`<div class="knowledgeGraphLane"><div class="knowledgeGraphEvidence">${lane.basis.map(basis=>`<div class="knowledgeGraphBranch">${basis.parent?`<div class="knowledgeGraphPart">${node(basis.parent,"evidence resource")}${edge(basis.partEdge)}</div>`:""}${node(basis.resource,"evidence resource")}${edge(basis.edge,true)}</div>`).join("")||'<div class="knowledgeGraphAbsent" role="note">Evidential basis <strong>Not declared</strong></div>'}</div><div class="knowledgeGraphSubject">${node(lane.subject,lane.subject.kind.replaceAll("-"," "))}</div><div class="knowledgeGraphTargets">${lane.annotations.map(route=>`<div class="knowledgeGraphRoute">${edge(route.edge)}${node(route.annotation,"annotation")}${route.targets.map(target=>`<div class="knowledgeGraphTarget">${edge(target.edge)}${node(target.node,target.node.kind.replaceAll("-"," "))}</div>`).join("")}</div>`).join("")||'<div class="knowledgeGraphAbsent" role="note">Annotation <strong>Not declared</strong></div>'}</div></div>`).join("");
+  const dialog=document.createElement("div"),close=()=>{document.removeEventListener("keydown",onKey);dialog.remove()},onKey=event=>{if(event.key==="Escape"){if(dialog.querySelector(".knowledgeGraphInspector")){clearSelection();dialog.querySelector(".knowledgeGraphInspector")?.remove();dialog.querySelector(".knowledgeGraphWorkspace")?.classList.remove("inspectorOpen")}else close()}};
+  dialog.className="knowledgeDetailBackdrop";
+  dialog.innerHTML=`<section class="knowledgeDetailDialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-subgraph-title"><header><div><span>Knowledge and evidence</span><h2 id="knowledge-subgraph-title">${escapeHtml(objectName(objectId))}</h2><small>Evidence-linking subgraph</small></div><button type="button" aria-label="Close evidence subgraph">×</button></header><div class="knowledgeDetailBody knowledgeSubgraphBody"><div class="knowledgeGraphWorkspace"><section class="knowledgeGraph" aria-label="Evidence-linking graph"><div class="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Declared targets</span></div>${rows}${!graph.relationships.length?`<p class="knowledgeGraphEmpty">No direct evidence links declared for this ${model.dependencyCount!==null?"assembly":"KO"}.${model.dependencyCount!==null?" Constituent KO evidence is not inherited.":""}</p>`:""}<details class="knowledgeGraphRelationshipList"><summary>Declared relationships (${graph.relationships.length})</summary>${graph.relationships.length?`<ol>${graph.relationships.map((item,index)=>`<li><button type="button" data-edge-index="${index}" aria-pressed="false">${escapeHtml(relationshipLabel(item))}</button></li>`).join("")}</ol>`:"<p>None declared.</p>"}</details></section></div></div></section>`;
+  const clearSelection=()=>dialog.querySelectorAll(".knowledgeGraphNode,.knowledgeGraphEdge,.knowledgeGraphRelationshipList button").forEach(button=>button.setAttribute("aria-pressed","false"));
+  const inspect=(button,detail,selection)=>{
+    if(!detail)return;
+    clearSelection();button.setAttribute("aria-pressed","true");
+    const workspace=dialog.querySelector(".knowledgeGraphWorkspace");
+    workspace.classList.add("inspectorOpen");
+    workspace.querySelector(".knowledgeGraphInspector")?.remove();
+    const aside=document.createElement("aside");aside.className="knowledgeGraphInspector";aside.setAttribute("role","complementary");aside.setAttribute("aria-label","Evidence graph inspector");
+    const plan=planEvidenceSubgraphActions(graph,model,metadata,selection,(file,kind)=>kind.startsWith("specification")?Boolean(documentProjectionForStandalone(objectId,file)?.sanitizedHtml):filesForObject(objectId).includes(file)&&Boolean(seedValue(objectId,file)));
+    aside.innerHTML=`<div class="knowledgeGraphInspectorHead"><div><small>${escapeHtml(detail.kind)}</small><h3>${escapeHtml(detail.title)}</h3></div><button type="button" aria-label="Close evidence graph inspector">×</button></div><dl>${detail.rows.map(row=>`<div><dt>${escapeHtml(row.label)}</dt><dd>${escapeHtml(row.value)}</dd></div>`).join("")}</dl>${plan.actions.length||plan.notice?`<div class="knowledgeGraphInspectorActions">${plan.actions.map((action,index)=>action.kind==="evidence"?`<a class="knowledgeDetailAction" href="${escapeHtml(action.url)}" target="_blank" rel="noopener noreferrer">Open evidence source ↗</a>`:`<button type="button" class="knowledgeDetailAction" data-graph-action="${index}">${escapeHtml(action.label)}</button>`).join("")}${plan.notice?`<p role="status">${escapeHtml(plan.notice)}</p>`:""}</div>`:""}`;
+    aside.querySelector("button").addEventListener("click",()=>{clearSelection();aside.remove();workspace.classList.remove("inspectorOpen")});
+    aside.querySelectorAll("[data-graph-action]").forEach(control=>control.addEventListener("click",()=>{
+      const action=plan.actions[Number(control.dataset.graphAction)];if(!action)return;
+      dialog.hidden=true;document.removeEventListener("keydown",onKey);
+      const resume=()=>{dialog.hidden=false;document.addEventListener("keydown",onKey);control.focus()};
+      const passage=action.kind==="passage"?{title:action.title,selector:action.selector}:null;
+      if(action.kind==="specification"||action.passageKind==="specification-passage")openDocumentProjectionStandalone(objectId,action.file,resume,passage);
+      else openKnowledgeImplementationStandalone(objectId,action.file,resume,passage);
+    }));
+    workspace.append(aside);
+  };
+  dialog.addEventListener("mousedown",event=>{if(event.target===dialog)close()});
+  dialog.querySelector('button[aria-label="Close evidence subgraph"]').addEventListener("click",close);
+  dialog.querySelectorAll("[data-node-key]").forEach(button=>button.addEventListener("click",()=>{const selection={kind:"node",key:button.dataset.nodeKey};inspect(button,inspectEvidenceSubgraphNode(graph,metadata,selection.key),selection)}));
+  dialog.querySelectorAll("[data-edge-index]").forEach(button=>button.addEventListener("click",()=>{const selection={kind:"edge",index:Number(button.dataset.edgeIndex)};inspect(button,inspectEvidenceSubgraphRelationship(graph,metadata,selection.index),selection)}));
+  document.addEventListener("keydown",onKey);document.body.append(dialog);dialog.querySelector('button[aria-label="Close evidence subgraph"]').focus();
+}
+function renderKnowledgeElement(element,objectId){return`<article class="knowledge-element-card"><h3>${escapeHtml(element.name)}</h3><p>${escapeHtml(knowledgePanelSummary(element.description))}</p><div class="knowledge-implementation"><span>Implementation</span>${element.implementations.length?`<code>${escapeHtml(element.implementations[0].path)}</code>${element.implementations.length>1?`<span>+${element.implementations.length-1} more</span>`:""}`:"<span>Implementation path not declared</span>"}</div></article>`}
 function knowledgeDependencyNames(model){return Array.from(new Set(model.linkedKnowledgeObjects.map(reference=>{const identifier=reference?.["@id"],knownId=objectIds.find(id=>{try{return JSON.parse(overrides[`${id}/metadata.json`])["@id"]===identifier}catch{return false}});return knownId?objectName(knownId):identifier||"Identifier not declared"})))}
 function renderKnowledgeLinkingDetail(model){const nexus=evidenceNexusIndicator(model.linkingCategory.category);return`<span class="knowledge-nexus-label nexus-level-${nexus.level}" title="${escapeHtml(nexus.explanation)}" tabindex="0" aria-label="${escapeHtml(`${nexus.label}: ${nexus.explanation}`)}">${escapeHtml(nexus.label)}</span>`}
-function renderKnowledgeRelationshipMap(model){
-  const map=buildKnowledgeRelationshipMap(model);
-  const sources=(items)=>items.map((item)=>'<span class="knowledgeMapSource">'+escapeHtml(item.name)+'</span>').join('');
-  const passages=(items,kind)=>items.map((item)=>'<span class="knowledgeMapPassage">Knowledge element → '+kind+': '+escapeHtml(item.title)+(item.status!=="resolved"?'<em> · Unresolved</em>':'')+'</span>').join('');
-  let content='<div class="knowledgeMapHeading"><small>Evidence linking</small><strong>'+escapeHtml(map.descriptor)+'</strong></div>';
-  if(map.wholeKoSources.length)content+='<div class="knowledgeMapBranch"><div class="knowledgeMapEvidence"><small>Declared evidential basis</small>'+sources(map.wholeKoSources)+'</div><span class="knowledgeMapArrow" aria-hidden="true">→</span><div class="knowledgeMapElement"><small>Declaration site</small><strong>Whole KO</strong></div><p class="knowledgeMapNote">These sources are not assigned to individual knowledge elements.</p></div>';
-  for(const branch of map.branches){content+='<div class="knowledgeMapBranch"><div class="knowledgeMapEvidence"><small>Declared evidential basis</small>'+(branch.evidence.length?sources(branch.evidence):'<span class="knowledgeMapMissing">No declared evidential basis</span>')+'</div><span class="knowledgeMapArrow" aria-hidden="true">'+(branch.evidence.length?'→':'')+'</span><div class="knowledgeMapElement"><small>Knowledge element</small><strong>'+escapeHtml(branch.elementName)+'</strong></div>';
-    if(branch.specificationPassages.length||branch.implementationPassages.length)content+='<div class="knowledgeMapPassages"><small>Separately linked from this element</small>'+passages(branch.specificationPassages,'CKS passage')+passages(branch.implementationPassages,'Code passage')+'</div>';
-    content+='</div>';
-  }
-  if(!map.wholeKoSources.length&&!map.branches.length)content+='<p class="knowledgeMapNone">No direct evidential basis declared for this '+(model.dependencyCount!==null?'assembly':'KO')+'.'+(model.dependencyCount!==null?' Constituent KO evidence is not inherited.':'')+'</p>';
-  if(map.branches.some((branch)=>branch.implementationPassages.length))content+='<p class="knowledgeMapNote">A code-passage link identifies an element’s implementation; it is not a direct evidence-to-code assertion.</p>';
-  return '<section class="knowledgeRelationshipMap" aria-label="Evidence linking relationship map">'+content+'</section>';
-}
-function renderKnowledge(){return`<section class="knowledge-exercise" aria-label="Knowledge exercise"><div class="view-sticky-controls"><div class="view-title"><div class="search-mark knowledge-mark">K</div><h2>Knowledge</h2></div><p>Distinguish computable knowledge from the evidence it is based on</p></div><div class="knowledge-grid">${objectIds.map(objectId=>{const model=knowledgeViewModel(objectId),dependencyNames=knowledgeDependencyNames(model),availableFacets=2+(model.dependencyCount!==null?1:0),declaredFacets=Number(model.elements.length>0)+Number(model.evidenceCount>0)+Number(model.dependencyCount!==null&&model.dependencyCount>0);return`<details class="accessibility-card knowledge-card" data-knowledge-elements="${model.elements.length}" data-evidential-sources="${model.evidenceCount}"><summary><strong>${escapeHtml(objectName(objectId))}</strong><span class="knowledge-tab-indicators">${renderKnowledgeLinkingDetail(model)}<span class="knowledge-facet-count ${declaredFacets===availableFacets?"has-facets":"incomplete-facets"}">${declaredFacets} Facets</span></span></summary>${renderKnowledgeRelationshipMap(model)}<div class="facet-list knowledge-card-body"><section class="facet-row knowledge-facet-row declared" aria-label="Knowledge Elements facet"><span class="facet-number">1</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>Knowledge Elements</strong><span>${model.elements.length} ${model.elements.length===1?"element":"elements"}</span></div><small class="knowledge-facet-description">What this object computes and where it is implemented</small><div class="knowledge-facet-content">${model.elements.length?model.elements.map(element=>renderKnowledgeElement(element,objectId)).join(""):'<p class="knowledge-empty-state">No knowledge elements declared.</p>'}</div></div></section><section class="facet-row knowledge-facet-row ${model.evidenceCount?"declared":"missing"}" aria-label="Evidential Sources facet"><span class="facet-number">2</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>Evidential Sources</strong><span>${model.evidenceCount} ${model.evidenceCount===1?"source":"sources"}</span></div><small class="knowledge-facet-description">Sources declared as a basis for this object's knowledge${model.dependencyCount!==null?"; constituent KO evidence is not inherited":""}</small><div class="knowledge-facet-content">${model.elements.filter(element=>element.evidentialBasis.length).map(element=>`<section class="knowledge-evidence-group knowledge-evidence-map-row" aria-label="Evidence for ${escapeHtml(element.name)}"><h3>Evidence for ${escapeHtml(element.name)}</h3><span>${element.evidentialBasis.length} ${element.evidentialBasis.length===1?"source":"sources"}</span><button class="knowledgeOpenButton" type="button" data-knowledge-object="${objectId}" data-knowledge-element="${element.index}" aria-label="Explore evidence for ${escapeHtml(element.name)}">Explore</button></section>`).join("")}${model.koEvidentialBasis.length?`<section class="knowledge-ko-evidence knowledge-evidence-map-row" aria-label="Evidence for this KO"><h3>Evidence for this KO</h3><span>${model.koEvidentialBasis.length} ${model.koEvidentialBasis.length===1?"source":"sources"}</span><button class="knowledgeOpenButton" type="button" data-knowledge-ko-evidence="${objectId}" aria-label="Explore evidence for this KO">Explore</button></section>`:""}${model.evidenceCount?"":'<p class="knowledge-empty-state">No evidential basis declared anywhere in this KO.</p>'}</div></div></section>${model.dependencyCount===null?"":`<section class="facet-row knowledge-facet-row ${model.dependencyCount?"declared":"missing"}" aria-label="KO Dependencies facet"><span class="facet-number">3</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>KO Dependencies</strong><span>${model.dependencyCount} ${model.dependencyCount===1?"KO":"KOs"}</span></div><small class="knowledge-facet-description">Knowledge Objects incorporated by this assembly</small><div class="knowledge-facet-content">${dependencyNames.length?`<ul class="knowledge-dependency-list">${dependencyNames.map(name=>`<li>${escapeHtml(name)}</li>`).join("")}</ul>`:'<p class="knowledge-empty-state">No KO dependencies declared.</p>'}</div></div></section>`}</div></details>`}).join("")}</div></section>`}
-function openKnowledge(){workspace.innerHTML=renderKnowledge();workspace.querySelectorAll("[data-knowledge-object][data-knowledge-element]").forEach(button=>button.addEventListener("click",()=>openKnowledgeElementStandalone(Number(button.dataset.knowledgeObject),Number(button.dataset.knowledgeElement))));workspace.querySelectorAll("[data-knowledge-ko-evidence]").forEach(button=>button.addEventListener("click",()=>openKoEvidenceStandalone(Number(button.dataset.knowledgeKoEvidence))))}
+function renderKnowledge(){return`<section class="knowledge-exercise" aria-label="Knowledge exercise"><div class="view-sticky-controls"><div class="view-title"><div class="search-mark knowledge-mark">K</div><h2>Knowledge</h2></div><p>Distinguish computable knowledge from the evidence it is based on</p></div><div class="knowledge-grid">${objectIds.map(objectId=>{const model=knowledgeViewModel(objectId),dependencyNames=knowledgeDependencyNames(model),availableFacets=2+(model.dependencyCount!==null?1:0),declaredFacets=Number(model.elements.length>0)+Number(model.evidenceCount>0)+Number(model.dependencyCount!==null&&model.dependencyCount>0);return`<details class="accessibility-card knowledge-card" data-knowledge-elements="${model.elements.length}" data-evidential-sources="${model.evidenceCount}"><summary><strong>${escapeHtml(objectName(objectId))}</strong><span class="knowledge-tab-indicators"><button class="knowledgeOpenButton knowledge-tab-explore" type="button" data-knowledge-explore="${objectId}" aria-label="Explore ${escapeHtml(objectName(objectId))}">Explore</button>${renderKnowledgeLinkingDetail(model)}<span class="knowledge-facet-count ${declaredFacets===availableFacets?"has-facets":"incomplete-facets"}">${declaredFacets} Facets</span></span></summary><div class="facet-list knowledge-card-body"><section class="facet-row knowledge-facet-row declared" aria-label="Knowledge Elements facet"><span class="facet-number">1</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>Knowledge Elements</strong><span>${model.elements.length} ${model.elements.length===1?"element":"elements"}</span></div><small class="knowledge-facet-description">What this object computes and where it is implemented</small><div class="knowledge-facet-content">${model.elements.length?model.elements.map(element=>renderKnowledgeElement(element,objectId)).join(""):'<p class="knowledge-empty-state">No knowledge elements declared.</p>'}</div></div></section><section class="facet-row knowledge-facet-row ${model.evidenceCount?"declared":"missing"}" aria-label="Evidential Sources facet"><span class="facet-number">2</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>Evidential Sources</strong><span>${model.evidenceCount} ${model.evidenceCount===1?"source":"sources"}</span></div><small class="knowledge-facet-description">Sources declared as a basis for this object's knowledge${model.dependencyCount!==null?"; constituent KO evidence is not inherited":""}</small><div class="knowledge-facet-content">${model.elements.filter(element=>element.evidentialBasis.length).map(element=>`<section class="knowledge-evidence-group knowledge-evidence-map-row" aria-label="Evidence for ${escapeHtml(element.name)}"><h3>Evidence for ${escapeHtml(element.name)}</h3><span>${element.evidentialBasis.length} ${element.evidentialBasis.length===1?"source":"sources"}</span></section>`).join("")}${model.koEvidentialBasis.length?`<section class="knowledge-ko-evidence knowledge-evidence-map-row" aria-label="Evidence for this KO"><h3>Evidence for this KO</h3><span>${model.koEvidentialBasis.length} ${model.koEvidentialBasis.length===1?"source":"sources"}</span></section>`:""}${model.evidenceCount?"":'<p class="knowledge-empty-state">No evidential basis declared anywhere in this KO.</p>'}</div></div></section>${model.dependencyCount===null?"":`<section class="facet-row knowledge-facet-row ${model.dependencyCount?"declared":"missing"}" aria-label="KO Dependencies facet"><span class="facet-number">3</span><div class="facet-copy"><div class="knowledge-facet-heading"><strong>KO Dependencies</strong><span>${model.dependencyCount} ${model.dependencyCount===1?"KO":"KOs"}</span></div><small class="knowledge-facet-description">Knowledge Objects incorporated by this assembly</small><div class="knowledge-facet-content">${dependencyNames.length?`<ul class="knowledge-dependency-list">${dependencyNames.map(name=>`<li>${escapeHtml(name)}</li>`).join("")}</ul>`:'<p class="knowledge-empty-state">No KO dependencies declared.</p>'}</div></div></section>`}</div></details>`}).join("")}</div></section>`}
+function openKnowledge(){workspace.innerHTML=renderKnowledge();workspace.querySelectorAll("[data-knowledge-explore]").forEach(button=>button.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();openKnowledgeSubgraphStandalone(Number(button.dataset.knowledgeExplore))}))}
 function renderAccessibilityCard(objectId){const links=getAccessibilityLinks(objectId),copy=link=>`<span><span class="access-point-heading"><strong>${escapeHtml(link.label)}</strong>${link.status?`<span class="access-tag ${link.status}">${link.status==="authentication"?"Authentication required":"Open"}</span>`:""}</span><small>${escapeHtml(link.host+" · "+link.display)}</small></span>`;return`<details class="accessibility-card${links.length?"":" zero-links"}"><summary><strong>${objectName(objectId)}</strong><span class="${links.length?"has-links":""}">${links.length} ${links.length===1?"option":"options"}</span></summary><div class="accessibility-card-body">${links.length?links.map(link=>link.kind==="web"?`<a class="access-point" href="${escapeHtml(link.href)}" target="_blank" rel="noopener noreferrer"><span class="link-glyph" aria-hidden="true">↗</span>${copy(link)}</a>`:`<button class="access-point" type="button" data-ko-access-id="${escapeHtml(link.knowledgeObjectId)}"><span class="link-glyph" aria-hidden="true">↓</span>${copy(link)}</button>`).join(""):'<div class="no-links">No declared access points found.</div>'}</div></details>`}
 function renderAccessibility(){return`<section class="accessibility-exercise" aria-label="Accessibility exercise"><div class="view-sticky-controls"><div class="view-title"><div class="search-mark">A</div><h2>Access</h2></div><p>Get knowledge objects using declared access methods</p></div><div class="accessibility-grid">${objectIds.map(renderAccessibilityCard).join("")}</div></section>`}
 function openAccessibility(){workspace.innerHTML=renderAccessibility();workspace.querySelectorAll("[data-ko-access-id]").forEach(button=>button.addEventListener("click",async()=>{const body=button.closest(".accessibility-card-body");body?.querySelector(".access-download-error")?.remove();const result=await window.FDOBench.access.downloadKnowledgeObject({knowledgeObjectId:button.dataset.koAccessId,content:"embedded",format:"zip"});if(result&&!result.ok&&result.status!=="authentication-cancelled"){const message=document.createElement("p");message.className="access-download-error";message.setAttribute("role","alert");message.textContent=result.message||"The knowledge object could not be downloaded.";body?.append(message)}}))}
@@ -1018,7 +1471,7 @@ function openDocumentProjectionStandalone(objectId,file,onClose=()=>{},passage=n
   dialog.addEventListener("mousedown",event=>{if(event.target===dialog)close()});dialog.querySelector(".document-viewer-close").addEventListener("click",close);
   dialog.querySelector("[data-document-download]").addEventListener("click",()=>downloadOriginalDocumentStandalone(objectId,file));document.addEventListener("keydown",keyClose);document.body.append(dialog);
   dialog.querySelector(".document-viewer-close").focus();
-  if(passage){const result=markVerifiedPassage(dialog.querySelector(".document-viewer-body"),passage.selector),status=document.createElement("p");status.className="knowledgePassageStatus";status.setAttribute("role","status");status.textContent=result.ok?`Showing highlighted passage: ${passage.title}`:`Exact navigation could not be verified: ${result.reason}. Showing the whole document.`;dialog.querySelector(".document-viewer-dialog").classList.add("hasPassageStatus");dialog.querySelector(".document-viewer-body").before(status);dialog.querySelector("mark.knowledgePassageHighlight")?.scrollIntoView({block:"center",behavior:"instant"})}
+  if(passage){const result=markVerifiedPassage(dialog.querySelector(".document-viewer-body"),passage.selector),status=document.createElement("p");status.className="knowledgePassageStatus";status.setAttribute("role","status");status.textContent=result.ok?`Showing highlighted passage: ${passage.title}`:`Exact navigation could not be verified: ${result.reason}. No whole-document substitute is shown.`;dialog.querySelector(".document-viewer-dialog").classList.add("hasPassageStatus");dialog.querySelector(".document-viewer-body").hidden=!result.ok;dialog.querySelector(".document-viewer-body").before(status);dialog.querySelector("mark.knowledgePassageHighlight")?.scrollIntoView({block:"center",behavior:"instant"})}
 }
 function renderEvidenceProjection(evidence,objectId){return`<div class="evidence-projection" aria-label="${evidence.length} evidence sources cited"><div class="evidence-projection-header"><b>Cited evidence</b><span>${evidence.length} ${evidence.length===1?"source":"sources"}</span></div><ul>${evidence.map(item=>`<li>${item.sourcePath?`<button type="button" onclick="openEmbeddedEvidence(${objectId},'${encodeURIComponent(item.sourcePath)}')"><span class="evidence-glyph" aria-hidden="true">E</span><span><strong>${escapeHtml(item.label)}</strong><small>Embedded ${escapeHtml(item.kind)} · View in FDO Bench</small></span><i aria-hidden="true">›</i></button>`:item.href?`<a href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer"><span class="evidence-glyph" aria-hidden="true">E</span><span><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.kind)} · External resource</small></span><i aria-hidden="true">↗</i></a>`:`<div><span class="evidence-glyph" aria-hidden="true">E</span><span><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.kind)}</small></span></div>`}</li>`).join("")}</ul><small class="evidence-projection-note">Cited resources; evidentiary quality is not assessed by this view.</small></div>`}
 function renderReusabilityCard(objectId){const facets=getReusabilityFacets(objectId),declared=facets.filter(facet=>facet.value).length;return`<details class="accessibility-card reusability-card${declared?"":" zero-facets"}"><summary><strong>${objectName(objectId)}</strong><span class="${declared===facets.length?"has-facets":"incomplete-facets"}">${declared} Facets</span></summary><div class="facet-list">${facets.map((facet,index)=>`<div class="facet-row ${facet.value?"declared":"missing"}"><span class="facet-number">${index+1}</span><span class="facet-copy"><strong class="facet-label" tabindex="0" data-question="${escapeHtml(facet.question)}" aria-label="${escapeHtml(facet.name+": "+facet.question)}">${facet.name}</strong>${facet.scope?renderScopeProjection(facet.scope):facet.provenance?renderProvenanceProjection(facet.provenance):facet.tests?.length?renderTestsProjection(facet.tests,objectId):facet.evidence?.length?renderEvidenceProjection(facet.evidence,objectId):facet.href?`<a class="${facet.property==="schema:license"?"license-resource-link":""}" href="${escapeHtml(facet.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(facet.value)}${facet.property==="schema:license"?`<span aria-hidden="true">↗</span>`:""}</a>`:`<small>${escapeHtml(facet.value||"Not declared")}</small>`}</span></div>`).join("")}</div></details>`}

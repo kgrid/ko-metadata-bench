@@ -1,5 +1,6 @@
 import { resolveKnowledgeAnnotations } from "./knowledge-annotation-resolver.js";
 import { deriveEvidenceLinkingCategory } from "./evidence-linking-category.js";
+import { projectEvidenceSubgraph } from "./evidence-subgraph-projection.js";
 
 const asEntries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
 
@@ -82,16 +83,18 @@ export function projectKnowledgeViewModel(model, metadata, destinationStatuses =
     ? new Set(model.linkedKnowledgeObjects.map((record) => declaredText(record?.["@id"])).filter(Boolean)).size
     : null;
   const annotationResolution = resolveKnowledgeAnnotations(metadata);
+  const resolvedAnnotations = {
+    ...annotationResolution,
+    annotations: annotationResolution.annotations.map((annotation) => ({
+      ...annotation,
+      destination: destinationStatuses.find((status) => status.annotationId === annotation.id && status.targetId === annotation.targetId)
+        ?? { status: "not-checked", reason: "Passage has not been checked against embedded content" },
+    })),
+  };
   return {
     elements, linkedKnowledgeObjects: model.linkedKnowledgeObjects, koEvidentialBasis, evidenceCount, dependencyCount,
-    annotationResolution: {
-      ...annotationResolution,
-      annotations: annotationResolution.annotations.map((annotation) => ({
-        ...annotation,
-        destination: destinationStatuses.find((status) => status.annotationId === annotation.id && status.targetId === annotation.targetId)
-          ?? { status: "not-checked", reason: "Passage has not been checked against embedded content" },
-      })),
-    },
+    annotationResolution: resolvedAnnotations,
+    evidenceSubgraph: projectEvidenceSubgraph(metadata, model, resolvedAnnotations),
     linkingCategory: deriveEvidenceLinkingCategory(metadata),
     cks: cks ? { path: cks["@id"], name: declaredText(cks["dc:title"], cks["schema:name"]) || cks["@id"] } : null,
   };

@@ -56,12 +56,12 @@ test("the standalone edition completes startup and mounts all four embedded KO p
   assert.equal((workspace.innerHTML.match(/class="ko-object-shade"/g) ?? []).length, 4);
   for (const handler of exercises[0].listeners.click ?? []) handler({ preventDefault: noop, stopPropagation: noop });
   const knowledge = workspace.innerHTML;
-  assert.match(knowledge, /data-knowledge-ko-evidence="1"/);
+  assert.match(knowledge, /data-knowledge-explore="1"/);
   assert.match(knowledge, /Evidence for this KO<\/h3><span>2 sources/);
   assert.match(knowledge, /Evidence for Regimen Range<\/h3><span>2 sources/);
   assert.match(knowledge, /Evidence for Burden Questionnaire Logic<\/h3><span>1 source/);
   assert.doesNotMatch(knowledge, />Explore (?:knowledge|evidence|KO)/);
-  assert.equal((knowledge.match(/>Explore<\/button>/g) ?? []).length, 12);
+  assert.equal((knowledge.match(/>Explore<\/button>/g) ?? []).length, 4);
   assert.match(scripts[1], /View Specification/);
   assert.match(scripts[1], /View Implementation/);
   assert.doesNotMatch(scripts[1], />View CKS<\/button>/);

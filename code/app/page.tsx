@@ -25,6 +25,10 @@ import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKo
 import { addAssemblyToActiveObjects, createInitialActiveObjects, isAssemblyActive } from "./active-knowledge-objects.js";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "./k-view-model.js";
 import { buildKnowledgeRelationshipMap } from "./knowledge-relationship-map.js";
+import { layoutEvidenceSubgraph } from "./evidence-subgraph-layout.js";
+import { inspectEvidenceSubgraphNode, inspectEvidenceSubgraphRelationship } from "./evidence-subgraph-inspector.js";
+import { planEvidenceSubgraphActions } from "./evidence-subgraph-actions.js";
+import { evidencePassageGlimpse } from "./evidence-passage-glimpse.js";
 import { evidenceNexusIndicator } from "./evidence-linking-category.js";
 import { evidenceActionUrl, markVerifiedPassage } from "./passage-navigation.js";
 
@@ -1896,29 +1900,86 @@ function DocumentProjectionDialog({ objectId, file, projection, onClose, passage
   useEffect(() => {
     if (!passage || !bodyRef.current) { setNavigation(null); return; }
     const result = markVerifiedPassage(bodyRef.current, passage.selector);
-    setNavigation(result.ok ? `Showing highlighted passage: ${passage.title}` : `Exact navigation could not be verified: ${result.reason}. Showing the whole document.`);
+    setNavigation(result.ok ? `Showing highlighted passage: ${passage.title}` : `Exact navigation could not be verified: ${result.reason}. No whole-document substitute is shown.`);
   }, [html, passage]);
   useEffect(() => {
-    if (navigation?.startsWith("Showing highlighted passage:") && passage && bodyRef.current && !bodyRef.current.querySelector(".knowledgePassageHighlight")) {
-      markVerifiedPassage(bodyRef.current, passage.selector);
+    if (navigation?.startsWith("Showing highlighted passage:") && passage && bodyRef.current) {
+      if (!bodyRef.current.querySelector(".knowledgePassageHighlight")) markVerifiedPassage(bodyRef.current, passage.selector);
+      bodyRef.current.querySelector(".knowledgePassageHighlight")?.scrollIntoView({ block: "center", behavior: "instant" });
     }
   }, [navigation, passage]);
-  return <div className="documentViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className={`documentViewerDialog ${navigation ? "hasPassageStatus" : ""}`} role="dialog" aria-modal="true" aria-labelledby="document-viewer-title"><header><div><span>Document</span><h2 id="document-viewer-title">{objectName(objectId)} · {file.split("/").at(-1)}</h2><small>{file}</small></div><div className="documentViewerActions"><button type="button" onClick={() => downloadOriginalDocument(objectId, file)}>Download Original</button><button type="button" className="documentViewerClose" onClick={onClose} aria-label="Close document">×</button></div></header>{navigation && <p className="knowledgePassageStatus" role="status">{navigation}</p>}<div ref={bodyRef} className="documentViewerBody" dangerouslySetInnerHTML={{ __html: html }} /><footer><span>Read-only document projection</span>{projection.projectionStatus === "partial" && <span>{projection.conversionWarnings.length} conversion {projection.conversionWarnings.length === 1 ? "warning" : "warnings"}</span>}</footer></section></div>;
+  return <div className="documentViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className={`documentViewerDialog ${navigation ? "hasPassageStatus" : ""}`} role="dialog" aria-modal="true" aria-labelledby="document-viewer-title"><header><div><span>Document</span><h2 id="document-viewer-title">{objectName(objectId)} · {file.split("/").at(-1)}</h2><small>{file}</small></div><div className="documentViewerActions"><button type="button" onClick={() => downloadOriginalDocument(objectId, file)}>Download Original</button><button type="button" className="documentViewerClose" onClick={onClose} aria-label="Close document">×</button></div></header>{navigation && <p className="knowledgePassageStatus" role="status">{navigation}</p>}<div ref={bodyRef} className="documentViewerBody" hidden={Boolean(passage) && !navigation?.startsWith("Showing highlighted passage:")} dangerouslySetInnerHTML={{ __html: html }} /><footer><span>Read-only document projection</span>{projection.projectionStatus === "partial" && <span>{projection.conversionWarnings.length} conversion {projection.conversionWarnings.length === 1 ? "warning" : "warnings"}</span>}</footer></section></div>;
 }
 function knowledgePanelSummary(description: string) {
   const firstThought = description.split(/[.;](?:\s|$)/)[0];
   return firstThought.length > 110 ? `${firstThought.slice(0, 107).replace(/\s+\S*$/, "")}…` : firstThought;
 }
-function KnowledgeRelationshipMap({ model }: { model: ReturnType<typeof projectKnowledgeViewModel> }) {
-  const map = buildKnowledgeRelationshipMap(model);
-  const sourceNames = (sources: Array<{ identifier: string; name: string }>) => sources.map((source, index) => <span className="knowledgeMapSource" key={`${source.identifier}-${index}`}>{source.name}</span>);
-  const passages = (items: Array<{ identifier: string; title: string; status: string }>, kind: string) => items.map((item, index) => <span className="knowledgeMapPassage" key={`${item.identifier}-${index}`}>Knowledge element → {kind}: {item.title}{item.status !== "resolved" && <em> · Unresolved</em>}</span>);
-  return <section className="knowledgeRelationshipMap" aria-label="Evidence linking relationship map"><div className="knowledgeMapHeading"><small>Evidence linking</small><strong>{map.descriptor}</strong></div>
-    {map.wholeKoSources.length > 0 && <div className="knowledgeMapBranch"><div className="knowledgeMapEvidence"><small>Declared evidential basis</small>{sourceNames(map.wholeKoSources)}</div><span className="knowledgeMapArrow" aria-hidden="true">→</span><div className="knowledgeMapElement"><small>Declaration site</small><strong>Whole KO</strong></div><p className="knowledgeMapNote">These sources are not assigned to individual knowledge elements.</p></div>}
-    {map.branches.map((branch) => <div className="knowledgeMapBranch" key={`${branch.elementId}-${branch.elementIndex}`}><div className="knowledgeMapEvidence"><small>Declared evidential basis</small>{branch.evidence.length ? sourceNames(branch.evidence) : <span className="knowledgeMapMissing">No declared evidential basis</span>}</div><span className="knowledgeMapArrow" aria-hidden="true">{branch.evidence.length ? "→" : ""}</span><div className="knowledgeMapElement"><small>Knowledge element</small><strong>{branch.elementName}</strong></div>{(branch.specificationPassages.length > 0 || branch.implementationPassages.length > 0) && <div className="knowledgeMapPassages"><small>Separately linked from this element</small>{passages(branch.specificationPassages, "CKS passage")}{passages(branch.implementationPassages, "Code passage")}</div>}</div>)}
-    {!map.wholeKoSources.length && !map.branches.length && <p className="knowledgeMapNone">No direct evidential basis declared for this {model.dependencyCount !== null ? "assembly" : "KO"}.{model.dependencyCount !== null && " Constituent KO evidence is not inherited."}</p>}
-    {map.branches.some((branch) => branch.implementationPassages.length) && <p className="knowledgeMapNote">A code-passage link identifies an element’s implementation; it is not a direct evidence-to-code assertion.</p>}
-  </section>;
+function KnowledgeGraphImplementationDialog({ objectId, file, passage, onClose }: { objectId: ObjectId; file: string; passage?: PassageRequest | null; onClose: () => void }) {
+  const codeRef = useRef<HTMLElement>(null);
+  const [navigation, setNavigation] = useState<string | null>(null);
+  useEffect(() => {
+    const close = (event: globalThis.KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [onClose]);
+  useEffect(() => {
+    if (!passage || !codeRef.current) { setNavigation(null); return; }
+    const result = markVerifiedPassage(codeRef.current, passage.selector);
+    setNavigation(result.ok ? `Showing highlighted passage: ${passage.title}` : `Exact navigation could not be verified: ${result.reason}. No whole-file substitute is shown.`);
+  }, [file, passage]);
+  useEffect(() => {
+    if (navigation?.startsWith("Showing highlighted passage:")) codeRef.current?.querySelector(".knowledgePassageHighlight")?.scrollIntoView({ block: "center", behavior: "instant" });
+  }, [navigation]);
+  return <div className="testViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className={`testViewerDialog knowledgeImplementationDialog ${navigation ? "hasPassageStatus" : ""}`} role="dialog" aria-modal="true" aria-labelledby="knowledge-graph-implementation-title"><header><div><span>Knowledge implementation</span><h2 id="knowledge-graph-implementation-title">{objectName(objectId)} · {file.split("/").at(-1)}</h2><small>{file}</small></div><button type="button" onClick={onClose} aria-label="Close implementation">×</button></header>{navigation && <p className="knowledgePassageStatus" role="status">{navigation}</p>}<pre hidden={Boolean(passage) && !navigation?.startsWith("Showing highlighted passage:")}><code ref={codeRef}>{seedValue(objectId, file)}</code></pre><footer>Read-only · Embedded in this knowledge object</footer></section></div>;
+}
+function KnowledgeSubgraphDialog({ objectId, model, metadata, onClose }: { objectId: ObjectId; model: ReturnType<typeof projectKnowledgeViewModel>; metadata: any; onClose: () => void }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const [selection, setSelection] = useState<{ kind: "node"; key: string } | { kind: "edge"; index: number } | null>(null);
+  const [openedAction, setOpenedAction] = useState<any>(null);
+  useEffect(() => {
+    if (openedAction) return;
+    closeButton.current?.focus();
+    const close = (event: globalThis.KeyboardEvent) => { if (event.key === "Escape") { if (selection) setSelection(null); else onClose(); } };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [onClose, selection, openedAction]);
+  const graph = model.evidenceSubgraph;
+  const lanes = layoutEvidenceSubgraph(graph);
+  const graphNodes = new Map(graph.nodes.map((item: any) => [item.key, item]));
+  const compactLabel = (item: any) => {
+    const label = String(item.label || item.sourceId || "");
+    if (!/^https?:\/\//.test(label) && label.length <= 52) return label;
+    return decodeURIComponent(label.split(/[\/#]/).filter(Boolean).at(-1) || label).slice(0, 52);
+  };
+  const relationshipLabel = (item: any) => `${compactLabel(graphNodes.get(item.from))} — ${item.sourceField} — ${compactLabel(graphNodes.get(item.to))}`;
+  const detail = selection?.kind === "node"
+    ? inspectEvidenceSubgraphNode(graph, metadata, selection.key)
+    : selection?.kind === "edge" ? inspectEvidenceSubgraphRelationship(graph, metadata, selection.index) : null;
+  const actionPlan = planEvidenceSubgraphActions(graph, model, metadata, selection, (file: string, kind: string) =>
+    kind.startsWith("specification") ? Boolean(documentProjectionFor(objectId, file)?.sanitizedHtml) : filesForObject(objectId).includes(file) && Boolean(seedValue(objectId, file)));
+  if (openedAction) {
+    const passage = openedAction.kind === "passage" ? { title: openedAction.title, selector: openedAction.selector } : null;
+    if (openedAction.kind === "specification" || openedAction.passageKind === "specification-passage") {
+      const projection = documentProjectionFor(objectId, openedAction.file);
+      return projection ? <DocumentProjectionDialog objectId={objectId} file={openedAction.file} projection={projection} passage={passage} onClose={() => setOpenedAction(null)} /> : null;
+    }
+    return <KnowledgeGraphImplementationDialog objectId={objectId} file={openedAction.file} passage={passage} onClose={() => setOpenedAction(null)} />;
+  }
+  const node = (item: any, kind: string) => {
+    const passage = item.kind === "specification-passage" || item.kind === "implementation-passage";
+    const glimpse = passage ? evidencePassageGlimpse(item, (file: string) => filesForObject(objectId).includes(file) ? seedValue(objectId, file) : null) : null;
+    return <button type="button" className={`knowledgeGraphNode${glimpse ? " hasPassageGlimpse" : ""}`} title={item.sourceId} aria-label={`Inspect ${kind}: ${item.label}`} aria-pressed={selection?.kind === "node" && selection.key === item.key} onClick={() => setSelection({ kind: "node", key: item.key })}><small>{kind}</small><strong>{compactLabel(item)}</strong>{glimpse ? <span className="knowledgePassageGlimpse" aria-label={`Verified passage within ${glimpse.filePath}`}><mark>{glimpse.exact.slice(0, 80)}{glimpse.exact.length > 80 || glimpse.truncated ? "…" : ""}</mark></span> : item.verification && <small>{item.verification.status === "resolved" ? "Verified passage preview unavailable" : `Passage ${item.verification.status}`}</small>}</button>;
+  };
+  const edge = (item: any, reverse = false) => {
+    const index = graph.relationships.indexOf(item);
+    return <button type="button" className={`knowledgeGraphEdge${reverse ? " knowledgeGraphReverse" : ""}`} aria-label={`Inspect relationship: ${item.sourceField}`} aria-pressed={selection?.kind === "edge" && selection.index === index} onClick={() => setSelection({ kind: "edge", index })}>{reverse ? "← " : ""}{item.sourceField}{reverse ? "" : " →"}</button>;
+  };
+  return <div className="knowledgeDetailBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="knowledgeDetailDialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-subgraph-title"><header><div><span>Knowledge and evidence</span><h2 id="knowledge-subgraph-title">{objectName(objectId)}</h2><small>Evidence-linking subgraph</small></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Close evidence subgraph">×</button></header><div className="knowledgeDetailBody knowledgeSubgraphBody">
+    <div className={`knowledgeGraphWorkspace${detail ? " inspectorOpen" : ""}`}>
+      <section className="knowledgeGraph" aria-label="Evidence-linking graph"><div className="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Declared targets</span></div>{lanes.map((lane: any) => <div className="knowledgeGraphLane" key={lane.subject.key}><div className="knowledgeGraphEvidence">{lane.basis.map((basis: any, index: number) => <div className="knowledgeGraphBranch" key={`${basis.edge.to}-${index}`}>{basis.parent && <div className="knowledgeGraphPart">{node(basis.parent, "evidence resource")}{edge(basis.partEdge)}</div>}{node(basis.resource, "evidence resource")}{edge(basis.edge, true)}</div>)}{!lane.basis.length && <div className="knowledgeGraphAbsent" role="note">Evidential basis <strong>Not declared</strong></div>}</div><div className="knowledgeGraphSubject">{node(lane.subject, lane.subject.kind.replaceAll("-", " "))}</div><div className="knowledgeGraphTargets">{lane.annotations.map((route: any, index: number) => <div className="knowledgeGraphRoute" key={`${route.edge.to}-${index}`}>{edge(route.edge)}{node(route.annotation, "annotation")}{route.targets.map((target: any) => <div className="knowledgeGraphTarget" key={target.edge.to}>{edge(target.edge)}{node(target.node, target.node.kind.replaceAll("-", " "))}</div>)}</div>)}{!lane.annotations.length && <div className="knowledgeGraphAbsent" role="note">Annotation <strong>Not declared</strong></div>}</div></div>)}{!graph.relationships.length && <p className="knowledgeGraphEmpty">No direct evidence links declared for this {model.dependencyCount !== null ? "assembly" : "KO"}.{model.dependencyCount !== null && " Constituent KO evidence is not inherited."}</p>}<details className="knowledgeGraphRelationshipList"><summary>Declared relationships ({graph.relationships.length})</summary>{graph.relationships.length ? <ol>{graph.relationships.map((item: any, index: number) => <li key={index}><button type="button" aria-pressed={selection?.kind === "edge" && selection.index === index} onClick={() => setSelection({ kind: "edge", index })}>{relationshipLabel(item)}</button></li>)}</ol> : <p>None declared.</p>}</details></section>
+      {detail && <aside className="knowledgeGraphInspector" role="complementary" aria-label="Evidence graph inspector"><div className="knowledgeGraphInspectorHead"><div><small>{detail.kind}</small><h3>{detail.title}</h3></div><button type="button" onClick={() => setSelection(null)} aria-label="Close evidence graph inspector">×</button></div><dl>{detail.rows.map((item: any) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>{(actionPlan.actions.length > 0 || actionPlan.notice) && <div className="knowledgeGraphInspectorActions">{actionPlan.actions.map((action: any, index: number) => action.kind === "evidence" ? <a className="knowledgeDetailAction" key={index} href={action.url} target="_blank" rel="noopener noreferrer">{action.label} ↗</a> : <button className="knowledgeDetailAction" type="button" key={index} onClick={() => setOpenedAction(action)}>{action.label}</button>)}{actionPlan.notice && <p role="status">{actionPlan.notice}</p>}</div>}</aside>}
+    </div>
+  </div></section></div>;
 }
 function KnowledgeKoEvidenceDialog({ objectId, model, onClose }: { objectId: ObjectId; model: ReturnType<typeof projectKnowledgeViewModel>; onClose: () => void }) {
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -1957,7 +2018,7 @@ function KnowledgeElementDialog({ objectId, model, elementIndex, onOpenKoEvidenc
   useEffect(() => {
     if (!implementationFile || !passageRequest || !codeRef.current) { setCodeNavigation(null); return; }
     const result = markVerifiedPassage(codeRef.current, passageRequest.selector);
-    setCodeNavigation(result.ok ? `Showing highlighted passage: ${passageRequest.title}` : `Exact navigation could not be verified: ${result.reason}. Showing the whole file.`);
+    setCodeNavigation(result.ok ? `Showing highlighted passage: ${passageRequest.title}` : `Exact navigation could not be verified: ${result.reason}. No whole-file substitute is shown.`);
   }, [implementationFile, passageRequest]);
   useEffect(() => {
     if (codeNavigation?.startsWith("Showing highlighted passage:") && passageRequest && codeRef.current && !codeRef.current.querySelector(".knowledgePassageHighlight")) {
@@ -1970,7 +2031,7 @@ function KnowledgeElementDialog({ objectId, model, elementIndex, onOpenKoEvidenc
   const selectedCksFile = passageFile ?? cksFile;
   const selectedCksProjection = selectedCksFile ? documentProjectionFor(objectId, selectedCksFile) : undefined;
   if (viewCks && selectedCksFile && selectedCksProjection) return <DocumentProjectionDialog objectId={objectId} file={selectedCksFile} projection={selectedCksProjection} passage={passageRequest} onClose={() => setViewCks(false)} />;
-  if (implementationFile) return <div className="testViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setImplementationFile(null); }}><section className={`testViewerDialog knowledgeImplementationDialog ${codeNavigation ? "hasPassageStatus" : ""}`} role="dialog" aria-modal="true" aria-labelledby="knowledge-implementation-title"><header><div><span>Knowledge implementation</span><h2 id="knowledge-implementation-title">{objectName(objectId)} · {implementationFile.split("/").at(-1)}</h2><small>{implementationFile}</small></div><button type="button" onClick={() => setImplementationFile(null)} aria-label="Close implementation">×</button></header>{codeNavigation && <p className="knowledgePassageStatus" role="status">{codeNavigation}</p>}<pre><code ref={codeRef}>{seedValue(objectId, implementationFile)}</code></pre><footer>Read-only · Embedded in this knowledge object</footer></section></div>;
+  if (implementationFile) return <div className="testViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setImplementationFile(null); }}><section className={`testViewerDialog knowledgeImplementationDialog ${codeNavigation ? "hasPassageStatus" : ""}`} role="dialog" aria-modal="true" aria-labelledby="knowledge-implementation-title"><header><div><span>Knowledge implementation</span><h2 id="knowledge-implementation-title">{objectName(objectId)} · {implementationFile.split("/").at(-1)}</h2><small>{implementationFile}</small></div><button type="button" onClick={() => setImplementationFile(null)} aria-label="Close implementation">×</button></header>{codeNavigation && <p className="knowledgePassageStatus" role="status">{codeNavigation}</p>}<pre hidden={Boolean(passageRequest) && !codeNavigation?.startsWith("Showing highlighted passage:")}><code ref={codeRef}>{seedValue(objectId, implementationFile)}</code></pre><footer>Read-only · Embedded in this knowledge object</footer></section></div>;
   const branch = buildKnowledgeRelationshipMap(model).branches.find((item) => item.elementIndex === elementIndex);
   const specificationPassages = branch?.specificationPassages ?? [];
   const implementationPassages = branch?.implementationPassages ?? [];
@@ -2973,8 +3034,7 @@ export default function Home() {
   const [leftFile, setLeftFile] = useState<FileName>(FILTERED_FILES[0]);
   const [drafts, setDrafts] = useState<Drafts>({});
   const [activeExercise, setActiveExercise] = useState<"K" | "F" | "A" | "I" | "R" | null>(null);
-  const [openKnowledgeElement, setOpenKnowledgeElement] = useState<{ objectId: ObjectId; model: ReturnType<typeof projectKnowledgeViewModel>; elementIndex: number } | null>(null);
-  const [openKoEvidence, setOpenKoEvidence] = useState<{ objectId: ObjectId; model: ReturnType<typeof projectKnowledgeViewModel> } | null>(null);
+  const [openKnowledgeSubgraph, setOpenKnowledgeSubgraph] = useState<{ objectId: ObjectId; model: ReturnType<typeof projectKnowledgeViewModel>; metadata: any } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedSearchQuery, setSubmittedSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
@@ -3088,7 +3148,8 @@ export default function Home() {
           </div>
           <div className="knowledgeGrid">{activeObjectIds.map((objectId) => {
             let model;
-            try { const metadata = JSON.parse(workingFileValue(objectId, "metadata.json", drafts)); model = projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata, annotationDestinationOverrides[String(objectId)] ?? []); }
+            let metadata: any = null;
+            try { metadata = JSON.parse(workingFileValue(objectId, "metadata.json", drafts)); model = projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata, annotationDestinationOverrides[String(objectId)] ?? []); }
             catch { model = projectKnowledgeViewModel(buildKnowledgeViewModel(null), null); }
             const dependencyNames = Array.from(new Set(model.linkedKnowledgeObjects.map((reference) => {
               const identifier = reference?.["@id"];
@@ -3102,14 +3163,13 @@ export default function Home() {
             const declaredFacets = Number(model.elements.length > 0) + Number(model.evidenceCount > 0) + Number(model.dependencyCount !== null && model.dependencyCount > 0);
             const nexus = evidenceNexusIndicator(model.linkingCategory.category);
             return <details className="accessibilityCard knowledgeCard" key={objectId} data-knowledge-elements={model.elements.length} data-evidential-sources={model.evidenceCount}>
-              <summary><strong>{objectName(objectId)}</strong><span className="knowledgeTabIndicators"><span className={`knowledgeNexusLabel nexusLevel${nexus.level}`} title={nexus.explanation} tabIndex={0} aria-label={`${nexus.label}: ${nexus.explanation}`}>{nexus.label}</span><span className={`knowledgeFacetCount ${declaredFacets === availableFacets ? "hasFacets" : "incompleteFacets"}`}>{declaredFacets} Facets</span></span></summary>
-              <KnowledgeRelationshipMap model={model} />
+              <summary><strong>{objectName(objectId)}</strong><span className="knowledgeTabIndicators"><button className="knowledgeOpenButton knowledgeTabExplore" type="button" aria-label={`Explore ${objectName(objectId)}`} onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpenKnowledgeSubgraph({ objectId, model, metadata }); }}>Explore</button><span className={`knowledgeNexusLabel nexusLevel${nexus.level}`} title={nexus.explanation} tabIndex={0} aria-label={`${nexus.label}: ${nexus.explanation}`}>{nexus.label}</span><span className={`knowledgeFacetCount ${declaredFacets === availableFacets ? "hasFacets" : "incompleteFacets"}`}>{declaredFacets} Facets</span></span></summary>
               <div className="facetList knowledgeCardBody">
                 <section className="facetRow knowledgeFacetRow declared" aria-label="Knowledge Elements facet"><span className="facetNumber">1</span><div className="facetCopy"><div className="knowledgeFacetHeading"><strong>Knowledge Elements</strong><span>{model.elements.length} {model.elements.length === 1 ? "element" : "elements"}</span></div><small className="knowledgeFacetDescription">What this object computes and where it is implemented</small>
-                  <div className="knowledgeFacetContent">{model.elements.length ? model.elements.map((element) => <article className="knowledgeElementCard" key={`${element.identifier}-${element.index}`}><h3>{element.name}</h3><p>{knowledgePanelSummary(element.description)}</p><div className="knowledgeImplementation"><span>Implementation</span>{element.implementations.length ? <><code>{element.implementations[0].path}</code>{element.implementations.length > 1 && <span>+{element.implementations.length - 1} more</span>}</> : <span>Implementation path not declared</span>}</div><button className="knowledgeOpenButton" type="button" aria-label={`Explore ${element.name}`} onClick={() => setOpenKnowledgeElement({ objectId, model, elementIndex: element.index })}>Explore</button></article>) : <p className="knowledgeEmptyState">No knowledge elements declared.</p>}</div>
+                  <div className="knowledgeFacetContent">{model.elements.length ? model.elements.map((element) => <article className="knowledgeElementCard" key={`${element.identifier}-${element.index}`}><h3>{element.name}</h3><p>{knowledgePanelSummary(element.description)}</p><div className="knowledgeImplementation"><span>Implementation</span>{element.implementations.length ? <><code>{element.implementations[0].path}</code>{element.implementations.length > 1 && <span>+{element.implementations.length - 1} more</span>}</> : <span>Implementation path not declared</span>}</div></article>) : <p className="knowledgeEmptyState">No knowledge elements declared.</p>}</div>
                 </div></section>
                 <section className={`facetRow knowledgeFacetRow ${model.evidenceCount ? "declared" : "missing"}`} aria-label="Evidential Sources facet"><span className="facetNumber">2</span><div className="facetCopy"><div className="knowledgeFacetHeading"><strong>Evidential Sources</strong><span>{model.evidenceCount} {model.evidenceCount === 1 ? "source" : "sources"}</span></div><small className="knowledgeFacetDescription">Sources declared as a basis for this object's knowledge{model.dependencyCount !== null ? "; constituent KO evidence is not inherited" : ""}</small>
-                  <div className="knowledgeFacetContent">{model.elements.filter((element) => element.evidentialBasis.length).map((element) => <section className="knowledgeEvidenceGroup knowledgeEvidenceMapRow" aria-label={`Evidence for ${element.name}`} key={`${element.identifier}-${element.index}`}><h3>Evidence for {element.name}</h3><span>{element.evidentialBasis.length} {element.evidentialBasis.length === 1 ? "source" : "sources"}</span><button className="knowledgeOpenButton" type="button" aria-label={`Explore evidence for ${element.name}`} onClick={() => setOpenKnowledgeElement({ objectId, model, elementIndex: element.index })}>Explore</button></section>)}{model.koEvidentialBasis.length > 0 && <section className="knowledgeKoEvidence knowledgeEvidenceMapRow" aria-label="Evidence for this KO"><h3>Evidence for this KO</h3><span>{model.koEvidentialBasis.length} {model.koEvidentialBasis.length === 1 ? "source" : "sources"}</span><button className="knowledgeOpenButton" type="button" aria-label="Explore evidence for this KO" onClick={() => setOpenKoEvidence({ objectId, model })}>Explore</button></section>}{!model.evidenceCount && <p className="knowledgeEmptyState">No evidential basis declared anywhere in this KO.</p>}</div>
+                  <div className="knowledgeFacetContent">{model.elements.filter((element) => element.evidentialBasis.length).map((element) => <section className="knowledgeEvidenceGroup knowledgeEvidenceMapRow" aria-label={`Evidence for ${element.name}`} key={`${element.identifier}-${element.index}`}><h3>Evidence for {element.name}</h3><span>{element.evidentialBasis.length} {element.evidentialBasis.length === 1 ? "source" : "sources"}</span></section>)}{model.koEvidentialBasis.length > 0 && <section className="knowledgeKoEvidence knowledgeEvidenceMapRow" aria-label="Evidence for this KO"><h3>Evidence for this KO</h3><span>{model.koEvidentialBasis.length} {model.koEvidentialBasis.length === 1 ? "source" : "sources"}</span></section>}{!model.evidenceCount && <p className="knowledgeEmptyState">No evidential basis declared anywhere in this KO.</p>}</div>
                 </div></section>
                 {model.dependencyCount !== null && <section className={`facetRow knowledgeFacetRow ${model.dependencyCount ? "declared" : "missing"}`} aria-label="KO Dependencies facet"><span className="facetNumber">3</span><div className="facetCopy"><div className="knowledgeFacetHeading"><strong>KO Dependencies</strong><span>{model.dependencyCount} {model.dependencyCount === 1 ? "KO" : "KOs"}</span></div><small className="knowledgeFacetDescription">Knowledge Objects incorporated by this assembly</small><div className="knowledgeFacetContent">{dependencyNames.length ? <ul className="knowledgeDependencyList">{dependencyNames.map((name) => <li key={name}>{name}</li>)}</ul> : <p className="knowledgeEmptyState">No KO dependencies declared.</p>}</div></div></section>}
               </div>
@@ -3218,8 +3278,7 @@ export default function Home() {
       {abstractOpen && <AbstractDialog onClose={() => setAbstractOpen(false)} />}
       {openTest && <EmbeddedTestDialog objectId={openTest.objectId} file={openTest.file} source={workingFileValue(openTest.objectId, openTest.file, drafts)} onClose={() => setOpenTest(null)} />}
       {openEvidence && <EmbeddedEvidenceDialog objectId={openEvidence.objectId} file={openEvidence.file} onClose={() => setOpenEvidence(null)} />}
-      {openKnowledgeElement && createPortal(<KnowledgeElementDialog objectId={openKnowledgeElement.objectId} model={openKnowledgeElement.model} elementIndex={openKnowledgeElement.elementIndex} onOpenKoEvidence={() => { setOpenKoEvidence({ objectId: openKnowledgeElement.objectId, model: openKnowledgeElement.model }); setOpenKnowledgeElement(null); }} onClose={() => setOpenKnowledgeElement(null)} />, document.body)}
-      {openKoEvidence && createPortal(<KnowledgeKoEvidenceDialog objectId={openKoEvidence.objectId} model={openKoEvidence.model} onClose={() => setOpenKoEvidence(null)} />, document.body)}
+      {openKnowledgeSubgraph && createPortal(<KnowledgeSubgraphDialog objectId={openKnowledgeSubgraph.objectId} model={openKnowledgeSubgraph.model} metadata={openKnowledgeSubgraph.metadata} onClose={() => setOpenKnowledgeSubgraph(null)} />, document.body)}
       {openFindabilityResults && <FindabilityResultsDialog objectId={openFindabilityResults.objectId} query={openFindabilityResults.query} results={openFindabilityResults.results} onClose={() => setOpenFindabilityResults(null)} />}
       {openFindabilityAudit && <FindabilityAuditDialog objectId={openFindabilityAudit.objectId} rows={openFindabilityAudit.rows} onClose={() => setOpenFindabilityAudit(null)} />}
       {metadataInteractObject && createPortal(<div className="metadataInteractBackdrop" role="presentation"><section className="metadataInteractDialog" role="dialog" aria-modal="true" aria-labelledby="metadata-interact-title"><header><div><span>Metadata interaction</span><h2 id="metadata-interact-title">{objectName(metadataInteractObject)}</h2></div><button type="button" onClick={() => setMetadataInteractObject(null)} aria-label="Close metadata interaction">×</button></header><div className="workspaces singleEditorWorkspace metadataInteractWorkspace"><MetadataInteractionErrorBoundary key={`${metadataInteractObject}:${leftFile}`} objectId={metadataInteractObject} file={leftFile} onFileChange={setLeftFile}><WorkspacePane side="Metadata" objectId={metadataInteractObject} otherObjectId={0} file={leftFile} drafts={drafts} showObjectSelector={false} onObjectChange={() => {}} onFileChange={setLeftFile} onEdit={(value) => edit(metadataInteractObject, leftFile, value)} onReset={() => reset(metadataInteractObject, leftFile)} /></MetadataInteractionErrorBoundary></div></section></div>, document.body)}

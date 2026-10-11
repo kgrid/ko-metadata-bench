@@ -30,152 +30,101 @@ async function rosters(page, expected) {
     expect(names, `${view.control} preserves the KO order`).toEqual(expected);
     if (view.control === "K exercise") {
       const knowledgeProjection = [];
-      expect(await panels.evaluateAll((nodes) => nodes.every((node) => !node.open))).toBe(true);
       const counts = [[2, 2], [1, 1], [3, 3], [1, 1], [1, 0]].slice(0, expected.length);
-      const linking = [
-        "KO-only",
-        "Element-linked",
-        "Element-linked",
-        "Convergent",
-        "None",
-      ];
-      const levels = [2, 3, 3, 5, 1];
-      const explanations = [
-        "Evidence linked to the whole KO, not its elements.",
-        "Evidence linked to an element and a CKS passage.",
-        "Evidence linked across elements; code passages identified.",
-        "Evidence, CKS, and code passages all linked by element.",
-        "No evidence linked directly to this assembly.",
-      ];
+      const linking = ["KO-only", "Element-linked", "Element-linked", "Convergent", "None"];
       for (const [index, [elements, sources]] of counts.entries()) {
         const panel = panels.nth(index);
-        const linkingDetail = panel.locator("summary .knowledgeNexusLabel, summary .knowledge-nexus-label");
-        await expect(linkingDetail).toHaveText(linking[index]);
-        await expect(linkingDetail).toHaveAttribute("title", explanations[index]);
-        await expect(linkingDetail).toHaveAttribute("tabindex", "0");
-        await expect(linkingDetail).toHaveClass(new RegExp(`nexus(?:Level|[-]level[-])${levels[index]}`));
-        await expect(panel.locator("summary .knowledgeTabIndicators, summary .knowledge-tab-indicators").locator(".knowledgeFacetCount, .knowledge-facet-count")).toHaveCount(1);
-        await expect(panel.locator("summary .knowledgeCounts, summary .knowledge-counts")).toHaveCount(0);
-        const facetCounter = panel.locator("summary .knowledgeFacetCount, summary .knowledge-facet-count");
-        await expect(facetCounter).toHaveText("2 Facets");
-        await expect(facetCounter).toHaveClass(index === 4 ? /incompleteFacets|incomplete-facets/ : /hasFacets|has-facets/);
+        await expect(panel.locator("summary .knowledgeNexusLabel, summary .knowledge-nexus-label")).toHaveText(linking[index]);
+        await expect(panel.locator("summary .knowledgeFacetCount, summary .knowledge-facet-count")).toHaveText("2 Facets");
         const labels = [`${elements} ${elements === 1 ? "element" : "elements"}`, `${sources} ${sources === 1 ? "source" : "sources"}`];
         if (index === 4) labels.push("4 KOs");
         await expect(panel.locator(".knowledgeFacetHeading > span, .knowledge-facet-heading > span")).toHaveText(labels);
         await expect(panel.locator(".knowledgeFacetRow, .knowledge-facet-row")).toHaveCount(labels.length);
         await expect(panel.locator(".knowledgeFacetRow .facetNumber, .knowledge-facet-row .facet-number")).toHaveText(labels.map((_, number) => String(number + 1)));
-        await panel.locator("summary").click();
-        expect(await visibleText(panel.locator(".knowledgeOpenButton"))).toEqual(Array(await panel.locator(".knowledgeOpenButton").count()).fill("Explore"));
+        await expect(panel.locator("summary .knowledgeOpenButton")).toHaveCount(1);
+        await expect(panel.locator(".knowledgeCardBody .knowledgeOpenButton, .knowledge-card-body .knowledgeOpenButton")).toHaveCount(0);
+        await panel.locator("summary .knowledgeOpenButton").click();
+        await expect(panel).not.toHaveAttribute("open", "");
+        const graph = page.getByRole("dialog", { name: expected[index], exact: true });
+        await expect(graph).toBeVisible();
+        await expect(graph.getByRole("region", { name: "Evidence-linking graph" })).toBeVisible();
+        await expect(graph.locator(".knowledgeGraphLane")).toHaveCount(elements + 1);
+        const relationshipList = graph.locator(".knowledgeGraphRelationshipList");
+        await expect(relationshipList.getByText(`Declared relationships (${await graph.locator(".knowledgeGraphEdge").count()})`)).toBeVisible();
+        await relationshipList.locator("summary").click();
+        await expect(relationshipList.locator("li button")).toHaveCount(await graph.locator(".knowledgeGraphEdge").count());
+        if (index === 4) {
+          await expect(graph.locator(".knowledgeGraphAbsent")).not.toHaveCount(0);
+          await expect(graph.locator(".knowledgeGraphAbsent strong")).toHaveText(Array((elements + 1) * 2).fill("Not declared"));
+          await expect(relationshipList).toContainText("None declared.");
+        }
+        await expect(graph.locator(".knowledgePassageGlimpse mark")).toHaveCount([0, 1, 3, 3, 0][index]);
+        await expect(graph.locator(".knowledgeGraphEvidence .knowledgePassageGlimpse")).toHaveCount(0);
+        if (index === 0) {
+          await expect(graph.locator(".knowledgeGraphLane").first().locator(".knowledgeGraphBranch")).toHaveCount(2);
+          await expect(graph.locator(".knowledgeGraphLane").nth(1).locator(".knowledgeGraphEvidence .knowledgeGraphAbsent")).toContainText("Not declared");
+        }
+        if (index === 1) {
+          await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "specification passage" })).toHaveCount(1);
+          await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(0);
+        }
+        if (index === 2) {
+          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphEvidence .knowledgeGraphAbsent")).toContainText("Not declared");
+          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphTargets .knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(1);
+        }
+        if (index === 3) {
+          await expect(graph.locator(".knowledgeGraphPart")).toHaveCount(1);
+          await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "specification passage" })).toHaveCount(1);
+          await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(2);
+          await expect(graph.locator(".knowledgeGraphRoute").filter({ hasText: "annotation-margolis-table3" })).toHaveCount(0);
+          const tableNode = graph.locator(".knowledgeGraphEvidence").getByRole("button", { name: "Inspect evidence resource: Supplementary Table 3" });
+          await tableNode.click();
+          const inspector = graph.getByRole("complementary", { name: "Evidence graph inspector" });
+          await expect(inspector).toContainText("annotation-margolis-table3");
+          await expect(inspector.getByRole("link", { name: "Open evidence source" })).toHaveAttribute("href", /NIHMS1801579-supplement-1\.pdf$/);
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+          const passage = graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" }).first();
+          await passage.click();
+          await expect(inspector).toContainText("src/prognosis.js");
+          await expect(inspector).toContainText("Exact passage");
+          await inspector.getByRole("button", { name: "Follow passage" }).click();
+          const codeViewer = page.locator(".knowledgeImplementationDialog");
+          await expect(codeViewer).toBeVisible();
+          await expect(codeViewer.locator("mark.knowledgePassageHighlight")).not.toHaveCount(0);
+          await codeViewer.getByRole("button", { name: "Close implementation" }).click();
+          await expect(graph).toBeVisible();
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+          await graph.getByRole("button", { name: "Inspect relationship: koio:hasEvidentialBasis" }).first().click();
+          await expect(inspector).toContainText("Subject");
+          await expect(inspector).toContainText("Predicate");
+          await expect(inspector).toContainText("Object");
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+          await graph.locator(".knowledgeGraphNode").filter({ hasText: "knowledge element" }).first().click();
+          await inspector.getByRole("button", { name: "View Specification" }).click();
+          await expect(page.locator(".documentViewerDialog, .document-viewer-dialog")).toBeVisible();
+          await page.getByRole("button", { name: "Close document" }).click();
+          await expect(graph).toBeVisible();
+          await inspector.getByRole("button", { name: "View Implementation" }).click();
+          await expect(page.locator(".knowledgeImplementationDialog")).toBeVisible();
+          await page.getByRole("button", { name: "Close implementation" }).click();
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+          await graph.getByRole("button", { name: /Inspect evidence resource:.*Supplementary Table 3/ }).first().click();
+          await expect(inspector.getByRole("link", { name: "Open evidence source" })).toHaveAttribute("href", /NIHMS1801579-supplement-1\.pdf$/);
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+        }
+        if (index === 4) await expect(graph).toContainText("Constituent KO evidence is not inherited.");
         knowledgeProjection.push({
           name: expected[index],
-          linking: await linkingDetail.textContent(),
+          linking: await panel.locator("summary .knowledgeNexusLabel, summary .knowledge-nexus-label").textContent(),
           facetLabels: await visibleText(panel.locator(".knowledgeFacetHeading, .knowledge-facet-heading")),
-          elementCards: await visibleText(panel.locator(".knowledgeElementCard, .knowledge-element-card")),
-          evidenceGroups: await visibleText(panel.locator(".knowledgeEvidenceGroup, .knowledge-evidence-group")),
-          koEvidence: await visibleText(panel.locator(".knowledgeKoEvidence, .knowledge-ko-evidence")),
-          emptyEvidence: await visibleText(panel.locator(".knowledgeEmptyState, .knowledge-empty-state")),
+          graph: await visibleText(graph.locator(".knowledgeSubgraphBody")),
         });
+        await graph.getByRole("button", { name: "Close evidence subgraph" }).click();
         await panel.locator("summary").click();
+        await expect(panel.locator(".knowledgeElementCard, .knowledge-element-card")).toHaveCount(elements);
+        if (index === 4) await expect(panel.locator(".knowledgeEmptyState, .knowledge-empty-state")).toContainText("No evidential basis declared anywhere in this KO.");
       }
       observed.knowledgeProjection = knowledgeProjection;
-      const first = panels.first();
-      await first.locator("summary").click();
-      await expect(first.locator(".knowledgeElementCard, .knowledge-element-card")).toHaveCount(2);
-      await expect(first.locator(".knowledgeEvidenceGroup, .knowledge-evidence-group")).toHaveCount(0);
-      await expect(first.locator(".knowledgeKoEvidence, .knowledge-ko-evidence")).toContainText("Evidence for this KO");
-      await expect(first.locator(".knowledgeKoEvidence, .knowledge-ko-evidence")).toContainText("2 sources");
-      await expect(first.locator(".knowledgeKoEvidence .knowledgeEvidenceItem, .knowledge-ko-evidence .knowledge-evidence-item")).toHaveCount(0);
-      await first.getByRole("button", { name: "Explore evidence for this KO" }).click();
-      const koEvidenceDetail = page.getByRole("dialog", { name: "Evidence for this KO" });
-      await expect(koEvidenceDetail.locator(".knowledgeDetailSource")).toHaveCount(2);
-      await expect(koEvidenceDetail.getByRole("heading", { name: "Whole Knowledge Object" })).toBeVisible();
-      await expect(koEvidenceDetail.getByRole("heading", { name: "Knowledge element" })).toHaveCount(0);
-      await expect(koEvidenceDetail.getByRole("link", { name: "Open evidence source ↗" }).first()).toHaveAttribute("href", /^https:\/\/doi\.org\//);
-      await koEvidenceDetail.getByRole("button", { name: "Close KO evidence" }).click();
-      await first.locator(".knowledgeElementCard, .knowledge-element-card").first().getByRole("button", { name: "Explore Wagner Questionnaire Logic" }).click();
-      const firstDetail = page.getByRole("dialog", { name: "Wagner Questionnaire Logic" });
-      await expect(firstDetail).toContainText("No evidential basis declared for this knowledge element.");
-      await expect(firstDetail).toContainText("Declared for the whole KO, not connected to this element.");
-      await expect(firstDetail.locator(".knowledgeDetailSource")).toHaveCount(0);
-      await firstDetail.getByRole("button", { name: "Explore evidence for this KO" }).click();
-      await expect(page.getByRole("dialog", { name: "Evidence for this KO" }).locator(".knowledgeDetailSource")).toHaveCount(2);
-      await page.getByRole("button", { name: "Close KO evidence" }).click();
-      const second = panels.nth(1);
-      await second.locator("summary").click();
-      await expect(second.locator(".knowledgeElementCard, .knowledge-element-card")).toHaveCount(1);
-      await expect(second.locator(".knowledgeEvidenceGroup, .knowledge-evidence-group")).toContainText("1 source");
-      await expect(second.locator(".knowledgeEvidenceGroup .knowledgeEvidenceItem, .knowledge-evidence-group .knowledge-evidence-item")).toHaveCount(0);
-      await expect(second.locator(".knowledgeEvidenceGroup h3, .knowledge-evidence-group h3")).toHaveText("Evidence for DFU HBO2 Decision Logic");
-      await expect(second.locator(".knowledgeKoEvidence, .knowledge-ko-evidence")).toHaveCount(0);
-      await second.getByRole("button", { name: "Explore DFU HBO2 Decision Logic" }).click();
-      const knowledgeDetail = page.getByRole("dialog", { name: "DFU HBO2 Decision Logic" });
-      await expect(knowledgeDetail).toBeVisible();
-      await expect(knowledgeDetail.getByRole("heading", { name: "Evidence", exact: true })).toBeVisible();
-      await expect(knowledgeDetail.getByRole("heading", { name: "Knowledge element", exact: true })).toBeVisible();
-      await expect(knowledgeDetail.getByRole("heading", { name: "Specification passage" })).toBeVisible();
-      await expect(knowledgeDetail.getByRole("heading", { name: "Implementation passage" })).toHaveCount(0);
-      await expect(knowledgeDetail.getByRole("heading", { name: "Evidence for this KO" })).toHaveCount(0);
-      await expect(knowledgeDetail.getByRole("link", { name: "Open evidence source ↗" })).toHaveAttribute("href", "https://uhms.org/images/CPG/UHM_42-3_CPG_for_DFU.pdf");
-      await knowledgeDetail.getByRole("button", { name: "Follow passage" }).click();
-      const preciseCks = page.locator(".documentViewerDialog, .document-viewer-dialog");
-      await expect(preciseCks.getByRole("status")).toContainText("Showing highlighted passage");
-      await expect(preciseCks.locator("mark.knowledgePassageHighlight").first()).toBeVisible();
-      await preciseCks.getByRole("button", { name: "Close document" }).click();
-      await knowledgeDetail.getByRole("button", { name: "View Implementation" }).click();
-      const implementation = page.locator(".knowledgeImplementationDialog");
-      await expect(implementation).toContainText("Read-only · Embedded in this knowledge object");
-      await expect(implementation.locator("pre code")).not.toBeEmpty();
-      await implementation.getByRole("button", { name: "Close implementation" }).click();
-      await expect(knowledgeDetail).toBeVisible();
-      await knowledgeDetail.getByRole("button", { name: "View Specification" }).click();
-      await expect(page.locator(".documentViewerDialog, .document-viewer-dialog")).toBeVisible();
-      await page.getByRole("button", { name: "Close document" }).click();
-      await page.getByRole("button", { name: "Close knowledge and evidence" }).click();
-      await expect(panels.nth(2).locator(".knowledgeEvidenceGroup h3, .knowledge-evidence-group h3")).toHaveText([
-        "Evidence for Regimen Range",
-        "Evidence for Burden Questionnaire Logic",
-      ]);
-      await expect(panels.nth(2).locator(".knowledgeEvidenceGroup, .knowledge-evidence-group").first()).toContainText("2 sources");
-      await expect(panels.nth(2).locator(".knowledgeEvidenceGroup, .knowledge-evidence-group").last()).toContainText("1 source");
-      await panels.nth(2).locator("summary").click();
-      await panels.nth(2).getByRole("button", { name: "Explore Burden Response Analysis" }).click();
-      const burdenDetail = page.getByRole("dialog", { name: "Burden Response Analysis" });
-      await expect(burdenDetail).toContainText("No evidential basis declared for this knowledge element.");
-      await expect(burdenDetail.getByRole("heading", { name: "Implementation passage" })).toBeVisible();
-      await expect(burdenDetail.getByRole("heading", { name: "Specification passage" })).toHaveCount(0);
-      await burdenDetail.getByRole("button", { name: "Follow passage" }).click();
-      const preciseCode = page.locator(".knowledgeImplementationDialog");
-      await expect(preciseCode.getByRole("status")).toContainText("Showing highlighted passage");
-      await expect(preciseCode.locator("mark.knowledgePassageHighlight").first()).toBeVisible();
-      await preciseCode.getByRole("button", { name: "Close implementation" }).click();
-      await burdenDetail.getByRole("button", { name: "Close knowledge and evidence" }).click();
-      await expect(panels.nth(3).locator(".knowledgeEvidenceGroup h3, .knowledge-evidence-group h3")).toHaveText("Evidence for Margolis DFU Prognostic Lookup");
-      await panels.nth(3).locator("summary").click();
-      await panels.nth(3).getByRole("button", { name: "Explore Margolis DFU Prognostic Lookup" }).click();
-      const margolisDetail = page.getByRole("dialog", { name: "Margolis DFU Prognostic Lookup" });
-      await expect(margolisDetail.getByRole("heading", { name: "Specification passage" })).toBeVisible();
-      await expect(margolisDetail.getByRole("heading", { name: "Implementation passage" })).toBeVisible();
-      await expect(margolisDetail.locator(".knowledgeDetailBody .knowledgeDetailSource")).toHaveCount(4);
-      await expect(margolisDetail.getByRole("link", { name: "Open evidence source ↗" })).toHaveAttribute("href", "https://pmc.ncbi.nlm.nih.gov/articles/instance/9246994/bin/NIHMS1801579-supplement-1.pdf");
-      await margolisDetail.getByRole("button", { name: "Follow passage" }).first().click();
-      await expect(page.locator(".documentViewerDialog, .document-viewer-dialog").getByRole("status")).toContainText("Showing highlighted passage");
-      await page.getByRole("button", { name: "Close document" }).click();
-      await margolisDetail.getByRole("button", { name: "Follow passage" }).nth(1).click();
-      await expect(page.locator(".knowledgeImplementationDialog").getByRole("status")).toContainText("Showing highlighted passage");
-      await page.getByRole("button", { name: "Close implementation" }).click();
-      await margolisDetail.getByRole("button", { name: "Close knowledge and evidence" }).click();
-      if (expected.length === 5) {
-        const ka = panels.last();
-        await ka.locator("summary").click();
-        await expect(ka.locator(".knowledgeElementCard, .knowledge-element-card")).toHaveCount(1);
-        await expect(ka.locator(".knowledgeFacetContent, .knowledge-facet-content").nth(1)).toContainText("No evidential basis declared anywhere in this KO.");
-        await ka.getByRole("button", { name: "Explore HBOT Treatment Target KA Orchestration Logic" }).click();
-        const kaDetail = page.getByRole("dialog", { name: /.+/ });
-        await expect(kaDetail).toContainText("No evidential basis declared for this knowledge element.");
-        await expect(kaDetail).toContainText("No evidential basis declared anywhere in this KO.");
-        await expect(kaDetail).toContainText("Constituent KO evidence is not inherited.");
-        await kaDetail.getByRole("button", { name: "Close knowledge and evidence" }).click();
-      }
     }
     observed[view.control] = names;
   }
@@ -185,6 +134,7 @@ async function rosters(page, expected) {
 async function journey(page, url) {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1:3100\/)/, (route) => route.abort());
   await page.goto(url, { waitUntil: "domcontentloaded" });
   const before = await rosters(page, koNames);
 
@@ -263,17 +213,17 @@ test("both editions keep four KOs before load, project the KA fifth, and reset o
   await standalonePage.close();
 });
 
-test("both editions keep the K-view learning path usable at narrow width", async ({ browser }) => {
+test("both editions keep the KO-scoped K graph usable at narrow width", async ({ browser }) => {
   const readings = [];
   for (const url of Object.values(editions)) {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.route(/^https?:\/\/(?!127\.0\.0\.1:3100\/)/, (route) => route.abort());
     await page.goto(url, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "K exercise", exact: true }).click();
     const panels = page.locator("details.knowledgeCard, details.knowledge-card");
     await expect(panels).toHaveCount(4);
-    await panels.nth(2).locator("summary").click();
-    await panels.nth(2).locator(".knowledgeElementCard, .knowledge-element-card").first().getByRole("button", { name: "Explore Regimen Range" }).click();
-    const detail = page.getByRole("dialog", { name: "Regimen Range" });
+    await panels.nth(2).locator("summary .knowledgeOpenButton").click();
+    const detail = page.getByRole("dialog", { name: koNames[2], exact: true });
     await expect(detail).toBeVisible();
     const geometry = await detail.evaluate((node) => {
       const dialog = node.getBoundingClientRect();
@@ -284,10 +234,19 @@ test("both editions keep the K-view learning path usable at narrow width", async
     expect(geometry.dialogRight).toBeLessThanOrEqual(geometry.viewportWidth);
     expect(geometry.bodyLeft).toBeGreaterThanOrEqual(0);
     expect(geometry.bodyRight).toBeLessThanOrEqual(geometry.viewportWidth);
-    await expect(detail.getByRole("button", { name: "View Specification" })).toBeVisible();
-    await expect(detail.getByRole("button", { name: "View Implementation" }).first()).toBeVisible();
-    readings.push(await visibleText(detail.locator(".knowledgeDetailBody")));
-    await detail.getByRole("button", { name: "Close knowledge and evidence" }).click();
+    await expect(detail.locator(".knowledgeGraphLane")).toHaveCount(4);
+    const laneColumns = await detail.locator(".knowledgeGraphLane").first().evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
+    expect(laneColumns).toBe(1);
+    const relationships = detail.locator(".knowledgeGraphRelationshipList");
+    await relationships.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    const firstRelationship = relationships.getByRole("button").first();
+    await firstRelationship.focus();
+    await page.keyboard.press("Enter");
+    await expect(detail.getByRole("complementary", { name: "Evidence graph inspector" })).toBeVisible();
+    await expect(firstRelationship).toHaveAttribute("aria-pressed", "true");
+    readings.push(await visibleText(detail.locator(".knowledgeSubgraphBody")));
+    await detail.getByRole("button", { name: "Close evidence subgraph" }).click();
     await expect(panels.nth(2)).toBeVisible();
     await page.close();
   }

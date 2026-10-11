@@ -51,5 +51,23 @@ test("standalone uses the identical relationship-map projection", () => {
   vm.runInContext(`${block}\nthis.project = buildKnowledgeRelationshipMap`, context);
   const model = projectKnowledgeViewModel(buildKnowledgeViewModel(metadataFor(3)), metadataFor(3));
   assert.deepEqual(JSON.parse(JSON.stringify(context.project(model))), buildKnowledgeRelationshipMap(model));
-  assert.match(html, /renderKnowledgeRelationshipMap\(model\).*knowledge-card-body/s);
+  assert.doesNotMatch(html, /renderKnowledgeRelationshipMap\(model\)/);
+  assert.doesNotMatch(html, /knowledgeRelationshipMap/);
+  assert.match(html, /<div class="facet-list knowledge-card-body">/);
+});
+
+test("both K-view shades contain facets only, retaining counts and missing-data states", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.doesNotMatch(server, /<KnowledgeRelationshipMap/);
+  assert.doesNotMatch(standalone, /renderKnowledgeRelationshipMap\(model\)/);
+  assert.match(server, /<div className="facetList knowledgeCardBody">/);
+  assert.match(standalone, /<div class="facet-list knowledge-card-body">/);
+  for (const source of [server, standalone]) {
+    assert.match(source, /Knowledge Elements/);
+    assert.match(source, /Evidential Sources/);
+    assert.match(source, /KO Dependencies/);
+    assert.match(source, /No evidential basis declared anywhere in this KO/);
+    assert.match(source, /No KO dependencies declared/);
+  }
 });
