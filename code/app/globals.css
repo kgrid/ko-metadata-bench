@@ -287,6 +287,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeGraphInspectorHead h3 { margin: 3px 0 0; overflow-wrap: anywhere; }
 .knowledgeGraphInspectorHead small { margin: 0; text-transform: capitalize; }
 .knowledgeGraphInspectorHead button { flex: none; border: 1px solid #d2d2d7; border-radius: 6px; background: #fff; width: 28px; height: 28px; cursor: pointer; }
+.knowledgeGraphInspectorSummary { margin: 0; padding: 12px 14px; border-bottom: 1px solid #e5e5e7; color: #3a3a3c; font-size: 12px; line-height: 1.5; }
 .knowledgeGraphInspector dl { margin: 0; padding: 4px 14px 14px; }
 .knowledgeGraphInspector dl > div { padding: 9px 0; border-bottom: 1px solid #e5e5e7; }
 .knowledgeGraphInspector dt { color: #6e6e73; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
@@ -295,15 +296,36 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeGraphInspectorActions .knowledgeDetailAction { margin: 0; }
 .knowledgeGraphInspectorActions p { width: 100%; margin: 0; color: #6e6e73; font-size: 11px; line-height: 1.45; }
 .documentViewerBody[hidden], .knowledgeImplementationDialog pre[hidden] { display: none; }
-.knowledgeGraphHead, .knowledgeGraphLane { display: grid; grid-template-columns: minmax(0,1fr) minmax(150px,.78fr) minmax(0,1.3fr); }
+.knowledgeGraphHead, .knowledgeGraphLane { display: grid; grid-template-columns: minmax(138px,.65fr) minmax(145px,.82fr) minmax(175px,1fr) minmax(175px,1fr); }
 .knowledgeGraphHead { background: #f5f5f7; border-bottom: 1px solid #d2d2d7; color: #6e6e73; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .knowledgeGraphHead span { padding: 10px 12px; }
 .knowledgeGraphLane + .knowledgeGraphLane { border-top: 1px solid #d2d2d7; background: #f6f3ee; }
 .knowledgeGraphLane > div { min-width: 0; padding: 12px; }
+.knowledgeGraphLane.isSparse > div { padding-top: 9px; padding-bottom: 9px; }
+.knowledgeGraphLane.isEmpty > div { padding-top: 6px; padding-bottom: 6px; }
+.knowledgeGraphLane.isEmpty .knowledgeGraphSubject .knowledgeGraphNode { padding-top: 6px; padding-bottom: 6px; }
 .knowledgeGraphLane > div + div { border-left: 1px solid #ececef; }
-.knowledgeGraphEvidence, .knowledgeGraphTargets { display: grid; align-content: center; gap: 9px; }
+.knowledgeGraphEvidence, .knowledgeGraphSpecification, .knowledgeGraphImplementation { display: grid; align-content: center; gap: 9px; }
+.knowledgeGraphEvidence .knowledgeGraphNode { width: min(100%, 138px); min-height: 108px; }
+.knowledgeGraphUnresolved { grid-column: 1 / -1; display: grid; gap: 8px; border-top: 1px solid #ececef; }
+.knowledgeGraphLane > .knowledgeGraphUnresolved { border-left: 0; }
 .knowledgeGraphSubject { display: flex; align-items: center; }
+.knowledgeGraphSubject .knowledgeGraphNode { border: 2px solid #3a3a3c; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.08); }
 .knowledgeGraphNode { display: block; width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid #8e8e93; border-radius: 8px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.04); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.knowledgeGraphNodeGroup { display: grid; justify-items: start; gap: 4px; min-width: 0; }
+.knowledgeGraphNodeGroup > .knowledgeGraphNode { width: 100%; }
+.knowledgeGraphEvidence .knowledgeGraphNodeGroup { width: min(100%, 138px); }
+.knowledgeGraphSubject .knowledgeGraphNodeGroup { width: 100%; }
+.knowledgeGraphDirectAction { display: inline-block; padding: 3px 6px; border: 1px solid #8e8e93; border-radius: 5px; background: #fff; color: #1d1d1f; font-size: 10px; line-height: 1.3; font-weight: 700; text-decoration: none; cursor: pointer; }
+.knowledgeGraphDirectAction:hover { background: #ececef; }
+.knowledgeGraphDirectAction:focus-visible { outline: 2px solid #1d1d1f; outline-offset: 2px; }
+.knowledgeGraphDestination { border-color: #6e6e73; box-shadow: 0 2px 4px rgba(0,0,0,.06); }
+.knowledgeGraphNode.knowledgeGraphUnverifiedPassage { border-style: dashed; background: #f8f8f9; box-shadow: none; }
+.knowledgeGraphContainingFile, .knowledgeGraphPassageStatus { display: block; margin-top: 5px; color: #55555a; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+.knowledgeGraphPassageStatus { font-weight: 700; }
+.knowledgeGraphNode.knowledgeGraphAnnotation { justify-self: start; width: auto; max-width: 100%; padding: 4px 8px; border-color: #c7c7cc; border-radius: 999px; background: #f5f5f7; box-shadow: none; color: #55555a; font-size: 10px; line-height: 1.25; font-weight: 600; }
+.knowledgeGraphAnnotation span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.knowledgeGraphSubject .knowledgeGraphNode strong { font-size: 13px; }
 .knowledgeGraphNode[aria-pressed="true"], .knowledgeGraphEdge[aria-pressed="true"], .knowledgeGraphRelationshipList button[aria-pressed="true"] { border-color: #1d1d1f; background: #ececef; }
 .knowledgeGraphNode:focus-visible, .knowledgeGraphEdge:focus-visible, .knowledgeGraphInspector button:focus-visible, .knowledgeGraphRelationshipList button:focus-visible, .knowledgeGraphRelationshipList summary:focus-visible { outline: 2px solid #1d1d1f; outline-offset: 2px; }
 .knowledgeGraphNode strong { display: block; color: #1d1d1f; font-size: 12px; line-height: 1.35; }
@@ -316,8 +338,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeGraphReverse { text-align: right; }
 .knowledgeGraphRoute { padding-left: 10px; border-left: 1px solid #a8a8ad; }
 .knowledgeGraphTarget { padding-left: 10px; border-left: 1px solid #c7c7cc; }
-.knowledgeGraphAbsent { padding: 9px 10px; border: 1px dashed #c7c7cc; border-radius: 8px; background: #fafafa; color: #6e6e73; font-size: 10px; }
-.knowledgeGraphAbsent strong { display: block; margin-top: 3px; color: #55555a; font-size: 11px; }
+.knowledgeGraphAbsence { justify-self: start; align-self: center; color: #6e6e73; font-size: 10px; line-height: 1.3; }
+.knowledgeGraphUnresolvedNotice { color: #6e6e73; font-size: 10px; font-weight: 600; }
 .knowledgeGraphEmpty { margin: 0; padding: 10px 12px; border-top: 1px solid #ececef; }
 .knowledgeGraphRelationshipList { padding: 10px 12px; border-top: 1px solid #d2d2d7; }
 .knowledgeGraphRelationshipList summary { width: fit-content; cursor: pointer; color: #3a3a3c; font-size: 11px; font-weight: 700; }
@@ -325,7 +347,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeGraphRelationshipList li + li { margin-top: 4px; }
 .knowledgeGraphRelationshipList button { max-width: 100%; padding: 5px 7px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #3a3a3c; font-size: 11px; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
 .knowledgeGraphRelationshipList p { margin-top: 8px; font-size: 11px; }
-@media (max-width: 900px) { .knowledgeGraphWorkspace.inspectorOpen { display: flex; flex-direction: column; } .knowledgeGraphInspector { order: -1; flex: none; max-height: 34vh; border-left: 0; border-bottom: 1px solid #d2d2d7; } .knowledgeGraphHead { display: none; } .knowledgeGraphLane { grid-template-columns: 1fr; } .knowledgeGraphLane > div + div { border-left: 0; border-top: 1px solid #ececef; } .knowledgeGraphLane > div::before { display: block; margin-bottom: 6px; color: #6e6e73; font-size: 9px; font-weight: 700; text-transform: uppercase; } .knowledgeGraphEvidence::before { content: "Evidence"; } .knowledgeGraphSubject::before { content: "Declaring subject"; } .knowledgeGraphTargets::before { content: "Declared targets"; } .knowledgeGraphSubject { display: block; } }
+@media (max-width: 1100px) { .knowledgeGraphWorkspace.inspectorOpen { display: flex; flex-direction: column; } .knowledgeGraphWorkspace.inspectorOpen .knowledgeGraph { flex: 1; min-height: 0; } .knowledgeGraphInspector { order: -1; flex: none; max-height: 34vh; border-left: 0; border-bottom: 1px solid #d2d2d7; } }
+@media (max-width: 900px) { .knowledgeGraphHead { display: none; } .knowledgeGraphLane { grid-template-columns: minmax(0,1fr); margin: 8px 6px; border: 1px solid #d2d2d7; border-radius: 9px; overflow: hidden; } .knowledgeGraphLane > div + div { border-left: 0; border-top: 1px solid #ececef; } .knowledgeGraphLane > div::before { display: block; margin-bottom: 6px; color: #6e6e73; font-size: 9px; font-weight: 700; text-transform: uppercase; } .knowledgeGraphEvidence::before { content: "Evidence"; } .knowledgeGraphSubject::before { content: "Declaring subject"; } .knowledgeGraphSpecification::before { content: "Specification passages"; } .knowledgeGraphImplementation::before { content: "Implementation passages"; } .knowledgeGraphSubject { display: block; } .knowledgeGraphEvidence .knowledgeGraphNodeGroup, .knowledgeGraphEvidence .knowledgeGraphNode { width: 100%; } .knowledgeGraphEvidence .knowledgeGraphNode { min-height: 0; } .knowledgeGraphDirectAction, .knowledgeGraphEdge, .knowledgeGraphRelationshipList button, .knowledgeGraphInspectorActions .knowledgeDetailAction { min-height: 40px; padding: 8px 10px; display: inline-flex; align-items: center; } .knowledgeGraphNode.knowledgeGraphAnnotation { min-height: 40px; padding: 8px 10px; display: inline-flex; align-items: center; } .knowledgeGraphInspectorHead button { width: 40px; height: 40px; } }
 @media (max-width: 700px) { .knowledgeSubgraphRelations li { grid-template-columns: 1fr; gap: 2px; } .knowledgeSubgraphNodes > div { grid-template-columns: 1fr; } }
 .knowledgeDetailBody > section { min-width: 0; padding: 16px 18px; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; overflow-wrap: anywhere; }
 .knowledgeDetailBody h3 { margin: 0 0 10px; color: #1d1d1f; font-size: 15px; line-height: 1.3; }

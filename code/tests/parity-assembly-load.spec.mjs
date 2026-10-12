@@ -54,34 +54,41 @@ async function rosters(page, expected) {
         await relationshipList.locator("summary").click();
         await expect(relationshipList.locator("li button")).toHaveCount(await graph.locator(".knowledgeGraphEdge").count());
         if (index === 4) {
-          await expect(graph.locator(".knowledgeGraphAbsent")).not.toHaveCount(0);
-          await expect(graph.locator(".knowledgeGraphAbsent strong")).toHaveText(Array((elements + 1) * 2).fill("Not declared"));
+          await expect(graph.locator(".knowledgeGraphAbsence")).not.toHaveCount(0);
+          await expect(graph.locator(".knowledgeGraphAbsence")).toHaveText(Array((elements + 1) * 3).fill("Not declared"));
+          await expect(graph.locator(".knowledgeGraphLane.isEmpty")).toHaveCount(elements + 1);
           await expect(relationshipList).toContainText("None declared.");
         }
         await expect(graph.locator(".knowledgePassageGlimpse mark")).toHaveCount([0, 1, 3, 3, 0][index]);
         await expect(graph.locator(".knowledgeGraphEvidence .knowledgePassageGlimpse")).toHaveCount(0);
         if (index === 0) {
           await expect(graph.locator(".knowledgeGraphLane").first().locator(".knowledgeGraphBranch")).toHaveCount(2);
-          await expect(graph.locator(".knowledgeGraphLane").nth(1).locator(".knowledgeGraphEvidence .knowledgeGraphAbsent")).toContainText("Not declared");
+          await expect(graph.locator(".knowledgeGraphLane").nth(1).locator(".knowledgeGraphEvidence .knowledgeGraphAbsence")).toContainText("Not declared");
         }
         if (index === 1) {
           await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "specification passage" })).toHaveCount(1);
           await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(0);
         }
         if (index === 2) {
-          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphEvidence .knowledgeGraphAbsent")).toContainText("Not declared");
-          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphTargets .knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(1);
+          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphEvidence .knowledgeGraphAbsence")).toContainText("Not declared");
+          await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphImplementation .knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(1);
         }
         if (index === 3) {
           await expect(graph.locator(".knowledgeGraphPart")).toHaveCount(1);
           await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "specification passage" })).toHaveCount(1);
           await expect(graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" })).toHaveCount(2);
           await expect(graph.locator(".knowledgeGraphRoute").filter({ hasText: "annotation-margolis-table3" })).toHaveCount(0);
+          const annotation = graph.locator(".knowledgeGraphAnnotation").first();
+          await expect(annotation).toContainText("Annotation ·");
+          await annotation.click();
+          await expect(graph.getByRole("complementary", { name: "Evidence graph inspector" })).toContainText("Annotation");
+          await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
           const tableNode = graph.locator(".knowledgeGraphEvidence").getByRole("button", { name: "Inspect evidence resource: Supplementary Table 3" });
           await tableNode.click();
           const inspector = graph.getByRole("complementary", { name: "Evidence graph inspector" });
           await expect(inspector).toContainText("annotation-margolis-table3");
           await expect(inspector.getByRole("link", { name: "Open evidence source" })).toHaveAttribute("href", /NIHMS1801579-supplement-1\.pdf$/);
+          await expect(graph.getByRole("link", { name: "Open source: Supplementary Table 3" })).toHaveAttribute("href", /NIHMS1801579-supplement-1\.pdf$/);
           await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
           const passage = graph.locator(".knowledgeGraphNode").filter({ hasText: "implementation passage" }).first();
           await passage.click();
@@ -94,6 +101,12 @@ async function rosters(page, expected) {
           await codeViewer.getByRole("button", { name: "Close implementation" }).click();
           await expect(graph).toBeVisible();
           await graph.getByRole("button", { name: "Close evidence graph inspector" }).click();
+          await graph.getByRole("button", { name: /^View passage:/ }).first().click();
+          const directViewer = page.locator(".documentViewerDialog, .document-viewer-dialog, .knowledgeImplementationDialog");
+          await expect(directViewer).toBeVisible();
+          await expect(directViewer.locator("mark.knowledgePassageHighlight")).not.toHaveCount(0);
+          await page.getByRole("button", { name: /Close (document|implementation)/ }).click();
+          await expect(graph).toBeVisible();
           await graph.getByRole("button", { name: "Inspect relationship: koio:hasEvidentialBasis" }).first().click();
           await expect(inspector).toContainText("Subject");
           await expect(inspector).toContainText("Predicate");
@@ -216,7 +229,7 @@ test("both editions keep four KOs before load, project the KA fifth, and reset o
 test("both editions keep the KO-scoped K graph usable at narrow width", async ({ browser }) => {
   const readings = [];
   for (const url of Object.values(editions)) {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
     await page.route(/^https?:\/\/(?!127\.0\.0\.1:3100\/)/, (route) => route.abort());
     await page.goto(url, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "K exercise", exact: true }).click();
@@ -237,6 +250,16 @@ test("both editions keep the KO-scoped K graph usable at narrow width", async ({
     await expect(detail.locator(".knowledgeGraphLane")).toHaveCount(4);
     const laneColumns = await detail.locator(".knowledgeGraphLane").first().evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
     expect(laneColumns).toBe(1);
+    const stackedOrder = await detail.locator(".knowledgeGraphLane").first().evaluate((node) => [...node.children].slice(0, 4).map((child) => child.className));
+    expect(stackedOrder).toEqual(["knowledgeGraphEvidence", "knowledgeGraphSubject", "knowledgeGraphSpecification", "knowledgeGraphImplementation"]);
+    const directPassage = detail.getByRole("button", { name: /^View passage:/ }).first();
+    await directPassage.focus();
+    await expect(directPassage).toBeFocused();
+    expect(await directPassage.evaluate((node) => node.getBoundingClientRect().height)).toBeGreaterThanOrEqual(40);
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".knowledgeImplementationDialog mark.knowledgePassageHighlight")).toBeVisible();
+    await page.getByRole("button", { name: "Close implementation" }).click();
+    await expect(directPassage).toBeFocused();
     const relationships = detail.locator(".knowledgeGraphRelationshipList");
     await relationships.locator("summary").focus();
     await page.keyboard.press("Enter");
@@ -245,6 +268,14 @@ test("both editions keep the KO-scoped K graph usable at narrow width", async ({
     await page.keyboard.press("Enter");
     await expect(detail.getByRole("complementary", { name: "Evidence graph inspector" })).toBeVisible();
     await expect(firstRelationship).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("Escape");
+    await expect(firstRelationship).toBeFocused();
+    await expect(detail.getByRole("complementary", { name: "Evidence graph inspector" })).toHaveCount(0);
+    const touchNode = detail.locator(".knowledgeGraphSubject .knowledgeGraphNode").first();
+    await touchNode.scrollIntoViewIfNeeded();
+    const touchBox = await touchNode.boundingBox();
+    await page.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
+    await expect(detail.getByRole("complementary", { name: "Evidence graph inspector" })).toBeVisible();
     readings.push(await visibleText(detail.locator(".knowledgeSubgraphBody")));
     await detail.getByRole("button", { name: "Close evidence subgraph" }).click();
     await expect(panels.nth(2)).toBeVisible();

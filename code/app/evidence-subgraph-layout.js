@@ -15,6 +15,15 @@ export function layoutEvidenceSubgraph(graph) {
       annotation: byKey.get(edge.to),
       targets: from(edge.to, "annotation-target").map((targetEdge) => ({ edge: targetEdge, node: byKey.get(targetEdge.to) })),
     }));
-    return { subject, basis, annotations };
+    const routesTo = (kind) => annotations.flatMap((route) => {
+      const targets = route.targets.filter((target) => target.node?.kind === kind);
+      return targets.length ? [{ ...route, targets }] : [];
+    });
+    return {
+      subject, basis, annotations,
+      specificationRoutes: routesTo("specification-passage"),
+      implementationRoutes: routesTo("implementation-passage"),
+      unresolvedRoutes: annotations.filter((route) => !route.targets.length),
+    };
   });
 }

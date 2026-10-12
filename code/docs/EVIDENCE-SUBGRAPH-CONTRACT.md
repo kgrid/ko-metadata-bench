@@ -2,6 +2,31 @@
 
 This contract defines the **one-KO Explore graph** for the K view. It governs both SWA editions. The graph is a narrow projection of declarations in that object's `metadata.json`, not a general KO file map, a clinical-evidence score, or an inferred chain of support. The existing [evidence metadata progression](EVIDENCE-METADATA-PROGRESSION.md) supplies the five teaching patterns; this contract does not assign a pattern by KO name or workshop position.
 
+The display has four aligned columns: **Evidence**, **Declaring subject**, **Specification passages**, and **Implementation passages**. Each KO or knowledge-element subject gets its own row. A specification or implementation appears in its column only when a declared annotation route connects it to that same subject. Empty positions say “Not declared”; they are not graph edges. The compact evidence nodes conserve width without changing relationship meaning.
+
+## What the four-column display asserts
+
+| Display position | Meaning—and limit |
+| --- | --- |
+| Evidence | An evidential resource is a declared `koio:hasEvidentialBasis` of the subject in this row. A named part may show its declared `schema:hasPart` parent. This does not rate the evidence or imply that it supports every element in the KO. |
+| Declaring subject | The KO or knowledge element on which the displayed basis and annotation relationships are declared. This subject is the row anchor, not a claim that all objects in the row are directly related to each other. |
+| Specification passages | The subject has an applicable annotation route to the named, selected passage inside a specification document. The column must not suggest that a file-level CKS reference is itself a passage annotation. |
+| Implementation passages | The subject has an applicable annotation route to the named, selected passage inside an implementation file. `implementedBy` alone provides file context, not a passage route. |
+
+One row groups relationships **by their exact declaring subject**. The KO row must not absorb relationships declared on its elements, and an element row must not inherit KO-level evidence. When two passage columns are occupied in one element row, the graph shows that the *same element* declares both routes; it does not assert a direct evidence-to-specification, evidence-to-code, or specification-to-code triple. Multiple annotations or targets remain individually inspectable within that row. A row with no declared links may remain as compact context so that absence is visible, but must not acquire inferred edges.
+
+## Visual and interaction vocabulary for the redesign
+
+| State | Required treatment |
+| --- | --- |
+| Declared link | Draw a selectable connection only for a relationship in the projected metadata graph. Preserve its direction and the actual subject, predicate, and object in the inspector. An annotation may be shown as a compact, selectable stop on its route, but must not disappear from inspection or be collapsed into an invented direct edge. |
+| Absent link | Show a quiet “Not declared” placeholder within the subject row. It is neither a node nor a connection; do not give it the same border, weight, or action treatment as a declared resource. Compress otherwise empty rows rather than giving absence the space of a populated route. |
+| Verified passage | Distinguish the selected passage *inside* its containing CKS or code file. Show the containing filename and a short glimpse drawn from the uniquely matched embedded content. A direct “View passage” action may open the existing viewer at that highlighted match. Verification means navigation to this passage is supported; it does not evaluate the evidence or the knowledge claim. |
+| Unresolved passage | Retain the declared annotation and target, mark the passage “Unresolved,” and make the reason inspectable. Do not show a verified-looking excerpt or offer a “View passage” action that silently opens a whole file. A separate, explicitly labeled file-level action may be offered if that file is available. |
+| Whole-file reference | Treat `implementedBy` and a CKS document reference as file context, visually distinct from an annotated passage. A “View Specification” or “View Implementation” action may open the file, but must not imply that a specific passage was selected or verified. Do not turn this context into a passage node or edge. |
+
+The graph is the first reading layer: subjects and destinations should carry more visual weight than annotation machinery or absence markers. Direct follow actions belong on usable destination nodes; selection opens the inspector for identifiers, citations, declarations, selectors, and verification details. Both actions must remain distinguishable to keyboard and screen-reader users. These treatments are display rules for both SWA editions, not permission to derive additional metadata relationships.
+
 ## Permitted nodes
 
 | Kind | Inclusion rule |
@@ -14,6 +39,8 @@ This contract defines the **one-KO Explore graph** for the K view. It governs bo
 | Implementation passage | A named `oa:SpecificResource` within an element's implementation file, targeted by an applicable annotation and bearing a `oa:TextQuoteSelector`. |
 
 Each node carries a stable identifier from the metadata, its kind, a readable label, and provenance back to the source declaration. A passage additionally carries its containing file path, selector, recorded digest if present, and resolution status. Labels and display positions never serve as graph identity. An unresolved but declared passage stays a passage node with an unresolved status; it is not replaced by a whole-file node.
+
+For evidence-resource labels, use a nonblank `dc:title` declared for that identifier first, then `schema:name`, then the exact identifier. Resolve repeated descriptions of the same identifier across `dc:source` and `koio:hasEvidentialBasis` before falling back. The full citation, description, and identifier remain available in the inspector; a `dc:source` record alone does not create a graph node.
 
 ## Permitted directed relationships
 

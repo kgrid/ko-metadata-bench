@@ -27,6 +27,9 @@ const subgraphActionsSource = readFileSync(join(root, "app/evidence-subgraph-act
   .replace("export function planEvidenceSubgraphActions", "function planEvidenceSubgraphActions");
 const passageGlimpseSource = readFileSync(join(root, "app/evidence-passage-glimpse.js"), "utf8")
   .replace("export function evidencePassageGlimpse", "function evidencePassageGlimpse");
+const subgraphViewRecordSource = readFileSync(join(root, "app/evidence-subgraph-view-record.js"), "utf8")
+  .replace(/^import .*\n/gm, "")
+  .replace("export function buildEvidenceSubgraphViewRecord", "function buildEvidenceSubgraphViewRecord");
 const passageSource = readFileSync(join(root, "app/passage-navigation.js"), "utf8")
   .replace("export function safeEvidenceUrl", "function safeEvidenceUrl")
   .replace("export function evidenceActionUrl", "function evidenceActionUrl")
@@ -129,6 +132,18 @@ if (html.includes(glimpseStart)) {
   if (!html.includes(anchor)) throw new Error("Standalone passage-glimpse insertion point not found");
   html = html.replace(anchor, glimpseBlock + anchor);
 }
+const viewRecordStart = "/* EVIDENCE_SUBGRAPH_VIEW_RECORD_START */";
+const viewRecordEnd = "/* EVIDENCE_SUBGRAPH_VIEW_RECORD_END */";
+const viewRecordBlock = `${viewRecordStart}\n${subgraphViewRecordSource}\n${viewRecordEnd}\n`;
+if (html.includes(viewRecordStart)) {
+  const start = html.indexOf(viewRecordStart);
+  const end = html.indexOf(viewRecordEnd, start) + viewRecordEnd.length;
+  html = html.slice(0, start) + viewRecordBlock.trimEnd() + html.slice(end);
+} else {
+  const anchor = "function buildKnowledgeViewModel(metadata)";
+  if (!html.includes(anchor)) throw new Error("Standalone evidence-subgraph view-record insertion point not found");
+  html = html.replace(anchor, viewRecordBlock + anchor);
+}
 const standaloneResolution = 'const annotationResolution=resolveKnowledgeAnnotations(metadata);';
 const standaloneResolved = 'const annotationResolution=resolveKnowledgeAnnotations(metadata),resolvedAnnotations={...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))};';
 if (!html.includes(standaloneResolved)) {
@@ -209,4 +224,14 @@ if (!html.includes(incorrectBasisNodeLabel) && !html.includes('node(basis.resour
   throw new Error("Standalone evidence-resource node label not found");
 }
 html = html.replaceAll(incorrectBasisNodeLabel, 'node(basis.resource,"evidence resource")');
+const fourColumnRows = readFileSync(join(root, "scripts/standalone-evidence-graph-rows.txt"), "utf8").trimEnd();
+html = html.replace(/  const render(?:Graph)?Route=route=>[^\n]*\n/g, "");
+html = html.replace(/  const renderGraphFile=\(file,kind\)=>[^\n]*\n/g, "");
+const rowsPattern = /  const rows=lanes\.map\(lane=>[^\n]*\n(?=  (?:let selectedTrigger=null;\n  )?const dialog=)/;
+if (!rowsPattern.test(html)) throw new Error("Standalone evidence graph row insertion point not found");
+html = html.replace(rowsPattern, `${fourColumnRows}\n`);
+const oldGraphHead = '<div class="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Declared targets</span></div>';
+const fourColumnHead = '<div class="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Specification passages</span><span>Implementation passages</span></div>';
+if (!html.includes(oldGraphHead) && !html.includes(fourColumnHead)) throw new Error("Standalone evidence graph heading not found");
+html = html.replace(oldGraphHead, fourColumnHead);
 writeFileSync(path, html);

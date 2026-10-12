@@ -38,6 +38,15 @@ test("five embedded teaching patterns retain their distinct declared routes", ()
 
   assert.equal(passages(margolis, "specification-passage").length, 1);
   assert.equal(passages(margolis, "implementation-passage").length, 2);
+  const margolisLanes = layoutEvidenceSubgraph(margolis);
+  const convergentLane = margolisLanes.find((lane) => lane.subject.kind === "knowledge-element");
+  assert.ok(convergentLane, "Margolis has a declaring knowledge element");
+  assert.equal(convergentLane.basis.length, 1, "the same element declares the Table 3 basis");
+  assert.equal(convergentLane.specificationRoutes.length, 1, "the element has a CKS passage route");
+  assert.equal(convergentLane.implementationRoutes.length, 2, "the element has both code passage routes");
+  assert.ok([...convergentLane.specificationRoutes, ...convergentLane.implementationRoutes]
+    .every((route) => route.edge.declaringSubjectId === convergentLane.subject.sourceId),
+  "convergence is on one declaring subject, not across unrelated rows");
   assert.ok(margolis.relationships.some((edge) => edge.kind === "evidence-part"), "Table 3 must remain a part of the article");
   assert.ok(margolis.relationships.every((edge) => !(edge.from.startsWith("evidential-resource:") && /^(specification|implementation)-passage:/.test(edge.to))), "no direct evidence-to-passage claim");
 });

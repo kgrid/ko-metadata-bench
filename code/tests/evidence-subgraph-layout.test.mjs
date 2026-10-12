@@ -17,6 +17,10 @@ test("consistent lanes preserve each KO's declaration site without inferred link
   assert.deepEqual(decision.map((lane) => lane.basis.length), [0, 1]);
   assert.deepEqual(burden.map((lane) => lane.basis.length), [0, 2, 1, 0]);
   assert.deepEqual(margolis.map((lane) => lane.basis.length), [0, 1]);
+  assert.deepEqual(wagner.map((lane) => [lane.specificationRoutes.length, lane.implementationRoutes.length]), [[0, 0], [0, 0], [0, 0]]);
+  assert.deepEqual(decision.map((lane) => [lane.specificationRoutes.length, lane.implementationRoutes.length]), [[0, 0], [1, 0]]);
+  assert.deepEqual(burden.map((lane) => [lane.specificationRoutes.length, lane.implementationRoutes.length]), [[0, 0], [0, 1], [0, 1], [0, 1]]);
+  assert.deepEqual(margolis.map((lane) => [lane.specificationRoutes.length, lane.implementationRoutes.length]), [[0, 0], [1, 2]]);
   assert.equal(burden.at(-1).basis.length, 0);
   assert.ok(burden.at(-1).annotations.some((route) => route.targets.some((target) => target.node.kind === "implementation-passage")));
   assert.ok(margolis.at(-1).annotations.every((route) => route.targets.every((target) => target.node.kind !== "evidential-resource")));
@@ -55,4 +59,104 @@ test("the bone row treatment applies to element lanes, not the KO lane, in both 
   assert.match(standalone, /\.knowledgeGraphLane\+\.knowledgeGraphLane\{[^}]*background:#f6f3ee/);
   assert.doesNotMatch(serverCss, /\.knowledgeGraphHead \+ \.knowledgeGraphLane \{ background: #f6f3ee; \}/);
   assert.doesNotMatch(standalone, /\.knowledgeGraphHead\+\.knowledgeGraphLane\{background:#f6f3ee\}/);
+});
+
+test("Declaring Subject nodes alone receive the stronger graph border in both editions", () => {
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.match(serverCss, /\.knowledgeGraphSubject \.knowledgeGraphNode \{ border: 2px solid #3a3a3c;/);
+  assert.match(standalone, /\.knowledgeGraphSubject \.knowledgeGraphNode\{border:2px solid #3a3a3c/);
+});
+
+test("annotations are compact selectable route markers, while subjects and destinations remain prominent", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.match(source, /knowledgeGraphAnnotation/);
+    assert.match(source, /knowledgeGraphDestination/);
+    assert.match(source, /Inspect \$\{(?:escapeHtml\()?kind/);
+  }
+  assert.match(serverCss, /\.knowledgeGraphNode\.knowledgeGraphAnnotation \{[^}]*border-radius: 999px;[^}]*box-shadow: none;/);
+  assert.match(standalone, /\.knowledgeGraphNode\.knowledgeGraphAnnotation\{[^}]*border-radius:999px;[^}]*box-shadow:none;/);
+  assert.match(serverCss, /\.knowledgeGraphDestination \{ border-color: #6e6e73;/);
+  assert.match(standalone, /\.knowledgeGraphDestination\{border-color:#6e6e73/);
+});
+
+test("both editions render four aligned columns with compact evidence nodes", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.match(source, /<span>Specification passages<\/span><span>Implementation passages<\/span>/);
+    assert.match(source, /knowledgeGraphSpecification/);
+    assert.match(source, /knowledgeGraphImplementation/);
+  }
+  assert.match(serverCss, /\.knowledgeGraphEvidence \.knowledgeGraphNode \{ width: min\(100%, 138px\); min-height: 108px; \}/);
+  assert.match(standalone, /\.knowledgeGraphEvidence \.knowledgeGraphNode\{width:min\(100%,138px\);min-height:108px\}/);
+});
+
+test("absence is an unlinked inline state, not a node-like card, in both editions", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.doesNotMatch(source, /knowledgeGraphAbsent["{]/);
+    assert.match(source, /knowledgeGraphAbsence/);
+    assert.match(source, /knowledgeGraphLane is/);
+  }
+  assert.match(serverCss, /\.knowledgeGraphLane\.isEmpty > div \{ padding-top: 6px; padding-bottom: 6px; \}/);
+  assert.match(standalone, /\.knowledgeGraphLane\.isEmpty>div\{padding-top:6px;padding-bottom:6px\}/);
+  assert.doesNotMatch(serverCss, /\.knowledgeGraphAbsence \{[^}]*border:/);
+  assert.doesNotMatch(standalone, /\.knowledgeGraphAbsence\{[^}]*border:/);
+});
+
+test("both editions show passage status without placing whole-file context in graph rows", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.match(source, /knowledgeGraphContainingFile/);
+    assert.match(source, /knowledgeGraphPassageStatus/);
+    assert.match(source, /knowledgeGraphUnverifiedPassage/);
+    assert.doesNotMatch(source, /knowledgeGraphFileContext/);
+    assert.doesNotMatch(source, /Whole file · no passage/);
+    assert.match(source, /Selector unresolved/);
+  }
+});
+
+test("both editions expose direct graph actions without nesting them in inspector controls", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.match(source, /knowledgeGraphNodeGroup/);
+    assert.match(source, /knowledgeGraphDirectAction/);
+    assert.match(source, /View passage/);
+    assert.match(source, /Open source ↗/);
+  }
+  assert.match(standalone, /\[data-graph-follow\]/);
+});
+
+test("both editions preserve grouped reading order, touch targets, and inspector focus at narrow width", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    const evidence = source.indexOf("knowledgeGraphEvidence", source.indexOf("knowledgeGraphHead"));
+    const subject = source.indexOf("knowledgeGraphSubject", evidence);
+    const specification = source.indexOf("knowledgeGraphSpecification", subject);
+    const implementation = source.indexOf("knowledgeGraphImplementation", specification);
+    assert.ok(evidence < subject && subject < specification && specification < implementation);
+    assert.match(source, /knowledgeGraphDirectAction/);
+    assert.match(source, /knowledgeGraphInspector/);
+    assert.match(source, /role="group" aria-label=/);
+    assert.match(source, /Inspect relationship:/);
+    assert.match(source, /Inspect .*kind/);
+    assert.match(source, /Close evidence graph inspector/);
+  }
+  assert.match(serverCss, /\.knowledgeGraphLane \{ grid-template-columns: minmax\(0,1fr\); margin: 8px 6px;/);
+  assert.match(standalone, /\.knowledgeGraphLane\{grid-template-columns:minmax\(0,1fr\);margin:8px 6px;/);
+  assert.match(standalone, /role="group" aria-label="\$\{escapeHtml\(/);
+  assert.doesNotMatch(standalone, /role="group" aria-label="\$\{esc\(/);
+  assert.match(serverCss, /\.knowledgeGraphDirectAction, \.knowledgeGraphEdge[^}]*min-height: 40px;/);
+  assert.match(standalone, /\.knowledgeGraphDirectAction,\.knowledgeGraphEdge[^}]*min-height:40px;/);
 });

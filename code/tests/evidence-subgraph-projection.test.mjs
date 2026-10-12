@@ -29,6 +29,25 @@ test("four KO patterns preserve declaration sites and passage provenance", () =>
   assert.ok(graphs.every((graph) => !graph.relationships.some((edge) => edge.from.startsWith("evidential-resource:") && edge.to.startsWith("implementation-passage:"))));
 });
 
+test("evidence labels prefer declared titles, then names, then exact identifiers", () => {
+  const sourceId = "https://doi.org/10.1002/dmrr.3273";
+  const metadata = metadataFor(1);
+  const source = metadata["dc:source"].find((record) => record["@id"] === sourceId);
+  const basis = metadata["koio:hasEvidentialBasis"].find((record) => record["@id"] === sourceId);
+  const label = () => project(metadata).nodes.find((node) => node.kind === "evidential-resource" && node.sourceId === sourceId).label;
+  source["schema:name"] = "Readable source name";
+  delete source["dc:title"];
+  basis["dc:title"] = "  Preferred evidence title  ";
+  assert.equal(label(), "Preferred evidence title");
+  basis["dc:title"] = "   ";
+  assert.equal(label(), "Readable source name");
+  delete source["schema:name"];
+  basis["schema:name"] = "Basis record name";
+  assert.equal(label(), "Basis record name");
+  delete basis["schema:name"];
+  assert.equal(label(), sourceId);
+});
+
 test("an evidence-target annotation is not drawn as a second route or mistaken for a basis assertion", () => {
   const metadata = structuredClone(metadataFor(4));
   delete metadata["koio:hasKnowledge"][0]["koio:hasEvidentialBasis"];

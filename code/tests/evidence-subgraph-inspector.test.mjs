@@ -20,6 +20,7 @@ test("node inspection preserves citation, identity, file, selector and verificat
   assert.equal(value(evidenceDetail, "Identifier"), evidence.sourceId);
   assert.ok(value(evidenceDetail, "Description"));
   assert.ok(value(evidenceDetail, "Citation"));
+  assert.match(evidenceDetail.summary, /declared evidential-basis/);
   const table = graph.nodes.find((node) => node.kind === "evidential-resource" && node.sourceId.includes("evidence-margolis-table3"));
   assert.match(value(inspectEvidenceSubgraphNode(graph, metadata, table.key), "Evidence-target annotation"), /annotation-margolis-table3/);
   const passage = graph.nodes.find((node) => node.kind === "implementation-passage");
@@ -27,6 +28,10 @@ test("node inspection preserves citation, identity, file, selector and verificat
   assert.equal(value(passageDetail, "Contained in"), "src/prognosis.js");
   assert.equal(value(passageDetail, "Exact passage"), passage.selector.exact);
   assert.equal(value(passageDetail, "Passage verification"), "not-checked");
+  assert.match(value(passageDetail, "RDF step 1"), /schema:subjectOf/);
+  assert.match(value(passageDetail, "RDF step 2"), / — target → /);
+  assert.match(value(passageDetail, "Annotation body statement"), / — body → margolis_dfu_prognostic_Lookup/);
+  assert.match(passageDetail.summary, /not through a direct evidence-to-passage statement/);
   assert.equal(inspectEvidenceSubgraphNode(graph, metadata, "not-a-node"), null);
 });
 
@@ -39,6 +44,7 @@ test("relationship inspection gives exact declared triple and annotation route o
   assert.equal(value(basisDetail, "Predicate"), "koio:hasEvidentialBasis");
   assert.equal(value(basisDetail, "Object"), graph.nodes.find((node) => node.key === basis.to).sourceId);
   assert.equal(value(basisDetail, "Selector exact"), undefined);
+  assert.match(basisDetail.summary, /evidential basis/);
   const targetIndex = graph.relationships.findIndex((edge) => edge.kind === "annotation-target" && graph.nodes.find((node) => node.key === edge.to)?.kind === "implementation-passage");
   const target = graph.relationships[targetIndex];
   const targetDetail = inspectEvidenceSubgraphRelationship(graph, metadata, targetIndex);
@@ -46,6 +52,11 @@ test("relationship inspection gives exact declared triple and annotation route o
   assert.equal(value(targetDetail, "Object"), graph.nodes.find((node) => node.key === target.to).sourceId);
   assert.equal(value(targetDetail, "Selector exact"), graph.nodes.find((node) => node.key === target.to).selector.exact);
   assert.equal(value(targetDetail, "Target file"), "src/prognosis.js");
+  assert.match(value(targetDetail, "RDF step 1"), /schema:subjectOf/);
+  assert.match(value(targetDetail, "RDF step 2"), / — target → /);
+  assert.match(value(targetDetail, "Annotation body statement"), / — body → margolis_dfu_prognostic_Lookup/);
+  assert.equal(value(targetDetail, "File digest (SHA-256)"), graph.nodes.find((node) => node.key === target.to).digest);
+  assert.match(targetDetail.summary, /two RDF steps/);
   assert.equal(inspectEvidenceSubgraphRelationship(graph, metadata, -1), null);
 });
 

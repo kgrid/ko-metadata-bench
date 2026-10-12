@@ -2,7 +2,12 @@ import { EVIDENCE_SUBGRAPH_NODE_KINDS as N, EVIDENCE_SUBGRAPH_RELATIONSHIP_KINDS
 
 const entries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
 const idOf = (value) => typeof value === "string" ? value : typeof value?.["@id"] === "string" ? value["@id"] : "";
-const labelOf = (record, fallback) => record?.["dc:title"] || record?.["schema:name"] || fallback;
+const readable = (value) => typeof value === "string" && value.trim() ? value.trim() : null;
+// An evidence resource can be described in both dc:source and a basis record.
+// Prefer any declared title, then any declared name, then its exact identifier.
+const labelOf = (fallback, ...records) => records.map((record) => readable(record?.["dc:title"] ?? record?.title)).find(Boolean)
+  ?? records.map((record) => readable(record?.["schema:name"] ?? record?.name)).find(Boolean)
+  ?? fallback;
 const nodeKey = (kind, id) => `${kind}:${id}`;
 
 // This is a declared-metadata projection, not a transitive evidence claim.
@@ -31,11 +36,11 @@ export function projectEvidenceSubgraph(metadata, knowledgeModel, annotationReso
   };
   const ref = (kind, key) => key ? { kind, key } : null;
   const objectId = idOf(metadata);
-  const koKey = addNode(N.KNOWLEDGE_OBJECT, objectId, { label: labelOf(metadata, objectId), declarationSite: objectId });
+  const koKey = addNode(N.KNOWLEDGE_OBJECT, objectId, { label: labelOf(objectId, metadata), declarationSite: objectId });
   const elementKeys = new Map();
   for (const element of knowledgeModel.elements) {
     const id = idOf(element.record);
-    const key = addNode(N.KNOWLEDGE_ELEMENT, id, { label: labelOf(element.record, id), declarationSite: objectId });
+    const key = addNode(N.KNOWLEDGE_ELEMENT, id, { label: labelOf(id, element.record), declarationSite: objectId });
     if (key) elementKeys.set(id, key);
     for (const implementation of element.implementations) fileContext.push({ kind: "implementation-file", declaringSubjectId: id, sourceId: idOf(implementation), path: idOf(implementation) });
   }
@@ -44,16 +49,17 @@ export function projectEvidenceSubgraph(metadata, knowledgeModel, annotationReso
   }
   const cited = entries(metadata?.["dc:source"] ?? metadata?.source);
   const citedById = new Map(cited.map((record) => [idOf(record), record]));
+  const basisById = new Map(annotationResolution.basisLinks.map((link) => [link.evidenceId, link]));
   const basisIds = new Set(annotationResolution.basisLinks.map((link) => link.evidenceId).filter(Boolean));
   for (const source of cited) {
     const sourceId = idOf(source);
     const parts = entries(source?.["schema:hasPart"]);
     if (!basisIds.has(sourceId) && !parts.some((part) => basisIds.has(idOf(part)))) continue;
-    const parentKey = addNode(N.EVIDENTIAL_RESOURCE, sourceId, { label: labelOf(source, sourceId), declarationSite: sourceId });
+    const parentKey = addNode(N.EVIDENTIAL_RESOURCE, sourceId, { label: labelOf(sourceId, source, basisById.get(sourceId)), declarationSite: sourceId });
     for (const part of parts) {
       const partId = idOf(part);
       if (!basisIds.has(partId)) continue;
-      const partKey = addNode(N.EVIDENTIAL_RESOURCE, partId, { label: labelOf(part, partId), declarationSite: sourceId, parentSourceId: sourceId });
+      const partKey = addNode(N.EVIDENTIAL_RESOURCE, partId, { label: labelOf(partId, part, basisById.get(partId)), declarationSite: sourceId, parentSourceId: sourceId });
       addEdge(R.EVIDENCE_PART, ref(N.EVIDENTIAL_RESOURCE, parentKey), ref(N.EVIDENTIAL_RESOURCE, partKey), "schema:hasPart", sourceId);
     }
   }
@@ -63,7 +69,7 @@ export function projectEvidenceSubgraph(metadata, knowledgeModel, annotationReso
     const evidenceId = basis.evidenceId;
     const citedRecord = citedById.get(evidenceId);
     const evidenceKey = addNode(N.EVIDENTIAL_RESOURCE, evidenceId, {
-      label: basis.title || labelOf(citedRecord, evidenceId), declarationSite: basis.subjectId,
+      label: labelOf(evidenceId, citedRecord, basis), declarationSite: basis.subjectId,
       sourceUrl: basis.sourceUrl,
     });
     addEdge(R.EVIDENTIAL_BASIS, ref(subjectKind, subjectKey), ref(N.EVIDENTIAL_RESOURCE, evidenceKey), "koio:hasEvidentialBasis", basis.subjectId);

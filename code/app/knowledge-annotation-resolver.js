@@ -29,7 +29,8 @@ export function resolveKnowledgeAnnotations(metadata) {
     for (const evidence of basis(record)) basisLinks.push({
       declaredOn: subject.kind, subjectId: subject.id, evidenceId: identifier(evidence),
       sourceUrl: identifier(evidence?.["http://www.w3.org/ns/oa#hasSource"]) || null,
-      title: text(evidence?.["dc:title"] ?? evidence?.["schema:name"]),
+      title: text(evidence?.["dc:title"]),
+      name: text(evidence?.["schema:name"]),
       description: text(evidence?.["dc:description"] ?? evidence?.["schema:description"]),
     });
   }
