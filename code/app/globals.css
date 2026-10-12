@@ -329,6 +329,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeGraphNode[aria-pressed="true"], .knowledgeGraphEdge[aria-pressed="true"], .knowledgeGraphRelationshipList button[aria-pressed="true"] { border-color: #1d1d1f; background: #ececef; }
 .knowledgeGraphNode:focus-visible, .knowledgeGraphEdge:focus-visible, .knowledgeGraphInspector button:focus-visible, .knowledgeGraphRelationshipList button:focus-visible, .knowledgeGraphRelationshipList summary:focus-visible { outline: 2px solid #1d1d1f; outline-offset: 2px; }
 .knowledgeGraphNode strong { display: block; color: #1d1d1f; font-size: 12px; line-height: 1.35; }
+.knowledgeGraphNode.knowledgeGraphKo { position: relative; padding-right: 43px; }
+.knowledgeGraphKoMark { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; background: #1d1d1f; color: #fff; font-size: 10px; font-weight: 750; letter-spacing: -.02em; line-height: 1; }
 .knowledgeGraphNode small { margin: 0 0 3px; font-size: 9px; }
 .knowledgeGraphNode small:last-child:not(:first-child) { margin: 4px 0 0; }
 .knowledgePassageGlimpse { display: block; margin-top: 7px; padding: 7px 8px; border: 1px solid #e5e5e7; border-radius: 5px; background: #f8f8f9; color: #55555a; font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }

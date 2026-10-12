@@ -160,3 +160,16 @@ test("both editions preserve grouped reading order, touch targets, and inspector
   assert.match(serverCss, /\.knowledgeGraphDirectAction, \.knowledgeGraphEdge[^}]*min-height: 40px;/);
   assert.match(standalone, /\.knowledgeGraphDirectAction,\.knowledgeGraphEdge[^}]*min-height:40px;/);
 });
+
+test("only whole-KO graph nodes carry the compact KO logo in both editions", () => {
+  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const source of [server, standalone]) {
+    assert.match(source, /knowledgeGraphKoMark/);
+    assert.match(source, /item\.kind\s*===?\s*"knowledge-object"/);
+    assert.match(source, /aria-hidden/);
+  }
+  assert.match(serverCss, /\.knowledgeGraphKoMark\s*\{[^}]*background:\s*#1d1d1f;[^}]*color:\s*#fff/);
+  assert.match(standalone, /\.knowledgeGraphKoMark\{[^}]*background:#1d1d1f;[^}]*color:#fff/);
+});
