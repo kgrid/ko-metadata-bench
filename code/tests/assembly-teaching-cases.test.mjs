@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKoContributions, projectAssemblyKoExchange, projectAssemblyKaDecisions, projectAssemblySynthesisMatrix } from "../app/assembly-teaching-cases.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const page = readServerSourceSync();
 const embedded = JSON.parse(page.match(/const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = (\{.*\});/)?.[1] ?? "null");
 
 test("all five embedded cases provide requests and semantic traces, not expected answers", () => {

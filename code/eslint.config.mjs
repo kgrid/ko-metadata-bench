@@ -12,6 +12,16 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated editions, build output, and unpacked KO archives are not SWA source.
+    "outputs/**",
+    "public/**",
+    "work/**",
+    "dist/**",
+    ".vinext/**",
+    ".wrangler/**",
+    ".playwright-browsers/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

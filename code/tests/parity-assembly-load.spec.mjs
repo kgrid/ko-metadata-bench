@@ -1,11 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import { expect, test } from "@playwright/test";
-import { readFileSync } from "node:fs";
 
 const editions = {
   server: "http://127.0.0.1:3100/",
   standalone: new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url).href,
 };
-const source = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const source = readServerSourceSync();
 const assembly = JSON.parse(source.match(/^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = (\{.*\});/m)?.[1] ?? "null");
 const koNames = JSON.parse(source.match(/^const OBJECT_DISPLAY_NAMES = (\[[^\n]+\]) as const;/m)?.[1] ?? "null");
 const assemblyName = assembly.generalView.displayName;

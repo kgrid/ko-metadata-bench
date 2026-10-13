@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const page = readServerSourceSync().split("\n");
 const metadataFor = (id) => {
   const line = page.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));

@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -5,7 +6,7 @@ import vm from "node:vm";
 import { resolveKnowledgeAnnotations } from "../app/knowledge-annotation-resolver.js";
 import { evidenceActionUrl, markVerifiedPassage, safeEvidenceUrl } from "../app/passage-navigation.js";
 
-const embedded = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const embedded = readServerSourceSync().split("\n");
 function metadataFor(id) {
   const line = embedded.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));
@@ -57,9 +58,9 @@ test("missing and ambiguous rendered passages do not receive a false precise hig
 });
 
 test("both embedded CKS viewers contain one complete selected passage", () => {
-  const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const page = readServerSourceSync();
   const start = page.indexOf("const documentProjectionOverrides:");
-  const end = page.indexOf("const base64ToBytes", start);
+  const end = page.indexOf("export {", start);
   const projections = JSON.parse(page.slice(page.indexOf("= ", start) + 2, end).trim().replace(/;$/, ""));
   for (const id of [2, 4]) {
     const annotation = resolveKnowledgeAnnotations(metadataFor(id)).annotations.find((item) => item.target?.kind === "specification");

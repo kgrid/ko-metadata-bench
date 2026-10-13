@@ -8,6 +8,7 @@ export function buildEvidenceSubgraphViewRecord(graph, model, metadata, readText
   const sourceText = typeof readText === "function" ? readText : () => null;
   const canOpenFile = typeof availableFile === "function" ? availableFile : () => false;
   const isPassage = (kind) => kind === "specification-passage" || kind === "implementation-passage";
+  /** @type {Record<string, {key: string, kind: string, sourceId: string, declaringSubjectIds: string[], targetType: string | null, containingFile: string | null, displayFile: string | null | undefined, verification: {status: string, reason?: string} | null, passageState: string | null, glimpse: ReturnType<typeof evidencePassageGlimpse>, followAction: ReturnType<typeof planEvidenceSubgraphActions>["actions"][number] | null, followNotice: string | null}>} */
   const nodesByKey = {};
   for (const node of graph.nodes) {
     const passage = isPassage(node.kind);

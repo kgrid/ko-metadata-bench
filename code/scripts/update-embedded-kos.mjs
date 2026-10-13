@@ -1,20 +1,25 @@
 import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
+import { Script } from "node:vm";
 import { Parser } from "n3";
+import ts from "typescript";
 import { orderWorkshopObjects } from "../app/workshop-ordering.js";
 import { partitionKnowledgePackages, prepareAssemblyGeneralView } from "../app/assembly-discovery.js";
 import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
 import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
 import { validatePackageMetadata } from "./validate-package-metadata.mjs";
 import { validateAnnotationDestinations } from "../app/annotation-destination-validator.js";
+import { publishStagedKos } from "./publish-staged-kos.mjs";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
 
 const workspace = process.cwd();
 const temp = mkdtempSync(join(tmpdir(), "fdo-bench-kos-"));
+const stagingRoot = mkdtempSync(join(workspace, ".ko-update-"));
+let preserveStaging = false;
 const ignored = (name) => name === "__MACOSX" || name === ".DS_Store" || name.startsWith("._");
 
 function walk(dir) {
@@ -43,6 +48,19 @@ function serializeForScript(value, indent) {
   return JSON.stringify(value, null, indent)
     .replaceAll("\u2028", "\\u2028")
     .replaceAll("\u2029", "\\u2029");
+}
+
+function validateStagedCode(react, standalone) {
+  const source = ts.createSourceFile("page.tsx", react, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  if (source.parseDiagnostics.length) {
+    throw new Error(`Staged React edition has a syntax error: ${ts.flattenDiagnosticMessageText(source.parseDiagnostics[0].messageText, " ")}`);
+  }
+  const scripts = [...standalone.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
+  if (!scripts.length) throw new Error("Staged standalone edition has no scripts");
+  for (const [index, match] of scripts.entries()) {
+    try { new Script(match[1], { filename: `standalone-script-${index + 1}.js` }); }
+    catch (error) { throw new Error(`Staged standalone edition has a syntax error in script ${index + 1}`, { cause: error }); }
+  }
 }
 
 function declaredObjectName(object) {
@@ -125,12 +143,8 @@ try {
   const serverBinaryFiles = {};
   const serverStaticFiles = {};
   const documentProjections = {};
-  const serverKoAssetRoot = join(workspace, "public", "ko-assets");
-  // Clear generated files in place. Some managed workspaces allow file writes
-  // but do not allow removing and recreating the asset directory itself.
-  if (existsSync(serverKoAssetRoot)) {
-    for (const oldAsset of walk(serverKoAssetRoot)) rmSync(oldAsset, { force: true });
-  }
+  const serverKoAssetRoot = join(stagingRoot, "ko-assets");
+  mkdirSync(serverKoAssetRoot);
   folders.forEach((folder, index) => {
     const folderPath = join(root, folder.name);
     for (const path of walk(folderPath).sort()) {
@@ -166,20 +180,19 @@ try {
   });
   const packagedDocumentProjections = packageDocumentProjectionMedia({
     records: documentProjections,
-    publicRoot: join(workspace, "public", "docx-assets"),
+    publicRoot: join(stagingRoot, "docx-assets"),
   });
 
-  const reactPath = join(workspace, "app/page.tsx");
-  let react = readFileSync(reactPath, "utf8");
-  react = react.replace(/Math\.max\(MIN_OBJECT_COUNT, \d+\)/, `Math.max(MIN_OBJECT_COUNT, ${folders.length})`);
-  react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
-  react = replaceExactly(react, /^const OBJECT_DISPLAY_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_DISPLAY_NAMES = ${JSON.stringify(displayNames)} as const;`, "React metadata display names");
-  react = replaceExactly(react, /^const annotationDestinationOverrides:[^\n]+$/m, `const annotationDestinationOverrides: Record<string, Array<{ annotationId: string; targetId: string; kind: string | null; status: string; reason: string | null; filePath?: string }>> = ${serializeForScript(annotationDestinationRecords)};`, "React annotation destinations");
-  react = replaceExactly(react, /^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = [^\n]+;/m, `const EMBEDDED_ASSEMBLY: EmbeddedAssembly | null = ${serializeForScript(assemblyPayload)};`, "React assembly payload");
-  react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
-  react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
-  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nconst base64ToBytes`, "React binary, static-asset, and document-projection payloads");
-  writeFileSync(reactPath, react);
+  const generatedPath = join(workspace, "app/generated-ko-data.ts");
+  let generated = readFileSync(generatedPath, "utf8");
+  generated = replaceExactly(generated, /^const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`, "server KO folder names");
+  generated = replaceExactly(generated, /^const OBJECT_DISPLAY_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_DISPLAY_NAMES = ${JSON.stringify(displayNames)} as const;`, "server metadata display names");
+  generated = replaceExactly(generated, /^const annotationDestinationOverrides:[^\n]+$/m, `const annotationDestinationOverrides: Record<string, Array<{ annotationId: string; targetId: string; kind: string | null; status: string; reason: string | null; declaringSubjectId?: string; filePath?: string }>> = ${serializeForScript(annotationDestinationRecords)};`, "server annotation destinations");
+  generated = replaceExactly(generated, /^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = [^\n]+;/m, `const EMBEDDED_ASSEMBLY: EmbeddedAssembly | null = ${serializeForScript(assemblyPayload)};`, "server assembly payload");
+  generated = replaceExactly(generated, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "server text payload");
+  generated = replaceExactly(generated, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^export \{/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nexport {`, "server binary, static-asset, and document-projection payloads");
+  const stagedGeneratedPath = join(stagingRoot, "generated-ko-data.ts");
+  writeFileSync(stagedGeneratedPath, generated);
 
   const standalonePath = join(workspace, "outputs/Knowledge-Object-Workbench.html");
   let standalone = readFileSync(standalonePath, "utf8");
@@ -197,9 +210,42 @@ try {
     `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst documentProjectionOverrides=${serializeForScript(packagedDocumentProjections.standaloneRecords).replaceAll("</script", "<\\/script")};\nconst base64ToBytes=`,
     "standalone embedded payloads"
   );
-  writeFileSync(standalonePath, standalone);
+  const stagedStandalonePath = join(stagingRoot, "Knowledge-Object-Workbench.html");
+  writeFileSync(stagedStandalonePath, standalone);
+
+  // Validate the complete staged replacement before changing any published path.
+  // All assets referenced by the server payload must exist in the staging tree.
+  if (!generated.includes("const objectStaticAssetOverrides:") ||
+      !standalone.includes("const documentProjectionOverrides=")) {
+    throw new Error("Staged editions did not contain the expected replacement payloads");
+  }
+  validateStagedCode(readFileSync(stagedGeneratedPath, "utf8"), readFileSync(stagedStandalonePath, "utf8"));
+  for (const item of packagedDocumentProjections.assets) {
+    if (!existsSync(item.destination) || statSync(item.destination).size !== item.byteLength) {
+      throw new Error(`Staged document image is missing or incomplete: ${item.destination}`);
+    }
+  }
+  for (const [key, asset] of Object.entries(serverStaticFiles)) {
+    const destination = join(serverKoAssetRoot, ...key.split("/"));
+    if (!existsSync(destination) || statSync(destination).size !== asset.byteLength) {
+      throw new Error(`Staged PDF is missing or incomplete: ${key}`);
+    }
+  }
+  if (!existsSync(join(stagingRoot, "docx-assets"))) mkdirSync(join(stagingRoot, "docx-assets"));
+  try {
+    publishStagedKos({ stagingRoot, replacements: [
+      { staged: serverKoAssetRoot, target: join(workspace, "public", "ko-assets") },
+      { staged: join(stagingRoot, "docx-assets"), target: join(workspace, "public", "docx-assets") },
+      { staged: stagedGeneratedPath, target: generatedPath },
+      { staged: stagedStandalonePath, target: standalonePath },
+    ] });
+  } catch (error) {
+    preserveStaging = error instanceof AggregateError;
+    throw error;
+  }
 
   console.log(JSON.stringify({ version, objects: folders.map((folder, index) => ({ folder: folder.name, displayName: displayNames[index] })), assembly: knowledgeAssembly?.folderName ?? null, textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length, derivedDocumentImages: packagedDocumentProjections.assets.length }, null, 2));
 } finally {
   rmSync(temp, { recursive: true, force: true });
+  if (!preserveStaging) rmSync(stagingRoot, { recursive: true, force: true });
 }

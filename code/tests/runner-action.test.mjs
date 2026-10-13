@@ -1,8 +1,9 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const react = readServerSourceSync();
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
 

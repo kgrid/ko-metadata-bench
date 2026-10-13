@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -17,7 +18,6 @@ import {
 } from "../app/reusability-enrichment.js";
 import { embeddedLogicalEntry } from "./embedded-test-resources.mjs";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
 
 function standaloneOverrides(html) {
@@ -54,7 +54,7 @@ function standaloneBinaryOverrides(source) {
 }
 
 function pageDocumentProjectionOverrides(source) {
-  return objectLiteralBetween(source, "const documentProjectionOverrides: Record<string, unknown> = ", ";\nconst base64ToBytes", "React document-projection bundle");
+  return objectLiteralBetween(source, "const documentProjectionOverrides: Record<string, unknown> = ", ";\nexport {", "React document-projection bundle");
 }
 
 function standaloneDocumentProjectionOverrides(source) {
@@ -62,7 +62,7 @@ function standaloneDocumentProjectionOverrides(source) {
 }
 
 test("React and standalone editions embed identical Findability and Reusability metadata", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   const pageFiles = pageTextOverrides(page);
   const overrides = standaloneOverrides(standalone);
   for (let objectId = 1; objectId <= 4; objectId += 1) {
@@ -76,7 +76,7 @@ test("React and standalone editions embed identical Findability and Reusability 
 });
 
 test("server static KO PDFs and standalone embedded PDFs preserve complete edition payloads", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   const pageText = pageTextOverrides(page);
   const standaloneText = standaloneOverrides(standalone);
   const pageBinary = pageBinaryOverrides(page);
@@ -97,7 +97,12 @@ test("server static KO PDFs and standalone embedded PDFs preserve complete editi
     const standaloneDocument = standaloneDocuments[key];
     const withoutTransport = (document) => ({
       ...document,
-      embeddedImages: document.embeddedImages.map(({ contentBase64, resourceUrl, ...image }) => image),
+      embeddedImages: document.embeddedImages.map((image) => {
+        const withoutTransportFields = { ...image };
+        delete withoutTransportFields.contentBase64;
+        delete withoutTransportFields.resourceUrl;
+        return withoutTransportFields;
+      }),
     });
     assert.deepEqual(withoutTransport(serverDocument), withoutTransport(standaloneDocument), `${key} has edition-neutral document content`);
     for (let index = 0; index < serverDocument.embeddedImages.length; index += 1) {
@@ -139,7 +144,7 @@ test("server static KO PDFs and standalone embedded PDFs preserve complete editi
 });
 
 test("both editions route metadata-dependent views through their working copy", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   for (const consumer of ["searchKnowledgeObjects", "findabilityFacets", "knowledgeObjectPurpose", "reusabilityFacets"]) {
     const start = page.indexOf(`function ${consumer}`);
     assert.notEqual(start, -1, `${consumer} exists in React`);
@@ -153,7 +158,7 @@ test("both editions route metadata-dependent views through their working copy", 
 });
 
 test("metadata completion transitions directly from guided entry to the normal Table view", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   assert.match(page, /findabilityNeedsGuidedEntry[\s\S]*?<FindabilityGuidedEditor/);
   assert.match(page, /reusabilityNeedsGuidedEntry[\s\S]*?<ReusabilityGuidedEditor/);
   assert.match(page, /setRdfView\("human"\); onEdit\(nextValue\)/, "guided edits return React to Table presentation");
@@ -166,7 +171,7 @@ test("metadata completion transitions directly from guided entry to the normal T
 });
 
 test("complete enrichment lasts for the session and reset restores only the selected baseline", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const findabilityEntry = embeddedLogicalEntry(page, 4, "findability.metadata.txt");
   const reusabilityEntry = embeddedLogicalEntry(page, 4, "reusability.metadata.txt");
   const canonicalFindability = findabilityEntry.value;
@@ -201,7 +206,7 @@ test("complete enrichment lasts for the session and reset restores only the sele
 });
 
 test("neither edition persists learner changes across reloads", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   assert.doesNotMatch(page, /localStorage|sessionStorage|loadDrafts|saveDrafts|DRAFT_STORAGE_KEY/);
   assert.doesNotMatch(page, /Session changes|modifiedCount|changeDot|statusDot/);
   assert.doesNotMatch(standalone, /localStorage|sessionStorage|draftStorageKey|loadStoredDrafts|Saved locally|Recovered locally/);
@@ -210,7 +215,7 @@ test("neither edition persists learner changes across reloads", async () => {
 
 test("both editions retain the same guided-editor contract", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -249,7 +254,7 @@ test("both editions retain the same guided-editor contract", async () => {
 
 test("Reset is absent until relevant and occupies the left editor-header position", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -265,7 +270,7 @@ test("Reset is absent until relevant and occupies the left editor-header positio
 });
 
 test("both editions use an in-app Reset confirmation instead of the browser prompt", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   for (const source of [page, standalone]) {
     assert.ok(source.includes("Reset this metadata?"));
     assert.ok(source.includes("Resetting will discard edits in progress."));
@@ -279,7 +284,7 @@ test("both editions use an in-app Reset confirmation instead of the browser prom
 
 test("both editions share the centered FAIR control-bar arrangement", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -297,7 +302,7 @@ test("both editions share the centered FAIR control-bar arrangement", async () =
 
 test("both editions expose a collapsible Principles control row for each metadata file", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -327,7 +332,7 @@ test("both editions expose a collapsible Principles control row for each metadat
 
 test("both editions place existence metadata between reusability metadata and metadata.json", async () => {
   const [page, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(standaloneUrl, "utf8"),
   ]);
   for (const source of [page, standalone]) {

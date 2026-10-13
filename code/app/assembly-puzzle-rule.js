@@ -18,6 +18,10 @@ export function shuffleAssemblyPuzzlePieces(random = Math.random) {
 
 // A move into an occupied slot swaps two placed pieces. A piece brought from
 // the starting area sends the displaced piece back there instead.
+/** @param {Record<string, string>} placement
+ * @param {string} piece
+ * @param {string | null} [targetSlot]
+ */
 export function moveAssemblyPuzzlePiece(placement, piece, targetSlot = null) {
   if (!ASSEMBLY_PUZZLE_PIECES.includes(piece) || (targetSlot !== null && !ASSEMBLY_PUZZLE_SLOTS.includes(targetSlot))) return placement;
   const sourceSlot = ASSEMBLY_PUZZLE_SLOTS.find((slot) => placement[slot] === piece);

@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -5,7 +6,7 @@ import vm from "node:vm";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 import { buildKnowledgeRelationshipMap } from "../app/knowledge-relationship-map.js";
 
-const embedded = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const embedded = readServerSourceSync().split("\n");
 function metadataFor(id) {
   const line = embedded.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));
@@ -57,7 +58,7 @@ test("standalone uses the identical relationship-map projection", () => {
 });
 
 test("both K-view shades contain facets only, retaining counts and missing-data states", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.doesNotMatch(server, /<KnowledgeRelationshipMap/);
   assert.doesNotMatch(standalone, /renderKnowledgeRelationshipMap\(model\)/);

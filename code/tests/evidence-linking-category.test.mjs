@@ -1,9 +1,10 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { deriveEvidenceLinkingCategory, evidenceNexusIndicator } from "../app/evidence-linking-category.js";
 
-const embedded = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const embedded = readServerSourceSync().split("\n");
 const metadataFor = (id) => {
   const line = embedded.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));

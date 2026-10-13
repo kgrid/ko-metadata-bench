@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 import { evidenceCategoryPulseKeys } from "../app/evidence-subgraph-layout.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const page = readServerSourceSync().split("\n");
 const metadataFor = (id) => {
   const line = page.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));
@@ -47,7 +48,7 @@ test("None and unclassified patterns have no pulsing nodes, including the assemb
 });
 
 test("both editions use one shared selector and the same synchronized purple edge pulse", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const standaloneRows = readFileSync(new URL("../scripts/standalone-evidence-graph-rows.txt", import.meta.url), "utf8");

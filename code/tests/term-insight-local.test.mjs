@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
@@ -131,7 +132,7 @@ test("preview and full-page details consume one identical resolved label and exp
   );
   assert.equal(previewInsight.label, "Superficial ulcer");
   assert.equal(previewInsight.explanation, "An ulcer limited to superficial tissue.");
-  const reactSource = fs.readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const reactSource = readServerSourceSync();
   assert.match(reactSource, /rdfTermPreview[\s\S]*?<strong>\{insight!\.label\}<\/strong><p>\{insight!\.explanation/);
   assert.match(reactSource, /rdfTermDetailsBackdrop[\s\S]*?<h2 id="rdf-term-details-title">\{insight\.label\}<\/h2>[\s\S]*?\{insight\.explanation \? <p>\{insight\.explanation\}<\/p>/);
 });

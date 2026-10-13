@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -6,7 +7,6 @@ import { constructFindabilityMetadata, getFindabilityEnrichmentInput, getFindabi
 import { constructReusabilityMetadata, getReusabilityEnrichmentInput, getReusabilityEvidenceOptions, getReusabilityLicenseOptions } from "../app/reusability-enrichment.js";
 import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
 const rendererUrl = new URL("../app/canonical-metadata-renderer.js", import.meta.url);
 
@@ -19,7 +19,7 @@ function comments(source) {
 }
 
 test("complete guided construction is an exact canonical formatting round trip", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const findability = embeddedLogicalValue(page, 4, "findability.metadata.txt");
   const reusability = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   assert.equal(constructFindabilityMetadata(findability, getFindabilityEnrichmentInput(findability)), findability);
@@ -27,7 +27,7 @@ test("complete guided construction is an exact canonical formatting round trip",
 });
 
 test("incomplete Findability formatting preserves authored document structure", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const canonical = embeddedLogicalValue(page, 4, "findability.metadata.txt");
   const subjects = getFindabilitySubjectOptions(canonical);
   const outputs = getFindabilityOutputTermOptions(canonical);
@@ -48,7 +48,7 @@ test("incomplete Findability formatting preserves authored document structure", 
 });
 
 test("incomplete Reusability formatting preserves headings and multiline alignment", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const canonical = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   const working = constructReusabilityMetadata(canonical, {
     scope: 'Use for a declared learner context.\nDo not use outside that scope.',

@@ -144,15 +144,19 @@ if (html.includes(viewRecordStart)) {
   if (!html.includes(anchor)) throw new Error("Standalone evidence-subgraph view-record insertion point not found");
   html = html.replace(anchor, viewRecordBlock + anchor);
 }
-const standaloneResolution = 'const annotationResolution=resolveKnowledgeAnnotations(metadata);';
-const standaloneResolved = 'const annotationResolution=resolveKnowledgeAnnotations(metadata),resolvedAnnotations={...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))};';
-if (!html.includes(standaloneResolved)) {
-  if (!html.includes(standaloneResolution)) throw new Error("Standalone annotation resolution insertion point not found");
-  html = html.replace(standaloneResolution, standaloneResolved);
+// Older standalone builds kept a hand-maintained K-view projection. Once the
+// shared model is mounted, its annotation resolution is already authoritative.
+if (!html.includes("/* K_VIEW_MODEL_START */")) {
+  const standaloneResolution = 'const annotationResolution=resolveKnowledgeAnnotations(metadata);';
+  const standaloneResolved = 'const annotationResolution=resolveKnowledgeAnnotations(metadata),resolvedAnnotations={...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))};';
+  if (!html.includes(standaloneResolved)) {
+    if (!html.includes(standaloneResolution)) throw new Error("Standalone annotation resolution insertion point not found");
+    html = html.replace(standaloneResolution, standaloneResolved);
+  }
+  const standaloneInlineResolution = 'annotationResolution:{...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))}';
+  if (html.includes(standaloneInlineResolution)) html = html.replace(standaloneInlineResolution, 'annotationResolution:resolvedAnnotations,evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations)');
+  else if (!html.includes('evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations)')) throw new Error("Standalone evidence-subgraph model mount not found");
 }
-const standaloneInlineResolution = 'annotationResolution:{...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))}';
-if (html.includes(standaloneInlineResolution)) html = html.replace(standaloneInlineResolution, 'annotationResolution:resolvedAnnotations,evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations)');
-else if (!html.includes('evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations)')) throw new Error("Standalone evidence-subgraph model mount not found");
 const relationshipStart = "/* KNOWLEDGE_RELATIONSHIP_MAP_START */";
 const relationshipEnd = "/* KNOWLEDGE_RELATIONSHIP_MAP_END */";
 const relationshipBlock = `${relationshipStart}\nconst buildKnowledgeRelationshipMap = (() => {\n${relationshipSource}\nreturn buildKnowledgeRelationshipMap;\n})();\n${relationshipEnd}\n`;
@@ -179,7 +183,7 @@ if (html.includes(passageStart)) {
 }
 const field = "dependencyCount,cks:cks?";
 const replacement = "dependencyCount,annotationResolution:resolveKnowledgeAnnotations(metadata),cks:cks?";
-if (!html.includes(replacement) && !html.includes("annotationResolution:{...annotationResolution") && !html.includes("annotationResolution:resolvedAnnotations")) {
+if (!html.includes("/* K_VIEW_MODEL_START */") && !html.includes(replacement) && !html.includes("annotationResolution:{...annotationResolution") && !html.includes("annotationResolution:resolvedAnnotations")) {
   if (!html.includes(field)) throw new Error("Standalone K-model projection insertion point not found");
   html = html.replace(field, replacement);
 }

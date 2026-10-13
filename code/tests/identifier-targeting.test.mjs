@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -25,7 +26,7 @@ test("rejects missing or duplicate target identifiers", () => {
 
 test("both SWA editions target enrichment by identifier, not embedded slot", async () => {
   const [page, standalone] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readServerSource(),
     readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8"),
   ]);
   assert.match(page, /resolveObjectIdByIdentifier\(OBJECT_IDS/);

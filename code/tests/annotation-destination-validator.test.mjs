@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { validateAnnotationDestinations } from "../app/annotation-destination-validator.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const page = readServerSourceSync();
 const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
 const between = (source, start, end) => JSON.parse(source.slice(source.indexOf("= ", source.indexOf(start)) + 2, source.indexOf(end, source.indexOf(start))).trim().replace(/;$/, ""));
 const texts = between(page, "const objectFileOverrides:", "const objectBinaryOverrides:");
@@ -63,8 +64,8 @@ test("external publication targets are recorded without reading or fetching them
 test("both editions carry identical destination status records", () => {
   const portable = JSON.parse(standalone.match(/^const annotationDestinationOverrides=(.*);$/m)?.[1] ?? "null");
   assert.deepEqual(portable, statuses);
-  assert.match(page, /Passage unresolved:/);
-  assert.match(standalone, /Passage unresolved:/);
-  assert.match(page, /whole file is not a substitute/);
-  assert.match(standalone, /whole file is not a substitute/);
+  assert.match(page, /Selector unresolved/);
+  assert.match(standalone, /Selector unresolved/);
+  assert.match(page, /No whole-file substitute is shown/);
+  assert.match(standalone, /No whole-file substitute is shown/);
 });

@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 import { layoutEvidenceSubgraph } from "../app/evidence-subgraph-layout.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const page = readServerSourceSync().split("\n");
 const metadataFor = (id) => {
   const line = page.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));
@@ -41,7 +42,7 @@ test("assembly has its own empty lanes, not inherited evidence", () => {
 });
 
 test("both editions label evidential-basis targets as evidence resources", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.match(server, /node\(basis\.resource, "evidence resource"\)/);
   assert.match(standalone, /node\(basis\.resource,"evidence resource"\)/);
@@ -69,7 +70,7 @@ test("Declaring Subject nodes alone receive the stronger graph border in both ed
 });
 
 test("annotations are compact selectable route markers, while subjects and destinations remain prominent", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
@@ -84,7 +85,7 @@ test("annotations are compact selectable route markers, while subjects and desti
 });
 
 test("both editions render four aligned columns with compact evidence nodes", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
@@ -97,7 +98,7 @@ test("both editions render four aligned columns with compact evidence nodes", ()
 });
 
 test("absence is an unlinked inline state, not a node-like card, in both editions", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
@@ -112,7 +113,7 @@ test("absence is an unlinked inline state, not a node-like card, in both edition
 });
 
 test("both editions show passage status without placing whole-file context in graph rows", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
     assert.match(source, /knowledgeGraphContainingFile/);
@@ -125,7 +126,7 @@ test("both editions show passage status without placing whole-file context in gr
 });
 
 test("both editions expose direct graph actions without nesting them in inspector controls", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
     assert.match(source, /knowledgeGraphNodeGroup/);
@@ -137,7 +138,7 @@ test("both editions expose direct graph actions without nesting them in inspecto
 });
 
 test("both editions preserve grouped reading order, touch targets, and inspector focus at narrow width", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {
@@ -162,7 +163,7 @@ test("both editions preserve grouped reading order, touch targets, and inspector
 });
 
 test("only whole-KO graph nodes carry the compact KO logo in both editions", () => {
-  const server = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const server = readServerSourceSync();
   const serverCss = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const source of [server, standalone]) {

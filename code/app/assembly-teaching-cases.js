@@ -3,10 +3,12 @@ export const ASSEMBLY_CASE_IDS = Object.freeze(["case-1", "case-2", "case-3", "c
 const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const nonempty = (value) => typeof value === "string" && value.trim().length > 0;
 
+/** @returns {{ cases: Array<{ id: string, title: string, request: object, semanticTrace: object }>, error: string | null }} */
 export function loadAssemblyTeachingCases(assembly) {
   if (!isRecord(assembly) || !isRecord(assembly.textFiles)) {
     return { cases: [], error: "Teaching cases are unavailable in this assembly." };
   }
+  /** @type {Array<{ id: string, title: string, request: object, semanticTrace: object }>} */
   const cases = [];
   for (const id of ASSEMBLY_CASE_IDS) {
     const label = `Case ${id.slice(5)}`;

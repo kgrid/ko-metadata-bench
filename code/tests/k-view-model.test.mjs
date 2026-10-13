@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 
-const embedded = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8").split("\n");
+const embedded = readServerSourceSync().split("\n");
 function embeddedMetadata(id) {
   const line = embedded.find((value) => value.startsWith(`  "${id}/metadata.json":`));
   return JSON.parse(JSON.parse(line.slice(line.indexOf(":") + 1).trim().replace(/,$/, "")));
@@ -108,11 +109,31 @@ test("standalone and server editions produce the same readable projection", () =
   const start = html.indexOf("/* KNOWLEDGE_ANNOTATION_RESOLVER_START */");
   const end = html.indexOf("function renderKnowledge(){", start);
   const context = vm.createContext({});
-  vm.runInContext(`${html.slice(start, end)}; globalThis.project = metadata => projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata);`, context);
+  vm.runInContext(`${html.slice(start, end)}; globalThis.project = (metadata, id) => projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata, annotationDestinationOverrides[String(id)] ?? []);`, context);
+  const statusLine = embedded.find((value) => value.startsWith("const annotationDestinationOverrides:"));
+  const statuses = JSON.parse(statusLine.slice(statusLine.indexOf(" = ") + 3, -1));
   for (const id of [1, 2, 3, 4]) {
     const metadata = embeddedMetadata(id);
-    assert.deepEqual(JSON.parse(JSON.stringify(context.project(metadata))), projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata));
+    assert.deepEqual(JSON.parse(JSON.stringify(context.project(metadata, id))), projectKnowledgeViewModel(buildKnowledgeViewModel(metadata), metadata, statuses[String(id)]));
   }
+  const assemblyLine = embedded.find((value) => value.startsWith("const EMBEDDED_ASSEMBLY:"));
+  const assembly = JSON.parse(assemblyLine.slice(assemblyLine.indexOf(" = ") + 3, -1)).metadata;
+  assert.deepEqual(JSON.parse(JSON.stringify(context.project(assembly, 5))), projectKnowledgeViewModel(buildKnowledgeViewModel(assembly), assembly, statuses["5"]));
+
+  const unusual = {
+    "schema:category": "Knowledge Assembly",
+    "dc:source": [{ "@id": "https://example.org/article", "dc:bibliographicCitation": "A cited article", "schema:hasPart": { "@id": "https://example.org/article#table", "dc:title": "Table" } }],
+    "koio:hasKnowledge": [{ "@id": "element", "koio:hasEvidentialBasis": { "@id": "https://example.org/article#table" } }, { "@id": "constituent", "@type": "koio:KnowledgeObject", "koio:hasEvidentialBasis": { "@id": "inherited-paper" } }],
+  };
+  assert.deepEqual(JSON.parse(JSON.stringify(context.project(unusual, 99))), projectKnowledgeViewModel(buildKnowledgeViewModel(unusual), unusual));
+});
+
+test("standalone Knowledge-view rules are generated from the shared source", () => {
+  const html = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../app/k-view-model.js", import.meta.url), "utf8")
+    .replace(/^import .*\n/gm, "").replace(/^export /gm, "").trim();
+  assert.match(html, /\/\* K_VIEW_MODEL_START \*\/[\s\S]*\/\* K_VIEW_MODEL_END \*\//);
+  assert.ok(html.includes(source));
 });
 
 test("the KA counts its own orchestration knowledge, not four referenced constituent KOs", () => {

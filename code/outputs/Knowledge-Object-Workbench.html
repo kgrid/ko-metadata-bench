@@ -439,13 +439,38 @@ const objectIds=Array.from({length:embeddedObjectCount},(_,index)=>index+1),obje
 const assemblyVirtualId=embeddedObjectCount+1;
 const embeddedResourceIds=embeddedAssembly?[...objectIds,assemblyVirtualId]:objectIds;
 if(embeddedAssembly){objectFolderNames.push(embeddedAssembly.folderName);objectDisplayNames.push(embeddedAssembly.generalView?.displayName||embeddedAssembly.metadata?.["dc:title"]||"Knowledge Assembly")}
-const createInitialActiveObjects=ids=>ids.map(objectId=>({kind:"knowledge-object",objectId}));
-const isAssemblyActive=objects=>objects.some(object=>object.kind==="knowledge-assembly");
-const addAssemblyToActiveObjects=(objects,assembly)=>{if(!assembly?.generalView?.identifier||assembly.metadata?.["schema:category"]!=="Knowledge Assembly")throw new Error("A prepared Knowledge Assembly is required before loading it as a Knowledge Object.");if(isAssemblyActive(objects))return objects;return [...objects,{kind:"knowledge-assembly",identifier:assembly.generalView.identifier}]};
+/* ACTIVE_OBJECT_RULE_START */
+const { createInitialActiveObjects, isAssemblyActive, addAssemblyToActiveObjects } = (() => {
+/** @typedef {{ kind: "knowledge-object", objectId: number } | { kind: "knowledge-assembly", identifier: string }} ActiveObject */
+
+/** @param {number[]} objectIds
+ * @returns {ActiveObject[]}
+ */
+function createInitialActiveObjects(objectIds) {
+  return objectIds.map((objectId) => ({ kind: "knowledge-object", objectId }));
+}
+
+/** @param {ActiveObject[]} activeObjects */
+function isAssemblyActive(activeObjects) {
+  return activeObjects.some((object) => object.kind === "knowledge-assembly");
+}
+
+/** @param {ActiveObject[]} activeObjects
+ * @param {{ generalView?: { identifier: string }, metadata?: Record<string, unknown> } | null} assembly
+ * @returns {ActiveObject[]}
+ */
+function addAssemblyToActiveObjects(activeObjects, assembly) {
+  if (!assembly?.generalView?.identifier || assembly.metadata?.["schema:category"] !== "Knowledge Assembly") {
+    throw new Error("A prepared Knowledge Assembly is required before loading it as a Knowledge Object.");
+  }
+  if (isAssemblyActive(activeObjects)) return activeObjects;
+  return [...activeObjects, { kind: "knowledge-assembly", identifier: assembly.generalView.identifier }];
+}
+return { createInitialActiveObjects, isAssemblyActive, addAssemblyToActiveObjects };
+})();
+/* ACTIVE_OBJECT_RULE_END */
 let activeObjects=createInitialActiveObjects(objectIds);
-const files=["file 1.txt","file 2.txt","file 3.txt","metadata.json","access.metadata.txt","findability.metadata.txt","interoperability.metadata.txt","reusability.metadata.txt"];
 const filteredFiles=["findability.metadata.txt","access.metadata.txt","interoperability.metadata.txt","reusability.metadata.txt","existence.metadata.txt","metadata.json"];
-const seed={"file 1.txt":"asdjfsfajskal;","file 2.txt":"asdjfsfajskal;","file 3.txt":"asdjfsfajskal;","metadata.json":"asdjfsfajskal;","access.metadata.txt":"accessbility","findability.metadata.txt":"findability","interoperability.metadata.txt":"interoperability","reusability.metadata.txt":"@prefix schema: <https://schema.org/> .\n@prefix prov:   <http://www.w3.org/ns/prov#> .\n\n<https://example.org/ko/example/1.0>\n    a schema:SoftwareSourceCode, prov:Entity ;\n\n    # 1. Purpose\n    schema:description\n        \"Supports estimation of X for Y decision.\" ;\n\n    # 2. Scope\n    schema:usageInfo\n        <https://example.org/ko/example/1.0/scope> ;\n\n    # 3. License\n    schema:license\n        <https://spdx.org/licenses/Apache-2.0.html> ;\n\n    # 4. Provenance\n    prov:has_provenance\n        <https://example.org/ko/example/1.0/provenance> ;\n\n    # 5. Tests\n    schema:hasPart\n        <https://example.org/ko/example/1.0/tests> ;\n\n    # 6. Evidence\n    schema:citation\n        <https://doi.org/10.0000/example-evidence> ;\n\n    # 7. Identity and version\n    schema:identifier\n        \"example-ko\" ;\n\n    schema:version\n        \"1.0\" .\n\n\n# ============================================================\n# Minimal Reusability Profile\n#\n# schema:description   states the object's purpose.\n# schema:usageInfo     points to its scope statement.\n# schema:license       points to its governing license.\n# prov:has_provenance  points to its provenance record.\n# schema:hasPart       points to tests supplied with the object.\n# schema:citation      points to supporting evidence.\n#\n# The subject IRI, schema:identifier, and schema:version\n# identify the exact object version.\n#\n# These are profile conventions for this metadata pattern.\n# They do not redefine the source vocabularies.\n# ============================================================"};
 const interoperabilityMetadata="@prefix schema:  <https://schema.org/> .\n@prefix dcterms: <http://purl.org/dc/terms/> .\n\n<https://example.org/ko/example/1.0>\n    a schema:SoftwareSourceCode ;\n\n    # 1. Semantics\n    schema:about\n        <https://example.org/ko/example/1.0/semantics> ;\n\n    # 2. Data object profiles\n    dcterms:conformsTo\n        <https://example.org/ko/example/1.0/profiles> ;\n\n    # 3. Interface\n    schema:potentialAction\n        <https://example.org/ko/example/1.0/interface> ;\n\n    # Identity and version\n    schema:identifier\n        \"example-ko\" ;\n\n    schema:version\n        \"1.0\" .\n\n\n<https://example.org/ko/example/1.0/semantics>\n    schema:object\n        <https://example.org/concept/InputConcept> ;\n\n    schema:result\n        <https://example.org/concept/OutputConcept> .\n\n\n<https://example.org/ko/example/1.0/profiles>\n    schema:object\n        <https://example.org/profile/InputProfile/1.0> ;\n\n    schema:result\n        <https://example.org/profile/OutputProfile/1.0> .\n\n\n<https://example.org/ko/example/1.0/interface>\n    schema:target\n        <urn:javascript:function:run> .\n\n\n# ============================================================\n# Minimal Interoperability Profile\n#\n# schema:about points to the input and output semantics.\n#\n# dcterms:conformsTo points to the accepted input and\n# produced output data object profiles.\n#\n# schema:potentialAction points to the JavaScript interface.\n#\n# schema:object denotes an input.\n# schema:result denotes an output.\n#\n# urn:javascript:function:run denotes the exercise convention:\n# knowledgeObject.run(input).\n#\n# These are profile conventions for this metadata pattern.\n# They do not redefine the source vocabularies.\n# ============================================================\n```";
 const findabilityMetadata=`@prefix schema: <https://schema.org/> .
 @prefix prov:   <http://www.w3.org/ns/prov#> .
@@ -1486,6 +1511,7 @@ function buildEvidenceSubgraphViewRecord(graph, model, metadata, readText, avail
   const sourceText = typeof readText === "function" ? readText : () => null;
   const canOpenFile = typeof availableFile === "function" ? availableFile : () => false;
   const isPassage = (kind) => kind === "specification-passage" || kind === "implementation-passage";
+  /** @type {Record<string, {key: string, kind: string, sourceId: string, declaringSubjectIds: string[], targetType: string | null, containingFile: string | null, displayFile: string | null | undefined, verification: {status: string, reason?: string} | null, passageState: string | null, glimpse: ReturnType<typeof evidencePassageGlimpse>, followAction: ReturnType<typeof planEvidenceSubgraphActions>["actions"][number] | null, followNotice: string | null}>} */
   const nodesByKey = {};
   for (const node of graph.nodes) {
     const passage = isPassage(node.kind);
@@ -1549,20 +1575,108 @@ function buildEvidenceSubgraphViewRecord(graph, model, metadata, readText, avail
 }
 
 /* EVIDENCE_SUBGRAPH_VIEW_RECORD_END */
-function buildKnowledgeViewModel(metadata){const entries=value=>Array.isArray(value)?value:value&&typeof value==="object"?[value]:[],knowledge=entries(metadata?.["koio:hasKnowledge"]??metadata?.hasKnowledge),isObjectReference=entry=>entries(entry?.["@type"]).includes("koio:KnowledgeObject")||entry?.["@type"]==="koio:KnowledgeObject",linkedKnowledgeObjects=knowledge.filter(isObjectReference),elements=knowledge.filter(entry=>!isObjectReference(entry)).map((entry,index)=>({index,record:entry,implementations:entries(entry?.implementedBy),evidentialBasis:entries(entry?.["koio:hasEvidentialBasis"]??entry?.hasEvidentialBasis).map(record=>({record,declaredOn:"knowledge-element",elementIndex:index}))})),koEvidentialBasis=entries(metadata?.["koio:hasEvidentialBasis"]??metadata?.hasEvidentialBasis).map(record=>({record,declaredOn:"knowledge-object",elementIndex:null}));return{elements,linkedKnowledgeObjects,koEvidentialBasis}}
-function projectKnowledgeViewModel(model,metadata,destinationStatuses=[]){
-  const txt=(...values)=>values.find(value=>typeof value==="string"&&value.trim())?.trim()??"",entries=value=>Array.isArray(value)?value:value&&typeof value==="object"?[value]:[],description=record=>txt(record?.["dc:description"],record?.["schema:description"]);
-  const cks=entries(metadata?.["koio:hasDocumentation"]??metadata?.hasDocumentation).find(record=>entries(record?.["@type"]).includes("Specification Document")&&typeof record?.["@id"]==="string"&&/\.docx$/i.test(record["@id"]));
-  const sources=new Map(entries(metadata?.["dc:source"]??metadata?.source).filter(source=>txt(source?.["@id"])).map(source=>[source["@id"],source]));
-  for(const source of sources.values())for(const part of entries(source?.["schema:hasPart"])){const id=txt(part?.["@id"]);if(id&&!sources.has(id))sources.set(id,source)}
-  const evidence=link=>{const record=link.record??{},source=sources.get(record["@id"])??{},citation=txt(record["dc:bibliographicCitation"],source["dc:bibliographicCitation"]),detail=txt(description(record),description(source));return{identifier:txt(record["@id"]),name:txt(record["dc:title"],record["schema:name"],source["dc:title"],source["schema:name"],citation)||"Name not declared",citation:citation||"Citation not declared",description:detail||"Description not declared",descriptionDeclared:Boolean(detail),declaredOn:link.declaredOn,elementIndex:link.elementIndex}};
-  const elements=model.elements.map(element=>{const detail=description(element.record);return{index:element.index,identifier:txt(element.record?.["@id"]),name:txt(element.record?.["dc:title"],element.record?.["schema:name"])||"Name not declared",description:detail||"Description not declared",descriptionDeclared:Boolean(detail),implementations:element.implementations.map(record=>({path:txt(record?.["@id"])||"Implementation path not declared",description:description(record)||"Description not declared"})),evidentialBasis:element.evidentialBasis.map(evidence)}});
-  const koEvidentialBasis=model.koEvidentialBasis.map(evidence),seen=new Set();let evidenceCount=0;
-  for(const [index,item] of [...koEvidentialBasis,...elements.flatMap(element=>element.evidentialBasis)].entries()){const key=item.identifier||(item.citation!=="Citation not declared"?`citation:${item.citation}`:`anonymous:${index}`);if(!seen.has(key)){seen.add(key);evidenceCount++}}
-  const isKnowledgeAssembly=metadata?.["schema:category"]==="Knowledge Assembly",dependencyCount=isKnowledgeAssembly?new Set(model.linkedKnowledgeObjects.map(record=>txt(record?.["@id"])).filter(Boolean)).size:null;
-  const annotationResolution=resolveKnowledgeAnnotations(metadata),resolvedAnnotations={...annotationResolution,annotations:annotationResolution.annotations.map(annotation=>({...annotation,destination:destinationStatuses.find(status=>status.annotationId===annotation.id&&status.targetId===annotation.targetId)??{status:"not-checked",reason:"Passage has not been checked against embedded content"}}))};
-  return{elements,linkedKnowledgeObjects:model.linkedKnowledgeObjects,koEvidentialBasis,evidenceCount,dependencyCount,annotationResolution:resolvedAnnotations,evidenceSubgraph:projectEvidenceSubgraph(metadata,model,resolvedAnnotations),linkingCategory:deriveEvidenceLinkingCategory(metadata),cks:cks?{path:cks["@id"],name:txt(cks["dc:title"],cks["schema:name"])||cks["@id"]}:null}
+/* K_VIEW_MODEL_START */
+const { buildKnowledgeViewModel, projectKnowledgeViewModel } = (() => {
+const asEntries = (value) => Array.isArray(value) ? value : value && typeof value === "object" ? [value] : [];
+
+// Keep the declaration site: KO-level evidence is not attributed to every element.
+function buildKnowledgeViewModel(metadata) {
+  const knowledge = asEntries(metadata?.["koio:hasKnowledge"] ?? metadata?.hasKnowledge);
+  const isObjectReference = (entry) => asEntries(entry?.["@type"]).includes("koio:KnowledgeObject") || entry?.["@type"] === "koio:KnowledgeObject";
+  const linkedKnowledgeObjects = knowledge.filter(isObjectReference);
+  const elements = knowledge.filter((entry) => !isObjectReference(entry)).map((entry, index) => ({
+    index,
+    record: entry,
+    implementations: asEntries(entry?.implementedBy),
+    evidentialBasis: asEntries(entry?.["koio:hasEvidentialBasis"] ?? entry?.hasEvidentialBasis).map((record) => ({ record, declaredOn: "knowledge-element", elementIndex: index })),
+  }));
+  const koEvidentialBasis = asEntries(metadata?.["koio:hasEvidentialBasis"] ?? metadata?.hasEvidentialBasis)
+    .map((record) => ({ record, declaredOn: "knowledge-object", elementIndex: null }));
+  return { elements, linkedKnowledgeObjects, koEvidentialBasis };
 }
+
+const declaredText = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() ?? "";
+const descriptionOf = (record) => declaredText(record?.["dc:description"], record?.["schema:description"]);
+
+// A display projection does not change or infer the underlying evidence links.
+function projectKnowledgeViewModel(model, metadata, destinationStatuses = []) {
+  const documentation = asEntries(metadata?.["koio:hasDocumentation"] ?? metadata?.hasDocumentation);
+  const cks = documentation.find((record) =>
+    asEntries(record?.["@type"]).includes("Specification Document") &&
+    typeof record?.["@id"] === "string" && /\.docx$/i.test(record["@id"]));
+  const citedSources = new Map(asEntries(metadata?.["dc:source"] ?? metadata?.source)
+    .filter((source) => declaredText(source?.["@id"]))
+    .map((source) => [source["@id"], source]));
+  // An evidence resource may be a named part of a cited publication.
+  // In that case its bibliographic citation belongs to the parent source.
+  for (const source of citedSources.values()) {
+    for (const part of asEntries(source?.["schema:hasPart"])) {
+      const id = declaredText(part?.["@id"]);
+      if (id && !citedSources.has(id)) citedSources.set(id, source);
+    }
+  }
+  const evidence = (link) => {
+    const record = link.record ?? {};
+    const source = citedSources.get(record["@id"]) ?? {};
+    const citation = declaredText(record["dc:bibliographicCitation"], source["dc:bibliographicCitation"]);
+    const description = declaredText(descriptionOf(record), descriptionOf(source));
+    return {
+      identifier: declaredText(record["@id"]),
+      name: declaredText(record["dc:title"], record["schema:name"], source["dc:title"], source["schema:name"], citation) || "Name not declared",
+      citation: citation || "Citation not declared",
+      description: description || "Description not declared",
+      descriptionDeclared: Boolean(description),
+      declaredOn: link.declaredOn,
+      elementIndex: link.elementIndex,
+    };
+  };
+  const elements = model.elements.map((element) => {
+    const description = descriptionOf(element.record);
+    return {
+      index: element.index,
+      identifier: declaredText(element.record?.["@id"]),
+      name: declaredText(element.record?.["dc:title"], element.record?.["schema:name"]) || "Name not declared",
+      description: description || "Description not declared",
+      descriptionDeclared: Boolean(description),
+      implementations: element.implementations.map((record) => ({
+        path: declaredText(record?.["@id"]) || "Implementation path not declared",
+        description: descriptionOf(record) || "Description not declared",
+      })),
+      evidentialBasis: element.evidentialBasis.map(evidence),
+    };
+  });
+  const koEvidentialBasis = model.koEvidentialBasis.map(evidence);
+  const seen = new Set();
+  let evidenceCount = 0;
+  for (const [index, item] of [...koEvidentialBasis, ...elements.flatMap((element) => element.evidentialBasis)].entries()) {
+    // An unidentifiable reference cannot safely be merged with another one.
+    const key = item.identifier || (item.citation !== "Citation not declared" ? `citation:${item.citation}` : `anonymous:${index}`);
+    if (!seen.has(key)) { seen.add(key); evidenceCount += 1; }
+  }
+  const isKnowledgeAssembly = metadata?.["schema:category"] === "Knowledge Assembly";
+  const dependencyCount = isKnowledgeAssembly
+    ? new Set(model.linkedKnowledgeObjects.map((record) => declaredText(record?.["@id"])).filter(Boolean)).size
+    : null;
+  const annotationResolution = resolveKnowledgeAnnotations(metadata);
+  const resolvedAnnotations = {
+    ...annotationResolution,
+    annotations: annotationResolution.annotations.map((annotation) => ({
+      ...annotation,
+      destination: destinationStatuses.find((status) => status.annotationId === annotation.id && status.targetId === annotation.targetId)
+        ?? { status: "not-checked", reason: "Passage has not been checked against embedded content" },
+    })),
+  };
+  return {
+    elements, linkedKnowledgeObjects: model.linkedKnowledgeObjects, koEvidentialBasis, evidenceCount, dependencyCount,
+    annotationResolution: resolvedAnnotations,
+    evidenceSubgraph: projectEvidenceSubgraph(metadata, model, resolvedAnnotations),
+    linkingCategory: deriveEvidenceLinkingCategory(metadata),
+    cks: cks ? { path: cks["@id"], name: declaredText(cks["dc:title"], cks["schema:name"]) || cks["@id"] } : null,
+  };
+}
+return { buildKnowledgeViewModel, projectKnowledgeViewModel };
+})();
+/* K_VIEW_MODEL_END */
 const annotationDestinationOverrides={"1":[],"2":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#annotation-uhms-figure6","declaringSubjectId":"DFU_HBO2_Decision_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#evidence-uhms-figure6","kind":"evidence","status":"external","reason":"Open external publication deliberately"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#annotation-cks-decision-table","declaringSubjectId":"DFU_HBO2_Decision_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Treatment-Decision-KO#cks-decision-table","kind":"specification","status":"resolved","reason":null,"filePath":"specs/UHMS_Figure_6_DFU_HBO2_Algorithm_CKS_Version_1_0.docx"}],"3":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-regimen-range-code","declaringSubjectId":"Regimen_Range","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-regimen-range-scenarios","kind":"implementation","status":"resolved","reason":null,"filePath":"src/regimen-range.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-questionnaire-code","declaringSubjectId":"Burden_Questionnaire_Logic","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-questionnaire-response","kind":"implementation","status":"resolved","reason":null,"filePath":"src/questionnaire-logic.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#annotation-burden-analysis-code","declaringSubjectId":"Burden_Response_Analysis","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/HBOT-Regimen-Burden-KO#implementation-execution-burden-level","kind":"implementation","status":"resolved","reason":null,"filePath":"src/burden-response-analysis.js"}],"4":[{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-margolis-table3","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#evidence-margolis-table3","kind":"evidence","status":"external","reason":"Open external publication deliberately"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-cks-decision-table","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#cks-decision-table","kind":"specification","status":"resolved","reason":null,"filePath":"specs/Margolis_2022_DFU_Prognostic_CKS-1_0.docx"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-prognosis-rule-mapping","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#implementation-prognosis-rule-mapping","kind":"implementation","status":"resolved","reason":null,"filePath":"src/prognosis.js"},{"annotationId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#annotation-prognosis-rule-selection","declaringSubjectId":"margolis_dfu_prognostic_Lookup","targetId":"https://github.com/kgrid-objects/FAIR-DO-Workshop/tree/main/collection/DFU-Prognostic-Indicator-KO#implementation-prognosis-rule-selection","kind":"implementation","status":"resolved","reason":null,"filePath":"src/prognosis.js"}],"5":[]};
 function knowledgeViewModel(objectId){try{const metadata=JSON.parse(overrides[`${objectId}/metadata.json`]);return projectKnowledgeViewModel(buildKnowledgeViewModel(metadata),metadata,annotationDestinationOverrides[objectId]||[])}catch{return projectKnowledgeViewModel(buildKnowledgeViewModel(null),null)}}
 function knowledgePanelSummary(description){const firstThought=description.split(/[.;](?:\s|$)/)[0];return firstThought.length>110?`${firstThought.slice(0,107).replace(/\s+\S*$/,'')}…`:firstThought}
@@ -2189,6 +2303,10 @@ function shuffleAssemblyPuzzlePieces(random = Math.random) {
 
 // A move into an occupied slot swaps two placed pieces. A piece brought from
 // the starting area sends the displaced piece back there instead.
+/** @param {Record<string, string>} placement
+ * @param {string} piece
+ * @param {string | null} [targetSlot]
+ */
 function moveAssemblyPuzzlePiece(placement, piece, targetSlot = null) {
   if (!ASSEMBLY_PUZZLE_PIECES.includes(piece) || (targetSlot !== null && !ASSEMBLY_PUZZLE_SLOTS.includes(targetSlot))) return placement;
   const sourceSlot = ASSEMBLY_PUZZLE_SLOTS.find((slot) => placement[slot] === piece);

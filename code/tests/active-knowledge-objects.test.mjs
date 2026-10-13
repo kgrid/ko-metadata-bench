@@ -1,6 +1,8 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import vm from "node:vm";
 import { addAssemblyToActiveObjects, createInitialActiveObjects, isAssemblyActive } from "../app/active-knowledge-objects.js";
 
 const assembly = { metadata: { "schema:category": "Knowledge Assembly" }, generalView: { identifier: "https://example.org/ka" } };
@@ -24,8 +26,25 @@ test("loading requires the prepared embedded KA", () => {
   assert.throws(() => addAssemblyToActiveObjects(initial, { ...assembly, metadata: { "schema:category": "Other" } }), /prepared Knowledge Assembly/);
 });
 
+test("standalone shares the same active-object decisions and rejects invalid assemblies", () => {
+  const html = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  const source = readFileSync(new URL("../app/active-knowledge-objects.js", import.meta.url), "utf8")
+    .replace(/^export /gm, "").trim();
+  assert.ok(html.includes(source));
+  const start = html.indexOf("/* ACTIVE_OBJECT_RULE_START */");
+  const end = html.indexOf("/* ACTIVE_OBJECT_RULE_END */", start);
+  assert.ok(start >= 0 && end > start);
+  const context = vm.createContext({});
+  vm.runInContext(`${html.slice(start, end)}; globalThis.run = (ids, candidate) => { const initial = createInitialActiveObjects(ids); const loaded = addAssemblyToActiveObjects(initial, candidate); return { initial, loaded, active: isAssemblyActive(loaded), duplicate: addAssemblyToActiveObjects(loaded, candidate).length }; };`, context);
+  const actual = JSON.parse(JSON.stringify(context.run([1, 2, 3, 4], assembly)));
+  const initial = createInitialActiveObjects([1, 2, 3, 4]);
+  const loaded = addAssemblyToActiveObjects(initial, assembly);
+  assert.deepEqual(actual, { initial, loaded, active: isAssemblyActive(loaded), duplicate: addAssemblyToActiveObjects(loaded, assembly).length });
+  assert.throws(() => context.run([1, 2, 3, 4], null), /prepared Knowledge Assembly/);
+});
+
 test("both editions keep the active list in session memory", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.match(react, /useState\(\(\) => createInitialActiveObjects\(OBJECT_IDS\)\)/);
   assert.match(react, /setActiveObjects\(\(current\) => addAssemblyToActiveObjects\(current, EMBEDDED_ASSEMBLY\)\)/);
@@ -49,9 +68,9 @@ test("a fresh page initialization restores the four-KO state", () => {
 });
 
 test("both editions project the loaded assembly fifth in every general view", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
-  assert.match(react, /activeObjectIds: ObjectId\[\] = activeObjects\.map/);
+  assert.match(react, /activeObjectIds: ObjectId\[\] = useMemo\(\(\) => activeObjects\.map/);
   for (const projection of ["koGrid", "findabilityGrid", "accessibilityGrid", "interoperabilityGrid", "reusabilityGrid", "metadataRigGrid"]) {
     assert.match(react, new RegExp(`className="${projection}"[^>]*>\\s*\\{activeObjectIds\\.map`));
   }

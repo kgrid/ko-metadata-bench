@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -60,7 +61,7 @@ test("KA general-view preparation uses its own identifier and nested resources",
 });
 
 test("both editions retain a dedicated assembly slot and availability control", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.match(react, /const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = /);
   assert.match(standalone, /const embeddedAssembly=/);
@@ -69,7 +70,7 @@ test("both editions retain a dedicated assembly slot and availability control", 
 });
 
 test("both editions start with four ordinary KOs and keep the embedded KA separate", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const reactAssembly = JSON.parse(react.match(/^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = (\{.*\});/m)?.[1] ?? "null");
   const standaloneAssembly = JSON.parse(standalone.match(/^const embeddedAssembly=(\{.*\});/m)?.[1] ?? "null");
@@ -80,7 +81,7 @@ test("both editions start with four ordinary KOs and keep the embedded KA separa
   assert.equal(reactAssembly.generalView.graphicPaths["graphic.abstract.webp"], "auxiliary/aux-documentation/graphic.abstract.webp");
   assert.equal(reactAssembly.generalView.graphicPaths["graphic.logic.webp"], "auxiliary/aux-documentation/graphic.logic.webp");
   assert.ok(reactAssembly.generalView.files.includes("src/orchestrator.js"));
-  assert.match(react, /const EMBEDDED_OBJECT_COUNT = Math\.min\(MAX_OBJECT_COUNT, Math\.max\(MIN_OBJECT_COUNT, 4\)\)/);
+  assert.match(react, /const EMBEDDED_OBJECT_COUNT = Math\.min\(MAX_OBJECT_COUNT, Math\.max\(MIN_OBJECT_COUNT, OBJECT_FOLDER_NAMES\.length\)\)/);
   assert.match(standalone, /const minObjectCount=1,maxObjectCount=10,embeddedObjectCount=Math\.min\(maxObjectCount,Math\.max\(minObjectCount,4\)\)/);
   assert.match(react, /useState<"files" \| "objects" \| "assembly">\("objects"\)/);
   assert.match(standalone, /openKnowledgeObjects\(\);updateHeader\(\)/);
@@ -91,7 +92,7 @@ test("both editions start with four ordinary KOs and keep the embedded KA separa
 });
 
 test("both editions expose only the KA's supplied graphics, metadata, and exercise capabilities", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const reactAssembly = JSON.parse(react.match(/^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = (\{.*\});/m)?.[1] ?? "null");
   const standaloneAssembly = JSON.parse(standalone.match(/^const embeddedAssembly=(\{.*\});/m)?.[1] ?? "null");

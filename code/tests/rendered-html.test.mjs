@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -582,14 +583,14 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /if\(!visibleFiles\.includes\(s\.file\)\)s\.file=initialFileForObject\(s\.object\)/);
   assert.match(html, /if\(!metadataFilesForObject\(nextObject\)\.includes\(s\.file\)\)s\.file=initialFileForObject\(nextObject\)/);
   assert.doesNotMatch(html, /if\(!filesForObject\(nextObject\)\.includes\(s\.file\)\)/);
-  const serverSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const serverSource = await readServerSource();
   assert.match(serverSource, /access\.metadata\.txt/);
   assert.doesNotMatch(serverSource, /accessibility\.metadata\.txt/);
 });
 
 test("both Metadata Rig file rails expose access.metadata.txt and never the retired filename", async () => {
   const [serverSource, standaloneHtml] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readServerSource(),
     readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8"),
   ]);
   for (const edition of [serverSource, standaloneHtml]) {
@@ -601,7 +602,7 @@ test("both Metadata Rig file rails expose access.metadata.txt and never the reti
 });
 
 test("browser abstract dialog uses the embedded PDF rather than a downloadable route", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   assert.match(source, /const embeddedAbstractPdf="data:application\/pdf;base64,JVBER/);
   assert.match(source, /<iframe[^>]+src=\{embeddedAbstractPdf\}/);
   assert.doesNotMatch(source, /src="\/Representing_Computable_Biomedical_Knowledge_Monochromatic\.pdf"/);
@@ -646,8 +647,17 @@ test("KO replacement orders objects by workshop identifier metadata", async () =
   assert.doesNotMatch(script, /join\(root, folderName, "findability\.metadata\.txt"\)/);
 });
 
+test("standalone omits unused starter-file placeholders while retaining real KO resources", async () => {
+  const html = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.doesNotMatch(html, /^const (?:files|seed)=/m);
+  assert.match(html, /const overrides=\{"1\/README\.md"/);
+  const react = await readServerSource();
+  assert.match(react, /const FILTERED_FILES = \[/);
+  assert.match(react, /FILTERED_FILES\.filter\(/);
+});
+
 test("both editions display each KO's declared findability schema:name", async () => {
-  const react = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = await readServerSource();
   const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const declaredNames = [1, 2, 3, 4].map((id) => {
     const statements = new Parser({ format: "text/turtle" }).parse(embeddedLogicalValue(react, id, "findability.metadata.txt"));
@@ -666,7 +676,7 @@ test("both editions display each KO's declared findability schema:name", async (
 });
 
 test("keeps published metadata, exercise kit, and simulation session as explicit models", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   assert.match(source, /type PublishedInteroperabilityModel =/);
   assert.match(source, /type InteroperabilityExerciseKit =/);
   assert.match(source, /type InteroperabilitySimulationSession =/);
@@ -679,9 +689,8 @@ test("keeps published metadata, exercise kit, and simulation session as explicit
   assert.match(source, /className="interoperabilityGrid"/);
   assert.match(source, />Stages<\/button>/);
   assert.match(source, /Stages are not supplied for this knowledge object/);
-  assert.match(source, /const projectedState = exercise \? projectInteroperabilityExerciseState/);
-  assert.doesNotMatch(source, /const stage = projectedState\?\.primaryStage/);
-  assert.match(source, /const nextFacet = projectedState\?\.nextPrimaryFacet/);
+  assert.match(source, /if \(exercise\) return <section className="boundaryPanel detailSimulationOnly"/);
+  assert.match(source, /boundary\.questions\.map\(\(item\) => <details/);
   assert.match(source, /const stateFor = \(state: number\)/);
   assert.match(source, /selectedState: state/);
   assert.doesNotMatch(source, /State comparison|Move freely among four interoperability states/);
@@ -693,7 +702,7 @@ test("keeps published metadata, exercise kit, and simulation session as explicit
 });
 
 test("both editions use five interface process stages with outcomes handled by case controls", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   const playback = await readFile(new URL("../app/interface-playback.js", import.meta.url), "utf8");
   const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");

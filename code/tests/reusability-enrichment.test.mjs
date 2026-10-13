@@ -1,5 +1,5 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Parser } from "n3";
 import { constructReusabilityMetadata, createReusabilityEnrichmentBaseline, evaluateReusabilityEnrichment, getReusabilityEnrichmentInput, getReusabilityEvidenceOptions, getReusabilityEvidencePresentationOptions, getReusabilityLicenseOptions, getReusabilityUnlockState, REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER, setReusabilityEvidence, setReusabilityLicenses, setReusabilityScope } from "../app/reusability-enrichment.js";
@@ -7,12 +7,12 @@ import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
 async function canonicalTargetSource() {
   assert.equal(REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER, "workshop-ko-4");
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   return embeddedLogicalValue(source, 4, "reusability.metadata.txt");
 }
 
 async function embeddedTargetFile(file) {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   return embeddedLogicalValue(source, 4, file);
 }
 

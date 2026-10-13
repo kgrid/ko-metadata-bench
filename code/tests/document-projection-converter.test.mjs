@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -76,7 +77,7 @@ test("plain-text DOCX previews use the successful projection without a second un
 });
 
 test("real KO projections are embedded identically in both editions at build time", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.match(react, /const documentProjectionOverrides: Record<string, unknown> = \{/);
   assert.match(standalone, /const documentProjectionOverrides=\{/);
@@ -84,7 +85,7 @@ test("real KO projections are embedded identically in both editions at build tim
 
 test("both editions derive the large Wagner DOCX preview from its successful projection", () => {
   const key = "1/specs/kgrid.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0.docx";
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   const reactFiles = JSON.parse(react.match(/const objectFileOverrides: Record<string, string> = (\{[\s\S]*?\});\nconst objectBinaryOverrides:/)?.[1] ?? "{}");
   const standaloneFiles = JSON.parse(standalone.match(/const overrides=(\{[\s\S]*?\});\nconst objectBinaryOverrides=/)?.[1] ?? "{}");

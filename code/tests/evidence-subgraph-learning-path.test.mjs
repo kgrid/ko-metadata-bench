@@ -1,12 +1,12 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "../app/k-view-model.js";
 import { layoutEvidenceSubgraph } from "../app/evidence-subgraph-layout.js";
 import { planEvidenceSubgraphActions } from "../app/evidence-subgraph-actions.js";
 import { evidencePassageGlimpse } from "../app/evidence-passage-glimpse.js";
 
-const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const page = readServerSourceSync();
 const files = JSON.parse(page.slice(page.indexOf("const objectFileOverrides:") + "const objectFileOverrides: Record<string, string> = ".length, page.indexOf(";\nconst objectBinaryOverrides:")));
 const statuses = JSON.parse(page.split("\n").find((line) => line.startsWith("const annotationDestinationOverrides:")).split(" = ")[1].replace(/;$/, ""));
 const assemblyLine = page.split("\n").find((line) => line.startsWith("const EMBEDDED_ASSEMBLY:"));

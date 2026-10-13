@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -151,7 +152,7 @@ test("published metadata remains ordinary KO content and reusable modules contai
   assert.equal(published, before);
   const reusable = `${await readFile(new URL("../app/interoperability-exercise.js", import.meta.url), "utf8")}\n${await readFile(new URL("../app/interoperability-simulation.js", import.meta.url), "utf8")}`;
   assert.doesNotMatch(reusable, /Wagner|questionnaire|clinical|grade|classification/i);
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const page = await readServerSource();
   assert.match(page, /Published KO metadata remains available/);
   assert.match(page, /exerciseDiscovery\.status === "invalid"/);
   const projection = page.slice(page.indexOf("function SimulationCaseProjection"), page.indexOf("function InterfaceSpecificationProjection"));

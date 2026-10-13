@@ -1,3 +1,4 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -54,7 +55,7 @@ test("derives one temporary record per knowledge object", () => {
 });
 
 test("all currently embedded KOs supply structurally available matching Runners", () => {
-  const source = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = readServerSourceSync();
   const payload = source.match(/const objectFileOverrides: Record<string, string> = (\{[\s\S]*?\});\nconst objectBinaryOverrides:/);
   assert.ok(payload, "React embedded text payload should be present");
   const sources = JSON.parse(payload[1]);
@@ -73,7 +74,7 @@ test("all currently embedded KOs supply structurally available matching Runners"
 });
 
 test("both SWA editions include and derive the same temporary Runner record shape", () => {
-  const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const react = readServerSourceSync();
   const reactDiscovery = readFileSync(new URL("../app/runner-discovery.js", import.meta.url), "utf8");
   const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   for (const marker of ["runnerAvailabilityByObject", "available", "manifest", "bundleSource", "validationError"]) {

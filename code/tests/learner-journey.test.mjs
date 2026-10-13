@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -20,7 +21,6 @@ import {
 } from "../app/reusability-enrichment.js";
 import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
 
 function progress(state) {
@@ -28,7 +28,7 @@ function progress(state) {
 }
 
 test("Findability learner journey stays guided until every requirement is complete", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const canonical = embeddedLogicalValue(page, 4, "findability.metadata.txt");
   const subjects = getFindabilitySubjectOptions(canonical);
   const outputs = getFindabilityOutputTermOptions(canonical);
@@ -60,7 +60,7 @@ test("Findability learner journey stays guided until every requirement is comple
 });
 
 test("Reusability learner journey requires both evidence sources before Table and Source", async () => {
-  const page = await readFile(pageUrl, "utf8");
+  const page = await readServerSource();
   const canonical = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   const licenses = getReusabilityLicenseOptions(canonical);
   const evidence = getReusabilityEvidenceOptions(canonical);
@@ -91,7 +91,7 @@ test("Reusability learner journey requires both evidence sources before Table an
 
 test("both editions expose the same learner gates and reload from embedded baselines", async () => {
   const [page, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(standaloneUrl, "utf8"),
   ]);
 
