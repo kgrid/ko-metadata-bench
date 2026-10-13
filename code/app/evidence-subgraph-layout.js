@@ -27,3 +27,38 @@ export function layoutEvidenceSubgraph(graph) {
     };
   });
 }
+
+// Nodes witnessing a linking-detail category, not an inferred RDF route or
+// a judgment of evidence quality. Every key must already exist in the graph.
+export function evidenceCategoryPulseKeys(graph, category) {
+  if (!category || category === "none") return [];
+  const keys = new Set();
+  const includeBasis = (lane) => {
+    for (const basis of lane.basis) {
+      if (basis.parent) keys.add(basis.parent.key);
+      if (basis.resource) keys.add(basis.resource.key);
+    }
+  };
+  const includeTargets = (routes) => {
+    for (const route of routes) for (const target of route.targets) {
+      if (target.node) keys.add(target.node.key);
+    }
+  };
+  for (const lane of layoutEvidenceSubgraph(graph)) {
+    const ko = lane.subject.kind === "knowledge-object";
+    const evidence = lane.basis.length > 0;
+    const specification = lane.specificationRoutes.length > 0;
+    const implementation = lane.implementationRoutes.length > 0;
+    const qualifies = category === "koWide" ? ko && evidence
+      : category === "elementSpecification" ? !ko && evidence && specification
+      : category === "elementsCode" ? !ko && evidence && implementation
+      : category === "elementSpecificationCode" ? !ko && evidence && specification && implementation
+      : false;
+    if (!qualifies) continue;
+    keys.add(lane.subject.key);
+    includeBasis(lane);
+    if (category === "elementSpecification" || category === "elementSpecificationCode") includeTargets(lane.specificationRoutes);
+    if (category === "elementsCode" || category === "elementSpecificationCode") includeTargets(lane.implementationRoutes);
+  }
+  return [...keys];
+}

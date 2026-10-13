@@ -274,6 +274,9 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeGraphHead{background:#f5f5f7;border-bottom:1px solid #d2d2d7;color:#6e6e73;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .knowledgeGraphHead span{padding:10px 12px}
 .knowledgeGraphLane+.knowledgeGraphLane{border-top:1px solid #d2d2d7;background:#f6f3ee}
+/* Trial Convergent field: remove this class and its two rules to revert the row treatment. */
+.knowledgeGraphLane.knowledgeGraphConvergentLane{background:#f7f2fb;box-shadow:inset 0 0 0 2px #d7c3e9}
+.knowledgeGraphLane.knowledgeGraphConvergentLane>.knowledgeGraphSubject{background:#efe4f8;box-shadow:inset 4px 0 0 #8754b2}
 .knowledgeGraphLane>div{min-width:0;padding:12px}
 .knowledgeGraphLane.isSparse>div{padding-top:9px;padding-bottom:9px}
 .knowledgeGraphLane.isEmpty>div{padding-top:6px;padding-bottom:6px}
@@ -303,6 +306,19 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeGraphNode strong{display:block;color:#1d1d1f;font-size:12px;line-height:1.35}
 .knowledgeGraphNode.knowledgeGraphKo{position:relative;padding-right:43px}
 .knowledgeGraphKoMark{position:absolute;top:7px;right:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:6px;background:#1d1d1f;color:#fff;font-size:10px;font-weight:750;letter-spacing:-.02em;line-height:1}
+.knowledgeGraphNode.knowledgeGraphCategoryPulse{border-color:#7545a8;box-shadow:0 0 0 1px rgba(117,69,168,.45),0 0 8px rgba(117,69,168,.3);animation:knowledgeGraphEdgePulse 2.2s ease-in-out infinite}
+.knowledgeGraphSubject .knowledgeGraphNode.knowledgeGraphCategoryPulse{background:#f3edf9}
+@keyframes knowledgeGraphEdgePulse{0%,100%{border-color:#7545a8;box-shadow:0 0 0 1px rgba(117,69,168,.45),0 0 8px rgba(117,69,168,.3)}50%{border-color:#935dca;box-shadow:0 0 0 3px rgba(147,93,202,.58),0 0 17px rgba(117,69,168,.48)}}
+.knowledgeGraphNode.knowledgeGraphCategoryPulse.knowledgeGraphConvergentPulse{position:relative;animation-name:knowledgeGraphConvergentPulse}
+@keyframes knowledgeGraphConvergentPulse{0%,100%{border-color:#7545a8;box-shadow:0 0 10px rgba(117,69,168,.2)}45%{border-color:#935dca;box-shadow:0 0 17px rgba(117,69,168,.4)}}
+.knowledgeGraphConvergentPulse::before,.knowledgeGraphConvergentPulse::after{content:"";position:absolute;pointer-events:none;border:2px solid;border-radius:inherit}
+.knowledgeGraphConvergentPulse::before{inset:-2px;border-color:#935dca;animation:knowledgeGraphInnerRing 2.2s ease-in-out infinite}
+.knowledgeGraphConvergentPulse::after{inset:-6px;border-color:#c4a6e2;animation:knowledgeGraphOuterRing 2.2s ease-in-out infinite}
+.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphNodeGroup,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphBranch,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphPart,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphRoute,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphTarget{gap:10px}
+.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphEvidence,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphSpecification,.knowledgeGraphLane:has(.knowledgeGraphConvergentPulse) .knowledgeGraphImplementation{gap:14px}
+@keyframes knowledgeGraphInnerRing{0%,100%{opacity:.35}28%{opacity:1}60%{opacity:.45}}
+@keyframes knowledgeGraphOuterRing{0%,20%,100%{opacity:.2}58%{opacity:.95}82%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.knowledgeGraphNode.knowledgeGraphCategoryPulse{animation:none;border-color:#7545a8;box-shadow:0 0 0 2px rgba(117,69,168,.65)}.knowledgeGraphNode.knowledgeGraphConvergentPulse{box-shadow:none}.knowledgeGraphConvergentPulse::before,.knowledgeGraphConvergentPulse::after{animation:none;opacity:.8}}
 .knowledgeGraphNode small{margin:0 0 3px;font-size:9px}
 .knowledgeGraphNode small:last-child:not(:first-child){margin:4px 0 0}
 .knowledgePassageGlimpse{margin-top:7px;padding:7px 8px;border:1px solid #e5e5e7;border-radius:5px;background:#f8f8f9;color:#55555a;font:10px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -351,6 +367,15 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeDetailDialog { width: 100%; height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0,1fr); overflow: hidden; border: 1px solid #aeaeb2; border-radius: 18px; background: #f5f5f7; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
 .knowledgeDetailDialog > header { min-height: 72px; display: flex; align-items: center; gap: 18px; padding: 12px 18px; border-bottom: 1px solid #d2d2d7; background: rgba(255,255,255,.94); }
 .knowledgeDetailDialog > header > div { min-width: 0; flex: 1; }
+.knowledgeSubgraphTitleRow{display:flex;align-items:center;flex-wrap:wrap;column-gap:10px;row-gap:3px}
+.knowledgeSubgraphHeader .knowledge-nexus-label{flex:none;padding:3px 8px;border-radius:10px;white-space:nowrap;font-size:9px;font-weight:700;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}
+.knowledgeSubgraphHeader .knowledge-nexus-label:focus-visible{outline:2px solid #42265e;outline-offset:2px}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-0{background:#eeeef0;color:#525257}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-1{background:#f5f1f8;color:#574568}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-2{background:#e9dff0;color:#4f3865}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-3{background:#d6c2e6;color:#42265e}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-4{background:#b58ccf;color:#27133f}
+.knowledgeSubgraphHeader .knowledge-nexus-label.nexus-level-5{background:#6e4295;color:#fff}
 .knowledgeDetailDialog header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
 .knowledgeDetailDialog h2 { margin: 3px 0 2px; color: #1d1d1f; font-size: 17px; line-height: 1.25; }
 .knowledgeDetailDialog header small { color: #8e8e93; font-size: 10px; }
@@ -1196,6 +1221,41 @@ function layoutEvidenceSubgraph(graph) {
   });
 }
 
+// Nodes witnessing a linking-detail category, not an inferred RDF route or
+// a judgment of evidence quality. Every key must already exist in the graph.
+function evidenceCategoryPulseKeys(graph, category) {
+  if (!category || category === "none") return [];
+  const keys = new Set();
+  const includeBasis = (lane) => {
+    for (const basis of lane.basis) {
+      if (basis.parent) keys.add(basis.parent.key);
+      if (basis.resource) keys.add(basis.resource.key);
+    }
+  };
+  const includeTargets = (routes) => {
+    for (const route of routes) for (const target of route.targets) {
+      if (target.node) keys.add(target.node.key);
+    }
+  };
+  for (const lane of layoutEvidenceSubgraph(graph)) {
+    const ko = lane.subject.kind === "knowledge-object";
+    const evidence = lane.basis.length > 0;
+    const specification = lane.specificationRoutes.length > 0;
+    const implementation = lane.implementationRoutes.length > 0;
+    const qualifies = category === "koWide" ? ko && evidence
+      : category === "elementSpecification" ? !ko && evidence && specification
+      : category === "elementsCode" ? !ko && evidence && implementation
+      : category === "elementSpecificationCode" ? !ko && evidence && specification && implementation
+      : false;
+    if (!qualifies) continue;
+    keys.add(lane.subject.key);
+    includeBasis(lane);
+    if (category === "elementSpecification" || category === "elementSpecificationCode") includeTargets(lane.specificationRoutes);
+    if (category === "elementsCode" || category === "elementSpecificationCode") includeTargets(lane.implementationRoutes);
+  }
+  return [...keys];
+}
+
 /* EVIDENCE_SUBGRAPH_LAYOUT_END */
 /* EVIDENCE_PASSAGE_GLIMPSE_START */
 // A glimpse is derived from the embedded source, never from the selector alone.
@@ -1553,6 +1613,8 @@ function openKnowledgeSubgraphStandalone(objectId){
   const viewRecord=buildEvidenceSubgraphViewRecord(graph,model,metadata,file=>filesForObject(objectId).includes(file)?seedValue(objectId,file):null,(file,kind)=>kind.startsWith("specification")?Boolean(documentProjectionForStandalone(objectId,file)?.sanitizedHtml):filesForObject(objectId).includes(file)&&Boolean(seedValue(objectId,file)));
   const lanes=viewRecord.rows;
   const graphNodes=new Map(graph.nodes.map(item=>[item.key,item]));
+  const pulseKeys=new Set(evidenceCategoryPulseKeys(graph,model.linkingCategory?.category));
+  const nexus=evidenceNexusIndicator(model.linkingCategory?.category),convergent=model.linkingCategory?.category==="elementSpecificationCode";
   const compactLabel=item=>{const label=String(item?.label||item?.sourceId||"");return !/^https?:\/\//.test(label)&&label.length<=52?label:decodeURIComponent(label.split(/[\\/#]/).filter(Boolean).at(-1)||label).slice(0,52)};
   const relationshipLabel=item=>`${compactLabel(graphNodes.get(item.from))} — ${item.sourceField} — ${compactLabel(graphNodes.get(item.to))}`;
   const node=(item,kind)=>{
@@ -1560,15 +1622,17 @@ function openKnowledgeSubgraphStandalone(objectId){
     const glimpse=display?.passageState==="verified"?display.glimpse:null;
     const annotation=item.kind==="annotation",destination=item.kind==="evidential-resource"||item.kind.endsWith("-passage");
     const status=display?.passageState==="unresolved"?"Selector unresolved":display?.passageState==="unavailable"?"Exact passage unavailable":display?.passageState==="not-checked"?"Passage not checked":null;
-    return `<div class="knowledgeGraphNodeGroup"><button type="button" class="knowledgeGraphNode${item.kind==="knowledge-object"?" knowledgeGraphKo":""}${annotation?" knowledgeGraphAnnotation":destination?" knowledgeGraphDestination":""}${glimpse?" hasPassageGlimpse":""}${display?.passageState&&display.passageState!=="verified"?" knowledgeGraphUnverifiedPassage":""}" data-node-key="${escapeHtml(item.key)}" aria-label="Inspect ${escapeHtml(kind)}: ${escapeHtml(item.label)}${status?`. ${status}`:""}" aria-pressed="false" title="${escapeHtml(item.sourceId)}">${annotation?`<span>Annotation · ${escapeHtml(compactLabel(item))}</span>`:`${item.kind==="knowledge-object"?'<span class="knowledgeGraphKoMark" aria-hidden="true">KO</span>':""}<small>${escapeHtml(kind)}</small><strong>${escapeHtml(compactLabel(item))}</strong>${display?.containingFile?`<span class="knowledgeGraphContainingFile" title="${escapeHtml(display.containingFile)}">In ${escapeHtml(display.displayFile)}</span>`:""}${glimpse?`<span class="knowledgePassageGlimpse" aria-label="Verified passage within ${escapeHtml(glimpse.filePath)}"><mark>${escapeHtml(glimpse.exact.slice(0,80))}${glimpse.exact.length>80||glimpse.truncated?"…":""}</mark></span>`:status?`<span class="knowledgeGraphPassageStatus" title="${escapeHtml(display?.verification?.reason||display?.followNotice||"")}">${status}</span>`:""}`}</button>${display?.followAction?.kind==="passage"&&display.passageState==="verified"?`<button type="button" class="knowledgeGraphDirectAction" data-graph-follow="${escapeHtml(item.key)}" aria-label="View passage: ${escapeHtml(item.label)}">View passage</button>`:""}${display?.followAction?.kind==="evidence"?`<a class="knowledgeGraphDirectAction" href="${escapeHtml(display.followAction.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open source: ${escapeHtml(item.label)}">Open source ↗</a>`:""}</div>`;
+    return `<div class="knowledgeGraphNodeGroup"><button type="button" class="knowledgeGraphNode${item.kind==="knowledge-object"?" knowledgeGraphKo":""}${annotation?" knowledgeGraphAnnotation":destination?" knowledgeGraphDestination":""}${pulseKeys.has(item.key)?" knowledgeGraphCategoryPulse":""}${glimpse?" hasPassageGlimpse":""}${display?.passageState&&display.passageState!=="verified"?" knowledgeGraphUnverifiedPassage":""}" data-node-key="${escapeHtml(item.key)}" aria-label="Inspect ${escapeHtml(kind)}: ${escapeHtml(item.label)}${status?`. ${status}`:""}" aria-pressed="false" title="${escapeHtml(item.sourceId)}">${annotation?`<span>Annotation · ${escapeHtml(compactLabel(item))}</span>`:`${item.kind==="knowledge-object"?'<span class="knowledgeGraphKoMark" aria-hidden="true">KO</span>':""}<small>${escapeHtml(kind)}</small><strong>${escapeHtml(compactLabel(item))}</strong>${display?.containingFile?`<span class="knowledgeGraphContainingFile" title="${escapeHtml(display.containingFile)}">In ${escapeHtml(display.displayFile)}</span>`:""}${glimpse?`<span class="knowledgePassageGlimpse" aria-label="Verified passage within ${escapeHtml(glimpse.filePath)}"><mark>${escapeHtml(glimpse.exact.slice(0,80))}${glimpse.exact.length>80||glimpse.truncated?"…":""}</mark></span>`:status?`<span class="knowledgeGraphPassageStatus" title="${escapeHtml(display?.verification?.reason||display?.followNotice||"")}">${status}</span>`:""}`}</button>${display?.followAction?.kind==="passage"&&display.passageState==="verified"?`<button type="button" class="knowledgeGraphDirectAction" data-graph-follow="${escapeHtml(item.key)}" aria-label="View passage: ${escapeHtml(item.label)}">View passage</button>`:""}${display?.followAction?.kind==="evidence"?`<a class="knowledgeGraphDirectAction" href="${escapeHtml(display.followAction.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open source: ${escapeHtml(item.label)}">Open source ↗</a>`:""}</div>`;
   };
   const edge=(item,reverse=false)=>`<button type="button" class="knowledgeGraphEdge${reverse?" knowledgeGraphReverse":""}" data-edge-index="${graph.relationships.indexOf(item)}" aria-label="Inspect relationship: ${escapeHtml(item.sourceField)}" aria-pressed="false">${reverse?"← ":""}${escapeHtml(item.sourceField)}${reverse?"":" →"}</button>`;
   const renderGraphRoute=route=>`<div class="knowledgeGraphRoute">${edge(route.edge)}${node(route.annotation,"annotation")}${route.targets.map(target=>`<div class="knowledgeGraphTarget">${edge(target.edge)}${node(target.node,target.node.kind.replaceAll("-"," "))}</div>`).join("")}</div>`;
-  const rows=lanes.map(lane=>`<div class="knowledgeGraphLane is${lane.density[0].toUpperCase()}${lane.density.slice(1)}" role="group" aria-label="${escapeHtml((lane.subject.kind==="knowledge-object"?"Knowledge Object":"Knowledge element")+": "+lane.subject.label)}"><div class="knowledgeGraphEvidence">${lane.basis.map(basis=>`<div class="knowledgeGraphBranch">${basis.parent?`<div class="knowledgeGraphPart">${node(basis.parent,"evidence resource")}${edge(basis.partEdge)}</div>`:""}${node(basis.resource,"evidence resource")}${edge(basis.edge,true)}</div>`).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Evidential basis not declared">Not declared</span>'}</div><div class="knowledgeGraphSubject">${node(lane.subject,lane.subject.kind.replaceAll("-"," "))}</div><div class="knowledgeGraphSpecification">${lane.specificationRoutes.map(renderGraphRoute).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Specification passage not declared">Not declared</span>'}</div><div class="knowledgeGraphImplementation">${lane.implementationRoutes.map(renderGraphRoute).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Implementation passage not declared">Not declared</span>'}</div>${lane.unresolvedRoutes.length?`<div class="knowledgeGraphUnresolved"><span class="knowledgeGraphUnresolvedNotice">Unresolved annotation targets</span>${lane.unresolvedRoutes.map(renderGraphRoute).join("")}</div>`:""}</div>`).join("");
+  const rows=lanes.map(lane=>`<div class="knowledgeGraphLane is${lane.density[0].toUpperCase()}${lane.density.slice(1)}${convergent&&pulseKeys.has(lane.subject.key)?" knowledgeGraphConvergentLane":""}" role="group" aria-label="${escapeHtml((lane.subject.kind==="knowledge-object"?"Knowledge Object":"Knowledge element")+": "+lane.subject.label)}"><div class="knowledgeGraphEvidence">${lane.basis.map(basis=>`<div class="knowledgeGraphBranch">${basis.parent?`<div class="knowledgeGraphPart">${node(basis.parent,"evidence resource")}${edge(basis.partEdge)}</div>`:""}${node(basis.resource,"evidence resource")}${edge(basis.edge,true)}</div>`).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Evidential basis not declared">Not declared</span>'}</div><div class="knowledgeGraphSubject">${node(lane.subject,lane.subject.kind.replaceAll("-"," "))}</div><div class="knowledgeGraphSpecification">${lane.specificationRoutes.map(renderGraphRoute).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Specification passage not declared">Not declared</span>'}</div><div class="knowledgeGraphImplementation">${lane.implementationRoutes.map(renderGraphRoute).join("")||'<span class="knowledgeGraphAbsence" role="note" aria-label="Implementation passage not declared">Not declared</span>'}</div>${lane.unresolvedRoutes.length?`<div class="knowledgeGraphUnresolved"><span class="knowledgeGraphUnresolvedNotice">Unresolved annotation targets</span>${lane.unresolvedRoutes.map(renderGraphRoute).join("")}</div>`:""}</div>`).join("");
   let selectedTrigger=null;
   const dialog=document.createElement("div"),close=()=>{document.removeEventListener("keydown",onKey);dialog.remove()},onKey=event=>{if(event.key==="Escape"){if(dialog.querySelector(".knowledgeGraphInspector"))closeInspector();else close()}};
   dialog.className="knowledgeDetailBackdrop";
-  dialog.innerHTML=`<section class="knowledgeDetailDialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-subgraph-title"><header><div><span>Knowledge and evidence</span><h2 id="knowledge-subgraph-title">${escapeHtml(objectName(objectId))}</h2><small>Evidence-linking subgraph</small></div><button type="button" aria-label="Close evidence subgraph">×</button></header><div class="knowledgeDetailBody knowledgeSubgraphBody"><div class="knowledgeGraphWorkspace"><section class="knowledgeGraph" aria-label="Evidence-linking graph"><div class="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Specification passages</span><span>Implementation passages</span></div>${rows}${!graph.relationships.length?`<p class="knowledgeGraphEmpty">No direct evidence links declared for this ${model.dependencyCount!==null?"assembly":"KO"}.${model.dependencyCount!==null?" Constituent KO evidence is not inherited.":""}</p>`:""}<details class="knowledgeGraphRelationshipList"><summary>Declared relationships (${graph.relationships.length})</summary>${graph.relationships.length?`<ol>${graph.relationships.map((item,index)=>`<li><button type="button" data-edge-index="${index}" aria-pressed="false">${escapeHtml(relationshipLabel(item))}</button></li>`).join("")}</ol>`:"<p>None declared.</p>"}</details></section></div></div></section>`;
+  dialog.innerHTML=`<section class="knowledgeDetailDialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-subgraph-title"><header class="knowledgeSubgraphHeader"><div><span>Knowledge and evidence</span><div class="knowledgeSubgraphTitleRow"><h2 id="knowledge-subgraph-title">${escapeHtml(objectName(objectId))}</h2><span class="knowledge-nexus-label nexus-level-${nexus.level}" title="${escapeHtml(nexus.explanation)}" aria-label="${escapeHtml(`${nexus.label}: ${nexus.explanation}`)}">${escapeHtml(nexus.label)}</span></div><small>Evidence-linking subgraph</small></div><button type="button" aria-label="Close evidence subgraph">×</button></header><div class="knowledgeDetailBody knowledgeSubgraphBody"><div class="knowledgeGraphWorkspace"><section class="knowledgeGraph" aria-label="Evidence-linking graph"><div class="knowledgeGraphHead"><span>Evidence</span><span>Declaring subject</span><span>Specification passages</span><span>Implementation passages</span></div>${rows}${!graph.relationships.length?`<p class="knowledgeGraphEmpty">No direct evidence links declared for this ${model.dependencyCount!==null?"assembly":"KO"}.${model.dependencyCount!==null?" Constituent KO evidence is not inherited.":""}</p>`:""}<details class="knowledgeGraphRelationshipList"><summary>Declared relationships (${graph.relationships.length})</summary>${graph.relationships.length?`<ol>${graph.relationships.map((item,index)=>`<li><button type="button" data-edge-index="${index}" aria-pressed="false">${escapeHtml(relationshipLabel(item))}</button></li>`).join("")}</ol>`:"<p>None declared.</p>"}</details></section></div></div></section>`;
+  if(convergent)dialog.querySelectorAll(".knowledgeGraphCategoryPulse").forEach(button=>button.classList.add("knowledgeGraphConvergentPulse"));
+  dialog.querySelector(".knowledgeSubgraphHeader .knowledge-nexus-label").tabIndex=0;
   const clearSelection=()=>dialog.querySelectorAll(".knowledgeGraphNode,.knowledgeGraphEdge,.knowledgeGraphRelationshipList button").forEach(button=>button.setAttribute("aria-pressed","false"));
   const closeInspector=()=>{clearSelection();dialog.querySelector(".knowledgeGraphInspector")?.remove();dialog.querySelector(".knowledgeGraphWorkspace")?.classList.remove("inspectorOpen");selectedTrigger?.focus()};
   const openAction=(action,control)=>{

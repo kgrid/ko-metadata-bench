@@ -18,7 +18,7 @@ const subgraphProjectionSource = readFileSync(join(root, "app/evidence-subgraph-
   .replace(/^import .*\n/gm, "")
   .replace("export function projectEvidenceSubgraph", "function projectEvidenceSubgraph");
 const subgraphLayoutSource = readFileSync(join(root, "app/evidence-subgraph-layout.js"), "utf8")
-  .replace("export function layoutEvidenceSubgraph", "function layoutEvidenceSubgraph");
+  .replaceAll("export function ", "function ");
 const subgraphInspectorSource = readFileSync(join(root, "app/evidence-subgraph-inspector.js"), "utf8")
   .replace("export function inspectEvidenceSubgraphNode", "function inspectEvidenceSubgraphNode")
   .replace("export function inspectEvidenceSubgraphRelationship", "function inspectEvidenceSubgraphRelationship");

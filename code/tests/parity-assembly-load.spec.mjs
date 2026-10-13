@@ -49,6 +49,13 @@ async function rosters(page, expected) {
         await expect(graph).toBeVisible();
         await expect(graph.getByRole("region", { name: "Evidence-linking graph" })).toBeVisible();
         await expect(graph.locator(".knowledgeGraphLane")).toHaveCount(elements + 1);
+        const pulsing = graph.locator(".knowledgeGraphNode.knowledgeGraphCategoryPulse");
+        await expect(pulsing).toHaveCount([3, 4, 7, 6, 0][index]);
+        await expect(graph.locator(".knowledgeGraphLane.knowledgeGraphConvergentLane")).toHaveCount(index === 3 ? 1 : 0);
+        await expect(graph.locator(".knowledgeSubgraphHeader .knowledgeNexusLabel, .knowledgeSubgraphHeader .knowledge-nexus-label")).toHaveText(linking[index]);
+        await expect(graph.locator(".knowledgeGraphAnnotation.knowledgeGraphCategoryPulse")).toHaveCount(0);
+        if (index === 2) await expect(graph.locator(".knowledgeGraphLane").last().locator(".knowledgeGraphCategoryPulse")).toHaveCount(0);
+        if (index === 3) await expect(pulsing.first()).toHaveCSS("animation-name", "knowledgeGraphConvergentPulse");
         const relationshipList = graph.locator(".knowledgeGraphRelationshipList");
         await expect(relationshipList.getByText(`Declared relationships (${await graph.locator(".knowledgeGraphEdge").count()})`)).toBeVisible();
         await relationshipList.locator("summary").click();
