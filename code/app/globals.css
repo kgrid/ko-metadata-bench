@@ -1510,6 +1510,29 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyCaseClose:hover { background: #dcdce1; }
 .koInstrumentMark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: #3a3a3c; color: #fff; font-size: 11px; font-weight: 700; }
 .assemblyWorkspace { width: min(1240px, 100%); min-width: 0; min-height: 0; flex: 1; margin-top: 18px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: stretch; }
+.assemblyPuzzlePieces, .assemblyPuzzleBoard { min-width: 0; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
+.assemblyPuzzlePieces { padding: 16px 12px; }
+.assemblyPuzzlePieces h3 { margin: 0 8px 12px; color: #6e6e73; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.assemblyPuzzlePieceList { display: grid; gap: 8px; }
+.assemblyPuzzlePiece { width: 100%; padding: 10px 12px; border: 1px solid #bfc2c0; border-radius: 9px; background: linear-gradient(#fff, #f4f5f4); box-shadow: 0 2px 0 #aeb3af, 0 4px 7px #252c271a, inset 0 1px #fff; color: #3a3a3c; font-size: 12px; font-weight: 700; line-height: 1.35; text-align: left; cursor: grab; }
+.assemblyPuzzlePiece:hover, .assemblyPuzzleSlot:hover { background: #f0f0f2; }
+.assemblyPuzzlePiece.selected, .assemblyPuzzleSlot.selected { border-color: #3a3a3c; box-shadow: 0 0 0 2px #a8b4aa, 0 2px 0 #929a94; }
+.assemblyPuzzlePiece:focus-visible, .assemblyPuzzleSlot:focus-visible, .assemblyPuzzleReturn:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
+.assemblyPuzzleReturn { width: 100%; margin-top: 12px; padding: 7px 10px; border: 1px solid #c7c7cc; border-radius: 7px; background: #fff; color: #3a3a3c; font-size: 12px; font-weight: 650; cursor: pointer; }
+.assemblyPuzzleReturn:disabled { opacity: .5; cursor: default; }
+.assemblyPuzzleBoard { min-height: 0; padding: 22px 18px; overflow: auto; container-type: inline-size; }
+.assemblyPuzzleSlots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+.assemblyPuzzleSlot { position: relative; display: grid; place-items: center; min-width: 0; min-height: 112px; padding: 12px; border: 2px dashed #a8b4aa; border-radius: 9px; background: #f6f8f6; box-shadow: inset 0 2px 5px #38463b1c, inset 0 -1px #fff; color: #6e6e73; font-size: 12px; font-weight: 650; text-align: center; cursor: pointer; }
+.assemblyPuzzleSlot.occupied { border-style: solid; border-color: #bfc2c0; background: linear-gradient(#fff, #f4f5f4); box-shadow: 0 2px 0 #aeb3af, 0 4px 7px #252c271a, inset 0 1px #fff; color: #3a3a3c; font-weight: 700; cursor: grab; }
+.assemblyPuzzleMessage { margin: 10px 0 2px; color: #6e6e73; font-size: 12px; line-height: 1.35; }
+.assemblyPuzzleMessage.workable { color: #356b43; font-weight: 700; }
+.assemblyPuzzleMessage.unworkable { color: var(--status-red); font-weight: 700; }
+.assemblyPuzzleSlot:first-child::after { content: ""; position: absolute; z-index: 2; top: calc(50% - 12px); right: -26px; width: 24px; height: 24px; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2356645b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E"); }
+.assemblyPuzzleBoard .assemblyFlowToAssembly { margin-top: 3px; }
+.assemblyPuzzleDestination { padding: 14px; border: 1px solid #d2d2d7; border-radius: 9px; background: #f9f9fa; color: #6e6e73; font-size: 12px; font-weight: 700; text-align: center; }
+@container (max-width: 850px) { .assemblyPuzzleSlots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 500px) { .assemblyPuzzleSlots { grid-template-columns: minmax(0, 1fr); gap: 10px; } .assemblyPuzzleSlot:first-child::after { top: auto; right: calc(50% - 12px); bottom: -27px; transform: rotate(90deg); } }
+@media (max-width: 680px) { .assemblyPuzzleWorkspace { grid-template-rows: auto minmax(0, 1fr); } .assemblyPuzzlePieces { padding: 8px; } .assemblyPuzzlePieces h3 { margin: 0 0 7px; } .assemblyPuzzlePieceList { display: flex; gap: 6px; overflow-x: auto; } .assemblyPuzzlePiece { flex: 0 0 155px; } }
 .assemblyCaseSelector, .assemblyCaseDetail { min-width: 0; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; }
 .assemblyCaseSelector { padding: 16px 12px; }
 .assemblyCaseButtons { display: grid; gap: 3px; }

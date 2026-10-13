@@ -42,7 +42,8 @@ for (const edition of editions) {
     await page.getByRole("button", { name: "Knowledge Assembly", exact: true }).click();
     await page.getByRole("button", { name: "Orchestration", exact: true }).click();
     await expect(page.getByRole("dialog", { name: "Orchestration" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Case 1", exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Teaching cases" })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Assembly puzzle" }).locator("[data-assembly-slot]")).toHaveCount(4);
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: "Knowledge Objects", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Open .+ overview$/ })).toHaveCount(4);

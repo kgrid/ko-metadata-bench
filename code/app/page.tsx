@@ -22,6 +22,7 @@ import { EMBEDDED_VOCABULARY_REGISTRY } from "./term-vocabulary-registry.js";
 import { isTermInsightEligible, resolveLocalGraphTermInsight } from "./term-insight-local.js";
 import { placeTermPreview } from "./term-preview-placement.js";
 import { loadAssemblyTeachingCases, projectAssemblyCaseInputs, projectAssemblyKoContributions, projectAssemblyKoExchange, projectAssemblyKaDecisions, projectAssemblySynthesisMatrix } from "./assembly-teaching-cases.js";
+import { ASSEMBLY_PUZZLE_PIECES, ASSEMBLY_PUZZLE_SLOTS, assemblyPuzzleFailureMessage, evaluateAssemblyPuzzle, moveAssemblyPuzzlePiece, shuffleAssemblyPuzzlePieces } from "./assembly-puzzle-rule.js";
 import { addAssemblyToActiveObjects, createInitialActiveObjects, isAssemblyActive } from "./active-knowledge-objects.js";
 import { buildKnowledgeViewModel, projectKnowledgeViewModel } from "./k-view-model.js";
 import { buildKnowledgeRelationshipMap } from "./knowledge-relationship-map.js";
@@ -2932,6 +2933,13 @@ function AssemblyKoExchangeView({ exchange, name, caseNumber, onClose }: { excha
 }
 
 function KnowledgeAssemblyCaseView() {
+  const [puzzlePieceOrder] = useState(shuffleAssemblyPuzzlePieces);
+  const [puzzleComplete, setPuzzleComplete] = useState(false);
+  const [puzzlePlacement, setPuzzlePlacement] = useState<Record<string, string>>({});
+  const [selectedPuzzlePiece, setSelectedPuzzlePiece] = useState<string | null>(null);
+  const [puzzleMessage, setPuzzleMessage] = useState("Select a Knowledge Object, then choose a position; or drag it there.");
+  const firstPuzzlePieceRef = useRef<HTMLButtonElement>(null);
+  const firstCaseRef = useRef<HTMLButtonElement>(null);
   const [selectedCaseId, setSelectedCaseId] = useState("case-1");
   const [selectedKoRole, setSelectedKoRole] = useState<string | null>(null);
   if (!EMBEDDED_ASSEMBLY) return null;
@@ -2942,6 +2950,33 @@ function KnowledgeAssemblyCaseView() {
   const contributions = selectedCase ? projectAssemblyKoContributions(selectedCase.semanticTrace) : null;
   const kaDecisions = selectedCase ? projectAssemblyKaDecisions(selectedCase.semanticTrace) : null;
   const synthesisMatrix = selectedCase ? projectAssemblySynthesisMatrix(EMBEDDED_ASSEMBLY, selectedCase.semanticTrace) : null;
+  const puzzleCheck = evaluateAssemblyPuzzle(puzzlePlacement);
+  const puzzleFeedback = puzzleCheck.status === "workable" ? "This arrangement can be orchestrated."
+    : puzzleCheck.status === "unworkable" ? assemblyPuzzleFailureMessage(puzzleCheck.reason)
+    : puzzleMessage;
+  useEffect(() => {
+    if (puzzleCheck.status === "workable") {
+      setSelectedCaseId("case-1");
+      setPuzzleComplete(true);
+      return;
+    }
+    if (puzzleCheck.status !== "unworkable") return;
+    const failure = assemblyPuzzleFailureMessage(puzzleCheck.reason);
+    const timer = window.setTimeout(() => {
+      setPuzzlePlacement({});
+      setSelectedPuzzlePiece(null);
+      setPuzzleMessage(`${failure} All four KOs have returned to the starting area. Try again.`);
+      window.requestAnimationFrame(() => firstPuzzlePieceRef.current?.focus());
+    }, 1800);
+    return () => window.clearTimeout(timer);
+  }, [puzzleCheck.status, puzzleCheck.reason]);
+  useEffect(() => { if (puzzleComplete) firstCaseRef.current?.focus(); }, [puzzleComplete]);
+  const puzzleName = (role: string) => objectName(({ wagner: 1, decision: 2, margolis: 4, burden: 3 } as Record<string, number>)[role]);
+  const placePuzzlePiece = (role: string, targetSlot: string | null) => {
+    setPuzzlePlacement((current) => moveAssemblyPuzzlePiece(current, role, targetSlot));
+    setSelectedPuzzlePiece(null);
+    setPuzzleMessage(targetSlot ? `${puzzleName(role)} moved to position ${ASSEMBLY_PUZZLE_SLOTS.indexOf(targetSlot) + 1}.` : `${puzzleName(role)} returned to the starting area.`);
+  };
 
   const exchange = selectedKoRole && selectedCase ? projectAssemblyKoExchange(selectedCase, selectedKoRole) : null;
   return <><section className="knowledgeObjectsExercise assemblyExercise" aria-label="Knowledge Assembly explorer">
@@ -2949,11 +2984,27 @@ function KnowledgeAssemblyCaseView() {
       <div className="viewTitle"><h2>Assembly Orchestration</h2></div>
     </div>
     {loaded.error ? <div className="assemblyWorkspaceError" role="alert">{loaded.error}</div> :
-      <div className="assemblyWorkspace">
+      !puzzleComplete ? <div className="assemblyWorkspace assemblyPuzzleWorkspace">
+        <aside className="assemblyPuzzlePieces" aria-label="Knowledge Objects to assemble" onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); const role = event.dataTransfer.getData("text/plain"); if (ASSEMBLY_PUZZLE_PIECES.includes(role)) placePuzzlePiece(role, null); }}>
+          <h3>Knowledge Objects</h3>
+          <div className="assemblyPuzzlePieceList">
+            {puzzlePieceOrder.filter((role) => !Object.values(puzzlePlacement).includes(role)).map((role) => <button type="button" className={`assemblyPuzzlePiece${selectedPuzzlePiece === role ? " selected" : ""}`} data-assembly-piece={role} key={role} ref={role === puzzlePieceOrder[0] ? firstPuzzlePieceRef : undefined} draggable aria-pressed={selectedPuzzlePiece === role} onClick={() => setSelectedPuzzlePiece(selectedPuzzlePiece === role ? null : role)} onDragStart={(event) => { setSelectedPuzzlePiece(role); event.dataTransfer.setData("text/plain", role); }}>{puzzleName(role)}</button>)}
+          </div>
+          <button type="button" className="assemblyPuzzleReturn" disabled={!selectedPuzzlePiece} onClick={() => selectedPuzzlePiece && placePuzzlePiece(selectedPuzzlePiece, null)}>Return selected KO here</button>
+        </aside>
+        <section className="assemblyPuzzleBoard" aria-label="Assembly puzzle">
+          <div className="assemblyPuzzleSlots" aria-label="Four Knowledge Object positions">
+            {ASSEMBLY_PUZZLE_SLOTS.map((slot, index) => <button type="button" className={`assemblyPuzzleSlot${puzzlePlacement[slot] ? " occupied" : ""}${selectedPuzzlePiece === puzzlePlacement[slot] ? " selected" : ""}`} data-assembly-slot={slot} aria-label={puzzlePlacement[slot] ? `Position ${index + 1}: ${puzzleName(puzzlePlacement[slot])}` : `Empty Knowledge Object position ${index + 1}`} aria-pressed={Boolean(puzzlePlacement[slot] && selectedPuzzlePiece === puzzlePlacement[slot])} draggable={Boolean(puzzlePlacement[slot])} onClick={() => { if (selectedPuzzlePiece) placePuzzlePiece(selectedPuzzlePiece, slot); else if (puzzlePlacement[slot]) setSelectedPuzzlePiece(puzzlePlacement[slot]); }} onDragStart={(event) => { if (!puzzlePlacement[slot]) return; setSelectedPuzzlePiece(puzzlePlacement[slot]); event.dataTransfer.setData("text/plain", puzzlePlacement[slot]); }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); const role = event.dataTransfer.getData("text/plain"); if (ASSEMBLY_PUZZLE_PIECES.includes(role)) placePuzzlePiece(role, slot); }} key={slot}><span>{puzzlePlacement[slot] ? puzzleName(puzzlePlacement[slot]) : "Place KO here"}</span></button>)}
+          </div>
+          <p className={`assemblyPuzzleMessage${puzzleCheck.status !== "incomplete" ? ` ${puzzleCheck.status}` : ""}`} role="status">{puzzleFeedback}</p>
+          <div className="assemblyFlowToAssembly" aria-label="The second, third, and fourth positions feed the assembly"><span aria-hidden="true" /><span className="assemblyFlowArrow" aria-hidden="true" /><span className="assemblyFlowArrow" aria-hidden="true" /><span className="assemblyFlowArrow" aria-hidden="true" /></div>
+          <div className="assemblyPuzzleDestination">Assembly decisions</div>
+        </section>
+      </div> : <div className="assemblyWorkspace">
         <nav className="assemblyCaseSelector" aria-label="Teaching cases">
           <h3>Cases</h3>
           <div className="assemblyCaseButtons">
-            {loaded.cases.map((item, index) => <button type="button" key={item.id}
+            {loaded.cases.map((item, index) => <button type="button" key={item.id} ref={index === 0 ? firstCaseRef : undefined}
               className={item.id === selectedCase?.id ? "selected" : ""}
               aria-pressed={item.id === selectedCase?.id}
               onClick={() => { setSelectedKoRole(null); setSelectedCaseId(item.id); }}>
