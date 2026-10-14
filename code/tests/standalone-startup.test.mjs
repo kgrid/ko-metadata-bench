@@ -66,6 +66,6 @@ test("the standalone edition completes startup and mounts all four embedded KO p
   assert.match(scripts[1], /View Implementation/);
   assert.doesNotMatch(scripts[1], />View CKS<\/button>/);
   assert.doesNotMatch(knowledge, /Wagner Jr FW|Trial protocol: the 30-session planning anchor/);
-  assert.match(scripts[1], /renderHumanRdfForFiles=function\(source\)/);
+  assert.match(scripts[1], /renderHumanRdfForFiles=function\(source,uniqueKoIdOnly=false\)/);
   assert.match(scripts[1], /Select another file or close Metadata Interaction/);
 });

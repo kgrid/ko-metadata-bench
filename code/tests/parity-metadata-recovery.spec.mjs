@@ -83,3 +83,40 @@ test("both editions recover from a malformed working metadata file", async ({ br
   await serverPage.close();
   await standalonePage.close();
 });
+
+async function uniqueKoIdFilterJourney(page, url) {
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+  const panel = page.getByText("DFU Severity Score KO", { exact: true }).first().locator("xpath=ancestor::details[1]");
+  await panel.getByRole("button", { name: "Interact", exact: true }).click();
+  const interaction = page.getByRole("dialog", { name: "DFU Severity Score KO", exact: true });
+  await fileButton(interaction, "findability.metadata.txt").click();
+  await interaction.getByRole("button", { name: "Findability Principles" }).click();
+  const filter = interaction.getByRole("button", { name: "Unique KO ID", exact: true });
+  const rows = rdfTable(interaction).locator("tbody > tr[data-statement-id]");
+  const unfilteredCount = await rows.count();
+  expect(unfilteredCount).toBeGreaterThan(2);
+  await filter.click();
+  await expect(filter).toHaveAttribute("aria-pressed", "true");
+  await expect(filter).toHaveClass(/active/);
+  await expect(rows).toHaveCount(2);
+  const statementIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+  expect(statementIds.some((id) => id.includes("https://schema.org/identifier"))).toBe(true);
+  expect(statementIds.some((id) => id.includes("https://schema.org/version"))).toBe(true);
+  await interaction.getByRole("button", { name: "Source", exact: true }).click();
+  await interaction.getByRole("button", { name: "Table", exact: true }).click();
+  await expect(rows).toHaveCount(2);
+  await filter.click();
+  await expect(filter).toHaveAttribute("aria-pressed", "false");
+  await expect(rows).toHaveCount(unfilteredCount);
+  await interaction.getByRole("button", { name: "Close metadata interaction", exact: true }).click();
+}
+
+test("both editions toggle the Unique KO ID table filter without changing source", async ({ browser }) => {
+  const serverPage = await browser.newPage();
+  const standalonePage = await browser.newPage();
+  await uniqueKoIdFilterJourney(serverPage, editions.server);
+  await uniqueKoIdFilterJourney(standalonePage, editions.standalone);
+  await serverPage.close();
+  await standalonePage.close();
+});

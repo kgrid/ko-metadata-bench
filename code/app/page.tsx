@@ -56,7 +56,6 @@ const PRINCIPLES_LABELS: Record<string, string> = {
   "access.metadata.txt": "Accessibility Principles",
   "interoperability.metadata.txt": "Interoperability Principles",
   "reusability.metadata.txt": "Reusability Principles",
-  "existence.metadata.txt": "Existence Principles",
 };
 
 const PRINCIPLES_CONTROLS: Record<string, readonly string[]> = {
@@ -64,7 +63,6 @@ const PRINCIPLES_CONTROLS: Record<string, readonly string[]> = {
   "access.metadata.txt": ["KO Access", "KO Metadata Access"],
   "interoperability.metadata.txt": ["Specified Interface", "Object References"],
   "reusability.metadata.txt": ["License", "Dependencies"],
-  "existence.metadata.txt": ["Button 1", "Button 2"],
 };
 
 
@@ -1107,8 +1105,12 @@ function learnerAddedLinks(graph: CanonicalRdfGraph, baselineSource?: string) {
   const existing = new Set(baseline.statements.filter((statement) => statement.object.termType === "NamedNode").map(linkKey));
   return graph.statements.filter((statement) => statement.object.termType === "NamedNode" && LEARNER_LINK_LABELS[statement.predicate.value] && !existing.has(linkKey(statement)));
 }
-function HumanRdfView({ source, file, baselineSource }: { source: string; file: FileName; baselineSource?: string }) {
-  const graph = buildCanonicalRdfGraph(source), projection = buildHumanRdfProjection(graph);
+function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false }: { source: string; file: FileName; baselineSource?: string; uniqueKoIdOnly?: boolean }) {
+  const graph = buildCanonicalRdfGraph(source);
+  const koSubject = graph.statements.find((statement) => statement.subject.termType === "NamedNode")?.subject.id;
+  const identityPredicates = new Set(["https://schema.org/identifier", "https://schema.org/version"]);
+  const identityStatements = new Set(graph.statements.filter((statement) => statement.subject.id === koSubject && identityPredicates.has(statement.predicate.value)).map((statement) => statement.id));
+  const projection = buildHumanRdfProjection(graph).filter((statement) => !uniqueKoIdOnly || identityStatements.has(statement.id));
   const addedLinks = learnerAddedLinks(graph, baselineSource);
   const [selectedTerm, setSelectedTerm] = useState<RdfTermSelection | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<string | null>(null);
@@ -1127,13 +1129,13 @@ function HumanRdfView({ source, file, baselineSource }: { source: string; file: 
   });
   const issue = graph.diagnostics[0] ?? (unresolved ? `Unresolved IRI ${JSON.stringify(unresolved.value)}; declare a valid @base or use an absolute IRI.` : null);
   if (issue) return <div className="turtleView humanRdfView"><section className="metadataFileError" role="alert"><strong>Unable to display {file}</strong><p>{issue}</p><small>Select another file, inspect Source, or close Metadata Interaction.</small></section></div>;
-  return <div className="turtleView humanRdfView">{selectedTerm && <RdfTermDetails selection={selectedTerm} graph={graph} onClose={() => setSelectedTerm(null)} />}{addedLinks.length > 0 && <section className="metadataAddedLinks" aria-label="Links added in this session"><header><strong>Links added</strong><span>{addedLinks.length} connected resources</span></header><ul>{addedLinks.map((statement) => <li key={statement.id}><span>{LEARNER_LINK_LABELS[statement.predicate.value]}</span><RdfTermButton term={statement.object} label={statement.object.humanLabel || statement.object.compact} statement={statement} role="object" graph={graph} onSelect={setSelectedTerm} /></li>)}</ul></section>}<div className="tripleTableWrap"><table className="tripleTable humanRdfTable"><thead><tr><th>Subject</th><th>Relationship</th><th>Value</th></tr></thead><tbody>{projection.map((statement) => {
+  return <div className="turtleView humanRdfView">{selectedTerm && <RdfTermDetails selection={selectedTerm} graph={graph} onClose={() => setSelectedTerm(null)} />}{!uniqueKoIdOnly && addedLinks.length > 0 && <section className="metadataAddedLinks" aria-label="Links added in this session"><header><strong>Links added</strong><span>{addedLinks.length} connected resources</span></header><ul>{addedLinks.map((statement) => <li key={statement.id}><span>{LEARNER_LINK_LABELS[statement.predicate.value]}</span><RdfTermButton term={statement.object} label={statement.object.humanLabel || statement.object.compact} statement={statement} role="object" graph={graph} onSelect={setSelectedTerm} /></li>)}</ul></section>}<div className="tripleTableWrap"><table className="tripleTable humanRdfTable"><thead><tr><th>Subject</th><th>Relationship</th><th>Value</th></tr></thead><tbody>{projection.map((statement) => {
     const sourceStatement = graph.statements.find((candidate) => candidate.id === statement.id)!;
     const isAccessInstance = statement.relationship.human === "access instance";
     const subordinateChildren = isAccessInstance ? statement.value.children : statement.value.children.filter((child) => child.predicate.value === "https://schema.org/valueReference");
     const parentValue = isAccessInstance ? { ...statement.value, children: [] } : statement.value;
     return <Fragment key={statement.id}><tr data-statement-id={statement.id} className={selectedStatement === statement.id ? "rdfStatementSelected" : ""} onClick={() => window.dispatchEvent(new CustomEvent("rdf-statement-select", { detail: { statementId: statement.id } }))}><td><RdfTermButton term={statement.subject.rdfTerm} label={statement.subject.display} statement={sourceStatement} role="subject" graph={graph} onSelect={setSelectedTerm} /></td><td><RdfTermButton term={statement.predicate} label={statement.relationship.human} statement={sourceStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={parentValue} statement={sourceStatement} graph={graph} onSelect={setSelectedTerm} /></td></tr>{subordinateChildren.map((child) => { const childStatement = graph.statements.find((candidate) => candidate.id === child.id); return childStatement ? <tr className="humanRdfSubordinateRow" key={`${statement.id}-${child.id}`}><td aria-label="Subordinate relationship" /><td><RdfTermButton term={child.predicate} label={child.relationship.human} statement={childStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={child.value} statement={childStatement} graph={graph} onSelect={setSelectedTerm} />{child.predicate.value === "https://schema.org/valueReference" && <code>{child.value.rdfTerm.compact}</code>}</td></tr> : null; })}</Fragment>;
-  })}{graph.diagnostics.map((text, index) => <tr className="turtleRaw" key={`diagnostic-${index}`}><td colSpan={3}><span>Rendering Issue</span>{text}</td></tr>)}{graph.comments.length > 0 && <tr className="turtleComment"><td colSpan={3}><span>Comment</span>{graph.comments.join("\n")}</td></tr>}</tbody></table></div></div>;
+  })}{graph.diagnostics.map((text, index) => <tr className="turtleRaw" key={`diagnostic-${index}`}><td colSpan={3}><span>Rendering Issue</span>{text}</td></tr>)}{!uniqueKoIdOnly && graph.comments.length > 0 && <tr className="turtleComment"><td colSpan={3}><span>Comment</span>{graph.comments.join("\n")}</td></tr>}</tbody></table></div></div>;
 }
 
 
@@ -2042,6 +2044,7 @@ function WorkspacePane({
   const [relationshipOpen, setRelationshipOpen] = useState(false);
   const [resetConfirmationOpen, setResetConfirmationOpen] = useState(false);
   const [principlesOpen, setPrinciplesOpen] = useState(false);
+  const [uniqueKoIdOnly, setUniqueKoIdOnly] = useState(false);
   if (objectId === 0) {
     return (
       <section className="pane" aria-label={`${side} editor pane`}>
@@ -2049,7 +2052,7 @@ function WorkspacePane({
           <div><h2>Select a knowledge object</h2></div>
           <label className="selectWrap">
             <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
-            <select value="" onChange={(event) => onObjectChange(Number(event.target.value) as ObjectId)}>
+            <select value="" onChange={(event) => { setUniqueKoIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}>
               <option value="" disabled>Choose object…</option>
               {OBJECT_IDS.map((id) => (
                 <option key={id} value={id} disabled={id === otherObjectId}>{objectName(id)}{id === otherObjectId ? " · in use" : ""}</option>
@@ -2088,7 +2091,7 @@ function WorkspacePane({
           <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
           <select
             value={objectId}
-            onChange={(event) => onObjectChange(Number(event.target.value) as ObjectId)}
+            onChange={(event) => { setUniqueKoIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}
           >
             {OBJECT_IDS.map((id) => (
               <option key={id} value={id} disabled={id === otherObjectId}>
@@ -2110,7 +2113,7 @@ function WorkspacePane({
               <button
                 key={fileName}
                 className={fileName === file ? "fileButton active" : "fileButton"}
-                onClick={() => onFileChange(fileName)}
+                onClick={() => { setUniqueKoIdOnly(false); onFileChange(fileName); }}
                 title={fileName}
               >
                 <span className="fileIcon" aria-hidden="true">{fileName.endsWith(".json") ? "{}" : "T"}</span>
@@ -2124,14 +2127,14 @@ function WorkspacePane({
           <div className="editorBar">
             {modified && <button className="editorControlButton editorResetButton" type="button" onClick={() => setResetConfirmationOpen(true)}>Reset</button>}
             {file === "metadata.json" && <button className="informationPageButton" type="button" onClick={() => openEmbeddedInformationPage(objectId)}>Information Page</button>}
-            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => !open)}>{PRINCIPLES_LABELS[file]}</button>}
+            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) setUniqueKoIdOnly(false); return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
             <div className="editorControls">
               {isTurtle && !metadataNeedsGuidedEntry && <button className="editorControlButton" type="button" onClick={() => setRelationshipOpen(true)} disabled={turtleDiagnostics.length > 0} title={turtleDiagnostics.length ? "Correct the Turtle source before graphing it" : undefined}>Graph</button>}
               {isTurtle && !metadataNeedsGuidedEntry && <div className="rdfViewControl" role="group" aria-label="RDF presentation">{(["human", "source"] as const).map((mode) => <button type="button" key={mode} className={rdfView === mode ? "active" : ""} aria-pressed={rdfView === mode} onClick={() => setRdfView(mode)}>{mode === "human" ? "Table" : "Source"}</button>)}</div>}
             </div>
           </div>
-          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
-          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
+          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => label === "Unique KO ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoIdOnly} onClick={() => { setUniqueKoIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
+          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} uniqueKoIdOnly={uniqueKoIdOnly && file === "findability.metadata.txt"} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
             value={value}
             onChange={(event) => onEdit(event.target.value)}
             spellCheck={false}

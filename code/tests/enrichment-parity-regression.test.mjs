@@ -300,24 +300,27 @@ test("both editions share the centered FAIR control-bar arrangement", async () =
   assert.match(standalone, /exercise-control-cluster/);
 });
 
-test("both editions expose a collapsible Principles control row for each metadata file", async () => {
+test("both editions expose Principles controls only for FAIR metadata files", async () => {
   const [page, styles, standalone] = await Promise.all([
     readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
-  for (const label of ["Findability Principles", "Accessibility Principles", "Interoperability Principles", "Reusability Principles", "Existence Principles"]) {
+  for (const label of ["Findability Principles", "Accessibility Principles", "Interoperability Principles", "Reusability Principles"]) {
     assert.ok(page.includes(label), `React includes ${label}`);
     assert.ok(standalone.includes(label), `standalone includes ${label}`);
   }
-  for (const label of ["Unique KO ID", "Unique KO Metadata ID", "KO Access", "KO Metadata Access", "Specified Interface", "Object References", "License", "Dependencies", "Button 1", "Button 2"]) {
+  for (const label of ["Unique KO ID", "Unique KO Metadata ID", "KO Access", "KO Metadata Access", "Specified Interface", "Object References", "License", "Dependencies"]) {
     assert.ok(page.includes(label), `React Principles tray includes ${label}`);
     assert.ok(standalone.includes(label), `standalone Principles tray includes ${label}`);
+  }
+  for (const source of [page, standalone]) {
+    for (const label of ["Existence Principles", '"Button 1"', '"Button 2"']) assert.ok(!source.includes(label), `${label} is not a Principles control`);
   }
   assert.match(page, /aria-expanded=\{principlesOpen\}/);
   assert.match(page, /principlesControlRow/);
   assert.match(styles, /\.principlesControlRow \{/);
-  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;render\(side\)/);
+  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;if\(!s\.principlesOpen\)s\.uniqueKoIdOnly=false;render\(side\)/);
   assert.match(standalone, /class="principles-control-row"/);
   assert.match(styles, /justify-content: center/);
   assert.match(standalone, /justify-content:center/);
