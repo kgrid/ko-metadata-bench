@@ -96,16 +96,22 @@ async function uniqueKoIdFilterJourney(page, url) {
   const rows = rdfTable(interaction).locator("tbody > tr[data-statement-id]");
   const unfilteredCount = await rows.count();
   expect(unfilteredCount).toBeGreaterThan(2);
+  const unfilteredIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+  const koSubject = unfilteredIds[0]?.split(" ")[0];
+  const expectedIdentityIds = unfilteredIds.filter((id) => id?.startsWith(`${koSubject} `)
+    && (id.includes("https://schema.org/identifier") || id.includes("https://schema.org/version")));
+  expect(expectedIdentityIds.length).toBeGreaterThanOrEqual(2);
   await filter.click();
   await expect(filter).toHaveAttribute("aria-pressed", "true");
   await expect(filter).toHaveClass(/active/);
-  await expect(rows).toHaveCount(2);
+  await expect(rows).toHaveCount(expectedIdentityIds.length);
   const statementIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+  expect(statementIds).toEqual(expectedIdentityIds);
   expect(statementIds.some((id) => id.includes("https://schema.org/identifier"))).toBe(true);
   expect(statementIds.some((id) => id.includes("https://schema.org/version"))).toBe(true);
   await interaction.getByRole("button", { name: "Source", exact: true }).click();
   await interaction.getByRole("button", { name: "Table", exact: true }).click();
-  await expect(rows).toHaveCount(2);
+  await expect(rows).toHaveCount(expectedIdentityIds.length);
   await filter.click();
   await expect(filter).toHaveAttribute("aria-pressed", "false");
   await expect(rows).toHaveCount(unfilteredCount);

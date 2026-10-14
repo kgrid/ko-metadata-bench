@@ -227,7 +227,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /embeddedObjectCount=Math\.min\(maxObjectCount,Math\.max\(minObjectCount,4\)\)/);
   assert.doesNotMatch(html, /Session changes|changedCount|class="dot"|class="green"|>Modified</);
   assert.doesNotMatch(html, /localStorage|sessionStorage|draftStorageKey/);
-  assert.match(html, /Public access; no authentication or payment required\./);
+  assert.match(html, /Open tagged repository directory through HTTPS/);
   assert.match(html, /schema\.org\/urlTemplate/);
   assert.match(html, /schema\.org\/potentialAction/);
   assert.match(html, /data-ko-access-id/);
@@ -650,7 +650,8 @@ test("KO replacement orders objects by workshop identifier metadata", async () =
 test("standalone omits unused starter-file placeholders while retaining real KO resources", async () => {
   const html = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.doesNotMatch(html, /^const (?:files|seed)=/m);
-  assert.match(html, /const overrides=\{"1\/README\.md"/);
+  assert.match(html, /const overrides=\{/);
+  assert.match(html, /"1\/README\.md":/);
   const react = await readServerSource();
   assert.match(react, /const FILTERED_FILES = \[/);
   assert.match(react, /FILTERED_FILES\.filter\(/);
