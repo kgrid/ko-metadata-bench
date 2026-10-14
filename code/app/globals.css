@@ -285,10 +285,11 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeSubgraphNodes > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
 .knowledgeSubgraphNodes article { min-width: 0; padding: 8px 10px; border: 1px solid #e5e5e7; border-radius: 8px; overflow-wrap: anywhere; }
 .knowledgeSubgraphNodes article > strong { display: block; font-size: 12px; }
-.knowledgeSubgraphBody { grid-column: 1 / -1; display: flex; flex-direction: column; overflow: hidden; }
+.knowledgeSubgraphBody { display: flex; flex-direction: column; overflow: hidden; }
 .knowledgeSubgraphBody .knowledgeFollowIntro { margin-bottom: 12px; }
 .knowledgeSubgraphBody .knowledgeGraph { padding: 0; overflow: hidden; }
 .knowledgeGraphWorkspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) 0; border: 1px solid #d2d2d7; border-radius: 12px; background: #fff; overflow: hidden; }
+.knowledgeSubgraphBody > .knowledgeGraphWorkspace { grid-column: 1 / -1; }
 .knowledgeGraphWorkspace.inspectorOpen { grid-template-columns: minmax(0,1fr) minmax(250px,320px); }
 .knowledgeSubgraphBody .knowledgeGraphWorkspace .knowledgeGraph { border: 0; border-radius: 0; min-width: 0; overflow: auto; }
 .knowledgeGraphInspector { min-width: 0; min-height: 0; overflow: auto; border-left: 1px solid #d2d2d7; background: #f8f8f9; }

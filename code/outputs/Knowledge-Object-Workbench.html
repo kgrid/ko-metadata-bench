@@ -337,8 +337,9 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeGraphRelationshipList li+li{margin-top:4px}
 .knowledgeGraphRelationshipList button{max-width:100%;padding:5px 7px;border:1px solid transparent;border-radius:5px;background:transparent;color:#3a3a3c;font-size:11px;text-align:left;overflow-wrap:anywhere;cursor:pointer}
 .knowledgeGraphRelationshipList p{margin-top:8px;font-size:11px}
-.knowledgeSubgraphBody{grid-column:1/-1;display:flex;flex-direction:column;overflow:hidden}
+.knowledgeSubgraphBody{display:flex;flex-direction:column;overflow:hidden}
 .knowledgeGraphWorkspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 0;border:1px solid #d2d2d7;border-radius:12px;background:#fff;overflow:hidden}
+.knowledgeSubgraphBody>.knowledgeGraphWorkspace{grid-column:1/-1}
 .knowledgeGraphWorkspace.inspectorOpen{grid-template-columns:minmax(0,1fr) minmax(250px,320px)}
 .knowledgeSubgraphBody .knowledgeGraphWorkspace .knowledgeGraph{border:0;border-radius:0;min-width:0;overflow:auto}
 .knowledgeGraphInspector{min-width:0;min-height:0;overflow:auto;border-left:1px solid #d2d2d7;background:#f8f8f9}
