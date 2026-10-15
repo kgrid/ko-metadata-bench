@@ -2,7 +2,7 @@ import { DataFactory, Parser, Writer } from "n3";
 import { renderFindabilityCanonicalTemplate } from "./canonical-metadata-renderer.js";
 import { assertControlledMetadataEquivalence } from "./metadata-semantic-equivalence.js";
 
-export const FINDABILITY_ENRICHMENT_TARGET = 4;
+export const FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER = "workshop-ko-4";
 export const FINDABILITY_ENRICHMENT_FILE = "findability.metadata.txt";
 
 const SCHEMA = "https://schema.org/";

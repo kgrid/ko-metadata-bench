@@ -1,10 +1,10 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import test from "node:test";
 import { createRunnerInput, projectRunnerOutput, runnerExampleState, runnerInputConfig } from "../app/runner-input-config.js";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
 
 function jsonBetween(source, startMarker, endMarker) {
@@ -43,12 +43,13 @@ const outputFixtures = {
 };
 
 test("both editions embed byte-identical Runner manifests and bundle source", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   const reactFiles = jsonBetween(page, "const objectFileOverrides: Record<string, string> = ", ";\nconst objectBinaryOverrides");
   const standaloneFiles = jsonBetween(standalone, "const overrides=", ";\nconst objectBinaryOverrides");
-  const runnerPaths = Object.keys(reactFiles).filter((path) => /\/runner\/(runner\.manifest\.json|runner\.bundle\.js)$/.test(path)).sort();
+  const isRunnerResource = (path) => /\/runner\.(manifest\.json|bundle\.js)$/.test(path);
+  const runnerPaths = Object.keys(reactFiles).filter(isRunnerResource).sort();
   assert.equal(runnerPaths.length, 8);
-  assert.deepEqual(Object.keys(standaloneFiles).filter((path) => /\/runner\/(runner\.manifest\.json|runner\.bundle\.js)$/.test(path)).sort(), runnerPaths);
+  assert.deepEqual(Object.keys(standaloneFiles).filter(isRunnerResource).sort(), runnerPaths);
   for (const path of runnerPaths) assert.equal(standaloneFiles[path], reactFiles[path], `${path} remains byte-identical`);
 });
 
@@ -76,7 +77,7 @@ test("both editions produce the same human-readable output models", async () => 
 });
 
 test("both editions share the Runner protocol, sandbox, timeout, and failure language", async () => {
-  const [page, host, contract, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(new URL("../app/runner-sandbox-host.js", import.meta.url), "utf8"), readFile(new URL("../app/runner-contract.js", import.meta.url), "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, host, contract, standalone] = await Promise.all([readServerSource(), readFile(new URL("../app/runner-sandbox-host.js", import.meta.url), "utf8"), readFile(new URL("../app/runner-contract.js", import.meta.url), "utf8"), readFile(standaloneUrl, "utf8")]);
   const react = `${page}\n${host}\n${contract}`;
   for (const marker of ["runner:init", "runner:ready", "runner:run", "runner:result", "runner:reset", "FAIR_KO_RUNNER", "allow-scripts", "RunnerTimeoutError", "RunnerInitializationError", "RunnerMalformedOutputError", "Execution timed out.", "Output unavailable.", "Runner unavailable.", "Operation stopped.", "Technical details"]) {
     assert.ok(react.includes(marker), `React implementation retains ${marker}`);

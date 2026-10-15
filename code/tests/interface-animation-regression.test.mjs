@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -71,7 +72,7 @@ test("the standalone edition embeds the exact production motion and failure cont
 
 test("presentation regressions cannot collapse material, motion, or accessibility distinctions", async () => {
   const [page, styles, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("app/globals.css"),
     read("outputs/Knowledge-Object-Workbench.html"),
   ]);

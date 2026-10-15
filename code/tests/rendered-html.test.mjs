@@ -1,7 +1,10 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { Parser } from "n3";
 import { createKnowledgeObjectAccessApi } from "../app/ko-access.js";
+import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 import { loadInteroperabilityExerciseKit, projectInteroperabilityExerciseState } from "../app/interoperability-exercise.js";
 import { createInteroperabilitySimulationHost, fixtureReplaySimulationBinding } from "../app/interoperability-simulation.js";
 
@@ -32,6 +35,7 @@ test("server-renders FAIR Knowledge Object Bench without a subtitle", async () =
   assert.match(html, /Metadata/);
   assert.match(html, /Knowledge Objects/);
   assert.match(html, /Knowledge Assembly/);
+  assert.match(html, /K exercise/);
   assert.match(html, /F exercise/);
   assert.match(html, /A exercise/);
   assert.match(html, /I exercise/);
@@ -46,6 +50,8 @@ test("ships a self-contained standalone HTML edition", async () => {
     "utf8",
   );
   assert.match(html, /^<!doctype html>/i);
+  assert.match(html, /<div class="workspaces"><section class="pane" id="leftPane"><\/section><\/div>/);
+  assert.doesNotMatch(html, /<div class="workspaces single-editor-workspace"><section class="pane" id="leftPane"><\/section><\/div>/);
   assert.match(html, /function renderMetadataRig\(\)/);
   assert.match(html, /A rig to interact with Knowledge Object metadata/);
   assert.match(html, /data-metadata-interact=/);
@@ -62,14 +68,14 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(embeddedParser, /<!doctype html>|const embeddedAbstractPdf|RDF relationship explorer/);
   assert.match(html, /minObjectCount=1,maxObjectCount=10/);
   assert.match(html, /objectIds=Array\.from\(\{length:embeddedObjectCount\}/);
-  assert.match(html, /findabilityFilesForObject=id=>filesForObject\(id\)\.filter/);
+  assert.match(html, /findabilityFilesForObject=id=>resolveObjectResource\(id,"findability\.metadata\.txt"\)\?\["findability\.metadata\.txt"\]:\[\]/);
   assert.match(html, /for\(const objectId of objectIds\)for\(const file of findabilityFilesForObject\(objectId\)\)/);
   assert.doesNotMatch(html, /function searchAll\(query\)[\s\S]{0,300}for\(const file of filesForObject\(objectId\)\)/);
   assert.match(html, /<input type="search" aria-label="Search knowledge objects" aria-keyshortcuts="Enter" enterkeyhint="search"/);
   assert.match(html, /<button type="submit">Search<\/button>/);
   assert.match(html, /input\.addEventListener\("input",\(\)=>\{clearButton\.hidden=!input\.value;if\(!input\.value\)\{currentResults=\[\];searched=false;submittedQuery="";paintResults\(\)\}\}\)/);
   assert.match(html, /form\.addEventListener\("submit",event=>\{event\.preventDefault\(\);submittedQuery=input\.value\.trim\(\);if\(!submittedQuery\)\{currentResults=\[\];searched=false\}else\{currentResults=searchAll\(submittedQuery\);searched=true\}paintResults\(\)\}\)/);
-  assert.match(html, /const objectFolderNames=\["Wagner DFU severity score KO","HBOT treatment decision KO","HBOT regimen burden KO","DFU prognostic indicator KO"\]/);
+  assert.match(html, /const objectFolderNames=\["DFU-Severity-Score-KO","HBOT-Treatment-Decision-KO","HBOT-Regimen-Burden-KO","DFU-Prognostic-Indicator-KO"\]/);
   assert.doesNotMatch(html, /objectNames=\{1:"Knowledge Object 1"/);
   assert.match(html, /Instrument set: \$\{embeddedObjectCount\} embedded knowledge/);
   assert.match(html, /Knowledge Objects explorer/);
@@ -88,6 +94,10 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(html, /openKnowledgeObjects\(1,"grid"\)/);
   assert.match(html, /<details class="ko-object-shade" data-ko-object="\$\{objectId\}">/);
   assert.match(html, /class="facet-list ko-summary-facet-list"/);
+  assert.match(html, /facts=\[\["Information Page","A fully metadata-driven overview"\],\["Size",/);
+  assert.match(html, /label==="Information Page"\?`<button type="button" class="ko-summary-specs-button" data-ko-information aria-label="Open /);
+  assert.match(html, /workspace\.querySelectorAll\("\[data-ko-information\]"\)/);
+  assert.match(html, /if\(objectId\)openEmbeddedInformationPage\(objectId\)/);
   assert.match(html, /\["Knowledge Elements",koKnowledgeElementCount\(objectId\)\]/);
   assert.match(html, /\["Method",koMethod\(objectId\)\]/);
   assert.match(html, />Overview<\/button>/);
@@ -119,7 +129,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /context\.fillText\(label,cx,cy-middleRadius\+\.5\)/);
   assert.match(html, /Findability exercise/);
   assert.match(html, /class="view-title"><div class="search-mark">F<\/div><h2>Findability<\/h2>/);
-  assert.match(html, /class="view-title"><div class="search-mark">A<\/div><h2>Accessibility<\/h2>/);
+  assert.match(html, /class="view-title"><div class="search-mark">A<\/div><h2>Access<\/h2>/);
   assert.match(html, /class="view-title"><div class="search-mark">I<\/div><h2>Interoperability<\/h2>/);
   assert.match(html, /class="view-title"><div class="search-mark">R<\/div><h2>Reusability<\/h2>/);
   assert.match(html, /class="view-title"><div class="ko-instrument-mark">KOs<\/div><h2>Knowledge Objects<\/h2>/);
@@ -161,7 +171,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<span>Searched for<\/span><q>\$\{escapeHtml\(query\)\}<\/q>/);
   assert.match(html, /class="result-count match-idle" disabled>Matches<\/button>/);
   assert.match(html, /class="result-count match-zero" disabled>0 matches<\/button>/);
-  assert.match(html, /class="findability-audit-button" data-findability-audit="\$\{objectId\}">Audit<\/button>/);
+  assert.match(html, /class="findability-audit-button".*data-findability-audit="\$\{objectId\}".*>Audit<\/button>/);
   assert.match(html, /const findabilityAuditDefinitions=\[/);
   assert.match(html, /function runFindabilityAudit\(objectId\)/);
   assert.match(html, /function openFindabilityAudit\(objectId\)/);
@@ -175,7 +185,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /<th>Searched for<\/th><th>Expected<\/th>/);
   assert.match(html, /<th>Why this result is expected<\/th>/);
   assert.match(html, /class="audit-rationale"/);
-  assert.match(html, /rationale:definition\.rationales\[objectId-1\]/);
+  assert.match(html, /objectId===assemblyVirtualId\|\|definition\.expectedObjects\.includes\(objectId\)/);
+  assert.match(html, /rationale=objectId===assemblyVirtualId\?/);
   assert.match(html, /Unexpected match—the term appears in this KO’s findability metadata despite being outside its declared discovery focus\./);
   assert.match(html, /This KO classifies DFU severity; HBOT is not its declared subject or purpose\./);
   assert.doesNotMatch(html, /rationale:"Tests /);
@@ -201,7 +212,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /\$\{declaredFacets\} Facets/);
   assert.match(html, /\.result-group\.zero-facets,\.result-group\.zero-facets>summary\{background:#fff8f7\}/);
   assert.match(html, /\.result-group>summary \.facet-count\.has-facets\{background:#e5f3e8;color:#356b43\}/);
-  assert.match(html, /\.result-group>summary \.facet-count\.incomplete-facets\{background:#fff8f7;color:#b42318\}/);
+  assert.match(html, /\.result-group>summary \.facet-count\.incomplete-facets\{background:#fff8f7;color:var\(--status-red\)\}/);
   assert.match(html, /\.result-group>summary \.result-count\.match-positive\{border:1px solid #34c759\}/);
   assert.match(html, /\.result-group>summary \.result-count\.match-zero\{border:1px solid #ff3b30\}/);
   assert.match(html, /\.findability-facet-row\.missing,\.facet-row\.missing,\.boundary-questions details\.missing-facet\{background:#fff8f7\}/);
@@ -216,13 +227,13 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /embeddedObjectCount=Math\.min\(maxObjectCount,Math\.max\(minObjectCount,4\)\)/);
   assert.doesNotMatch(html, /Session changes|changedCount|class="dot"|class="green"|>Modified</);
   assert.doesNotMatch(html, /localStorage|sessionStorage|draftStorageKey/);
-  assert.match(html, /Public access; no authentication or payment required\./);
+  assert.match(html, /Open tagged repository directory through HTTPS/);
   assert.match(html, /schema\.org\/urlTemplate/);
   assert.match(html, /schema\.org\/potentialAction/);
   assert.match(html, /data-ko-access-id/);
   assert.match(html, /FDO Bench KO Access API 1\.0/);
   assert.match(html, /relationship:\{\.\.\.getPredicatePresentation\(statement\.predicate\),human:name\.object\.value\}/);
-  assert.match(html, /objectName=id=>formatFolderName\(objectFolderName\(id\)\)/);
+  assert.match(html, /objectName=id=>objectDisplayNames\[id-1\]/);
   assert.match(html, /fileNamesByObject/);
   assert.match(html, /Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx/);
   assert.match(html, /\[Extracted DOCX text\]/);
@@ -231,6 +242,11 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /id="abstractButton">Workshop Abstract<\/button>/);
   assert.match(html, /class="files-return" id="filesReturn" aria-pressed="false">Metadata Rig<\/button>/);
   assert.match(html, /id="knowledgeObjectsButton"[^>]*>Knowledge Objects<\/button><button[^>]*id="filesReturn"[^>]*>Metadata Rig<\/button><\/div><div class="exercise-control-cluster">/);
+  assert.match(html, /data-exercise="K" aria-label="K exercise" aria-pressed="false">K<\/button><button[^>]*data-exercise="F"/);
+  assert.match(html, /\.exercise-buttons button\.knowledge-exercise-button:not\(\.active\)\{background:#f6f3ee;color:#1d1d1f;opacity:1\}/);
+  assert.match(html, /function renderKnowledge\(\)/);
+  assert.match(html, /Distinguish computable knowledge from the evidence it is based on/);
+  assert.match(html, /class="search-mark knowledge-mark">K<\/div><h2>Knowledge<\/h2>/);
   assert.match(html, /<span class="label">Metadata Exercises<\/span>/);
   assert.doesNotMatch(html, /filesReturn\.hidden/);
   assert.match(html, /filesReturn\.classList\.remove\("active-destination"\)/);
@@ -340,8 +356,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /status:"binding-unavailable"/);
   assert.match(html, /same input and output are progressively annotated/);
   assert.match(html, /Host-supplied simulation binding/);
-  assert.match(html, /wagner-interoperability-exercise\/examples\/raw-input\.json/);
-  assert.match(html, /wagner-interoperability-exercise\/examples\/expected-output\.json/);
+  assert.match(html, /interoperability-exercise\/examples\/raw-input\.json/);
+  assert.match(html, /interoperability-exercise\/examples\/expected-output\.json/);
   assert.match(html, /function loadInteroperabilityExerciseKit\(\{files,readText\}\)/);
   assert.match(html, /configFiles\.length!==1/);
   assert.match(html, /parseState\(config\.simulationState/);
@@ -395,8 +411,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /authenticatedPreparations=new WeakSet/);
   assert.match(html, /knowledge-object-not-found/);
   assert.match(html, /-working-copy/);
-  assert.match(html, /"1\/Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx":"UEsDB/);
-  assert.match(html, /"1\/kgrid\.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0\.docx":"UEsDB/);
+  assert.match(html, /"1\/[^"\n]*Meggitt-Wagner_CKS_One-Page_Clinical-Knowledge_Summary\.docx":"UEsDB/);
+  assert.match(html, /"1\/[^"\n]*kgrid\.org_Meggitt_Wagner_Questionnaire_CKS_Version_1_0\.docx":"UEsDB/);
   assert.match(html, /Object\.hasOwn\(drafts,key\(object\.sourceIndex,path\)\)/);
   assert.match(html, /accessPredicates=new Set\(\["https:\/\/schema\.org\/url","https:\/\/schema\.org\/urlTemplate","https:\/\/schema\.org\/distribution","https:\/\/schema\.org\/contentUrl","https:\/\/schema\.org\/downloadUrl"\]\)/);
   assert.match(html, /statement\.predicate\.value==="https:\/\/schema\.org\/potentialAction"/);
@@ -457,7 +473,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /function buildHumanRdfProjection\(graph\)\{return graph\.statements\.filter\(statement=>statement\.subject\.termType!=="BlankNode"\)\.map\(statement=>projectRdfStatement\(graph,statement\)\)\}/);
   assert.doesNotMatch(html, /a\.projected\.relationship\.order-b\.projected\.relationship\.order/);
   assert.doesNotMatch(html, /children=graph\.statements[^\n]*\.sort\(/);
-  assert.match(html, /function renderHumanRdfForFiles\(source\)/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\)/);
   assert.match(html, /data-rdf-view="human" class="active"/);
   assert.doesNotMatch(html, />Compact RDF<\/button>/);
   assert.match(html, /data-rdf-view="source"/);
@@ -466,7 +482,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /Human view unavailable/);
   assert.match(html, /Invalid Turtle source/);
   assert.match(html, /Your source has been preserved/);
-  assert.match(html, /function renderHumanRdfForFiles\(source\).*graph\.diagnostics\.length/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\).*graph\.diagnostics\.length/);
   assert.match(html, /const updateRdfValidity=/);
   assert.match(html, /graphButton\.disabled=diagnostics\.length>0/);
   assert.match(html, /Authoritative Turtle source/);
@@ -487,6 +503,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.doesNotMatch(html, /relateButton\.textContent="Relate"|button\.textContent==="Relate"/);
   assert.match(html, /openRelationshipDialog/);
   assert.match(html, /RDF relationship explorer/);
+  assert.match(html, /\.relationship-backdrop\{z-index:1050\}/);
   assert.match(html, /Node-and-edge graph/);
   assert.doesNotMatch(html, /data-presentation="graph"|data-presentation="lanes"/);
   assert.doesNotMatch(html, /state=\{detail,presentation:"graph"/);
@@ -556,15 +573,36 @@ test("ships a self-contained standalone HTML edition", async () => {
     "README.md",
     "graphic.abstract.webp",
     "metadata.json",
-    "accessibility.metadata.txt",
+    "access.metadata.txt",
     "findability.metadata.txt",
     "interoperability.metadata.txt",
     "reusability.metadata.txt",
   ]) assert.match(html, new RegExp(filename.replaceAll(".", "\\.")));
+  assert.doesNotMatch(html, /accessibility\.metadata\.txt/);
+  assert.match(html, /\.metadata-rig-exercise\{grid-column:1\/-1;width:100%/);
+  assert.match(html, /if\(!visibleFiles\.includes\(s\.file\)\)s\.file=initialFileForObject\(s\.object\)/);
+  assert.match(html, /if\(!metadataFilesForObject\(nextObject\)\.includes\(s\.file\)\)s\.file=initialFileForObject\(nextObject\)/);
+  assert.doesNotMatch(html, /if\(!filesForObject\(nextObject\)\.includes\(s\.file\)\)/);
+  const serverSource = await readServerSource();
+  assert.match(serverSource, /access\.metadata\.txt/);
+  assert.doesNotMatch(serverSource, /accessibility\.metadata\.txt/);
+});
+
+test("both Metadata Rig file rails expose access.metadata.txt and never the retired filename", async () => {
+  const [serverSource, standaloneHtml] = await Promise.all([
+    readServerSource(),
+    readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8"),
+  ]);
+  for (const edition of [serverSource, standaloneHtml]) {
+    assert.match(edition, /"access\.metadata\.txt"/);
+    assert.doesNotMatch(edition, /accessibility\.metadata\.txt/);
+  }
+  assert.match(serverSource, /<span className="fileName">\{fileName\}<\/span>/);
+  assert.match(standaloneHtml, /<span class="file-name">\$\{f\}<\/span>/);
 });
 
 test("browser abstract dialog uses the embedded PDF rather than a downloadable route", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   assert.match(source, /const embeddedAbstractPdf="data:application\/pdf;base64,JVBER/);
   assert.match(source, /<iframe[^>]+src=\{embeddedAbstractPdf\}/);
   assert.doesNotMatch(source, /src="\/Representing_Computable_Biomedical_Knowledge_Monochromatic\.pdf"/);
@@ -604,13 +642,42 @@ test("findability quotes are strict and unquoted terms use AND ranking", async (
 
 test("KO replacement orders objects by workshop identifier metadata", async () => {
   const script = await readFile(new URL("../scripts/update-embedded-kos.mjs", import.meta.url), "utf8");
-  assert.match(script, /schema:identifier\\s\+"workshop-ko-\(\\d\+\)"/);
-  assert.match(script, /const an = workshopNumber\(root, a\.name\)/);
-  assert.match(script, /const bn = workshopNumber\(root, b\.name\)/);
+  assert.match(script, /orderWorkshopObjects/);
+  assert.match(script, /relative\(folderPath, path\)/);
+  assert.doesNotMatch(script, /join\(root, folderName, "findability\.metadata\.txt"\)/);
+});
+
+test("standalone omits unused starter-file placeholders while retaining real KO resources", async () => {
+  const html = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.doesNotMatch(html, /^const (?:files|seed)=/m);
+  assert.match(html, /const overrides=\{/);
+  assert.match(html, /"1\/README\.md":/);
+  const react = await readServerSource();
+  assert.match(react, /const FILTERED_FILES = \[/);
+  assert.match(react, /FILTERED_FILES\.filter\(/);
+});
+
+test("both editions display each KO's declared findability schema:name", async () => {
+  const react = await readServerSource();
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  const declaredNames = [1, 2, 3, 4].map((id) => {
+    const statements = new Parser({ format: "text/turtle" }).parse(embeddedLogicalValue(react, id, "findability.metadata.txt"));
+    const subject = statements.find((statement) => statement.predicate.value === "https://schema.org/identifier" && statement.object.value === `workshop-ko-${id}`)?.subject;
+    const names = statements.filter((statement) => subject && statement.subject.equals(subject) && statement.predicate.value === "https://schema.org/name").map((statement) => statement.object.value);
+    assert.equal(names.length, 1);
+    return names[0];
+  });
+  const reactNames = JSON.parse(react.match(/^const OBJECT_DISPLAY_NAMES = (\[[^\n]+\]) as const;/m)?.[1] ?? "null");
+  const standaloneNames = JSON.parse(standalone.match(/^const objectDisplayNames=(\[[^\n]+\]);/m)?.[1] ?? "null");
+  assert.deepEqual(reactNames, declaredNames);
+  assert.deepEqual(standaloneNames, declaredNames);
+  assert.match(react, /const objectName = \(id: ObjectId\) => id === ASSEMBLY_OBJECT_ID.*: OBJECT_DISPLAY_NAMES\[id - 1\]/);
+  assert.match(standalone, /objectName=id=>objectDisplayNames\[id-1\]/);
+  assert.match(standalone, /objectDisplayNames\.push\(embeddedAssembly\.generalView/);
 });
 
 test("keeps published metadata, exercise kit, and simulation session as explicit models", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   assert.match(source, /type PublishedInteroperabilityModel =/);
   assert.match(source, /type InteroperabilityExerciseKit =/);
   assert.match(source, /type InteroperabilitySimulationSession =/);
@@ -623,9 +690,8 @@ test("keeps published metadata, exercise kit, and simulation session as explicit
   assert.match(source, /className="interoperabilityGrid"/);
   assert.match(source, />Stages<\/button>/);
   assert.match(source, /Stages are not supplied for this knowledge object/);
-  assert.match(source, /const projectedState = exercise \? projectInteroperabilityExerciseState/);
-  assert.doesNotMatch(source, /const stage = projectedState\?\.primaryStage/);
-  assert.match(source, /const nextFacet = projectedState\?\.nextPrimaryFacet/);
+  assert.match(source, /if \(exercise\) return <section className="boundaryPanel detailSimulationOnly"/);
+  assert.match(source, /boundary\.questions\.map\(\(item\) => <details/);
   assert.match(source, /const stateFor = \(state: number\)/);
   assert.match(source, /selectedState: state/);
   assert.doesNotMatch(source, /State comparison|Move freely among four interoperability states/);
@@ -637,7 +703,7 @@ test("keeps published metadata, exercise kit, and simulation session as explicit
 });
 
 test("both editions use five interface process stages with outcomes handled by case controls", async () => {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const source = await readServerSource();
   const playback = await readFile(new URL("../app/interface-playback.js", import.meta.url), "utf8");
   const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
@@ -780,7 +846,7 @@ test("KO access API prepares deterministic embedded and working ZIP representati
   const objects = [{ id: "wagner", name: "Wagner", sourceIndex: 5, aliases: [5, "Knowledge Object 5"] }];
   const embedded = [{ path: "metadata.json", content: "embedded" }, { path: "src/index.js", content: "run();" }];
   const working = [{ path: "metadata.json", content: "edited" }, { path: "src/index.js", content: "run();" }];
-  const api = createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles: () => embedded, getWorkingFiles: () => working, environment: globalThis });
+  const api = createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles: async () => embedded, getWorkingFiles: async () => working, environment: globalThis });
   assert.deepEqual(api.listKnowledgeObjects(), [{ id: "wagner", name: "Wagner" }]);
 
   const missingPassword = await api.prepareKnowledgeObjectZip({ knowledgeObjectId: "wagner" });

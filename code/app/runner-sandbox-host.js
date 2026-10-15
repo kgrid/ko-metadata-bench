@@ -60,6 +60,7 @@ export function runnerSandboxDocument() {
   return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; img-src 'none'; media-src 'none'; font-src 'none'; style-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; base-uri 'none'; form-action 'none'"><script>${bootstrap.replaceAll("</script", "<\\/script")}</script></head><body></body></html>`;
 }
 
+/** @param {{ bundleSource?: string, timeoutMs?: number, document?: Document, window?: Window & typeof globalThis, crypto?: Crypto }} [options] */
 export function createDisposableRunnerSandbox({
   bundleSource,
   timeoutMs = 5000,

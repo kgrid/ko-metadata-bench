@@ -1,13 +1,25 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
+import { Script } from "node:vm";
+import { Parser } from "n3";
+import ts from "typescript";
+import { orderWorkshopObjects } from "../app/workshop-ordering.js";
+import { partitionKnowledgePackages, prepareAssemblyGeneralView } from "../app/assembly-discovery.js";
+import { convertDocxToProjection, documentProjectionToPlainText } from "../app/document-projection-converter.js";
+import { packageDocumentProjectionMedia } from "../app/document-projection-packager.js";
+import { validatePackageMetadata } from "./validate-package-metadata.mjs";
+import { validateAnnotationDestinations } from "../app/annotation-destination-validator.js";
+import { publishStagedKos } from "./publish-staged-kos.mjs";
 
 const [zipPath, version] = process.argv.slice(2);
 if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
 
 const workspace = process.cwd();
 const temp = mkdtempSync(join(tmpdir(), "fdo-bench-kos-"));
+const stagingRoot = mkdtempSync(join(workspace, ".ko-update-"));
+let preserveStaging = false;
 const ignored = (name) => name === "__MACOSX" || name === ".DS_Store" || name.startsWith("._");
 
 function walk(dir) {
@@ -24,21 +36,6 @@ function looksText(buffer) {
   return !decoded.includes("\uFFFD");
 }
 
-function extractedDocxText(path) {
-  try {
-    const xml = execFileSync("unzip", ["-p", path, "word/document.xml"], { encoding: "utf8" });
-    const text = xml
-      .replace(/<w:tab\/?\s*>/g, "\t")
-      .replace(/<\/w:p>/g, "\n")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
-      .replace(/\n{3,}/g, "\n\n").trim();
-    return `[Extracted DOCX text]\n\n${text}`;
-  } catch {
-    return "[Extracted DOCX text unavailable]";
-  }
-}
-
 function replaceExactly(source, pattern, replacement, label) {
   const matches = source.match(pattern);
   if (!matches || matches.length !== 1) throw new Error(`Could not uniquely replace ${label}`);
@@ -53,14 +50,27 @@ function serializeForScript(value, indent) {
     .replaceAll("\u2029", "\\u2029");
 }
 
-function workshopNumber(root, folderName) {
-  try {
-    const source = readFileSync(join(root, folderName, "findability.metadata.txt"), "utf8");
-    const match = source.match(/schema:identifier\s+"workshop-ko-(\d+)"/i);
-    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
-  } catch {
-    return Number.MAX_SAFE_INTEGER;
+function validateStagedCode(react, standalone) {
+  const source = ts.createSourceFile("page.tsx", react, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  if (source.parseDiagnostics.length) {
+    throw new Error(`Staged React edition has a syntax error: ${ts.flattenDiagnosticMessageText(source.parseDiagnostics[0].messageText, " ")}`);
   }
+  const scripts = [...standalone.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
+  if (!scripts.length) throw new Error("Staged standalone edition has no scripts");
+  for (const [index, match] of scripts.entries()) {
+    try { new Script(match[1], { filename: `standalone-script-${index + 1}.js` }); }
+    catch (error) { throw new Error(`Staged standalone edition has a syntax error in script ${index + 1}`, { cause: error }); }
+  }
+}
+
+function declaredObjectName(object) {
+  const source = object.readText(object.workshop.findabilityPath);
+  const statements = new Parser({ format: "text/turtle" }).parse(source);
+  const identifier = `workshop-ko-${object.workshop.number}`;
+  const subject = statements.find((statement) => statement.predicate.value === "https://schema.org/identifier" && statement.object.value === identifier)?.subject;
+  const names = statements.filter((statement) => subject && statement.subject.equals(subject) && statement.predicate.value === "https://schema.org/name" && statement.object.termType === "Literal").map((statement) => statement.object.value.trim());
+  if (names.length !== 1 || !names[0]) throw new Error(`${object.folderName}: expected one nonempty schema:name for ${identifier} in findability metadata`);
+  return names[0];
 }
 
 try {
@@ -69,18 +79,72 @@ try {
   const rootEntries = readdirSync(root, { withFileTypes: true }).filter((entry) => !ignored(entry.name));
   if (rootEntries.length === 1 && rootEntries[0].isDirectory()) root = join(root, rootEntries[0].name);
 
-  const folders = readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && !ignored(entry.name))
-    .sort((a, b) => {
-      const an = workshopNumber(root, a.name);
-      const bn = workshopNumber(root, b.name);
-      return an - bn || a.name.localeCompare(b.name);
-    });
+  const candidates = readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !ignored(entry.name));
+  const discovered = candidates.map((entry) => {
+    const folderPath = join(root, entry.name);
+    const paths = walk(folderPath);
+    const files = paths.map((path) => relative(folderPath, path).split("\\").join("/"));
+    return { entry, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
+  });
+  const { knowledgeObjects, knowledgeAssembly } = partitionKnowledgePackages(discovered);
+  // Reject unresolved identifiers before clearing assets or rewriting either edition.
+  const metadataErrors = [];
+  for (const object of discovered) {
+    try { validatePackageMetadata(object); }
+    catch (error) { metadataErrors.push(error instanceof Error ? error.message : String(error)); }
+  }
+  if (metadataErrors.length) throw new Error(`Metadata validation failed:\n${metadataErrors.join("\n")}`);
+  const orderedObjects = orderWorkshopObjects(knowledgeObjects);
+  const folders = orderedObjects.map((object) => object.entry);
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);
   const folderNames = folders.map((folder) => folder.name);
+  const displayNames = orderedObjects.map(declaredObjectName);
+  const annotationDestinationRecords = {};
+  for (const [index, object] of [...orderedObjects, ...(knowledgeAssembly ? [knowledgeAssembly] : [])].entries()) {
+    const folderPath = join(root, object.folderName);
+    const metadata = JSON.parse(object.readText("metadata.json"));
+    const passageTextCache = new Map();
+    const results = validateAnnotationDestinations(metadata, {
+      files: object.files,
+      readBytes: (file) => readFileSync(join(folderPath, file)),
+      readPassageText: (file) => {
+        if (!passageTextCache.has(file)) {
+          const sourcePath = join(folderPath, file);
+          const value = /\.docx$/i.test(file)
+            ? documentProjectionToPlainText(convertDocxToProjection({ docxPath: sourcePath, knowledgeObjectId: object.folderName, originalPath: file }))
+            : readFileSync(sourcePath, "utf8");
+          passageTextCache.set(file, value);
+        }
+        return passageTextCache.get(file);
+      },
+    });
+    annotationDestinationRecords[String(index + 1)] = results;
+    for (const result of results.filter((item) => item.status === "unresolved")) {
+      console.warn(`${object.folderName}/metadata.json: annotation ${result.annotationId || result.targetId || "unnamed"}: ${result.reason}`);
+    }
+  }
+  const assemblyPayload = knowledgeAssembly ? (() => {
+    const generalView = prepareAssemblyGeneralView(knowledgeAssembly);
+    const folderPath = join(root, knowledgeAssembly.folderName);
+    const textFiles = {};
+    const binaryFiles = {};
+    let byteLength = 0;
+    for (const file of knowledgeAssembly.files.sort()) {
+      const buffer = readFileSync(join(folderPath, file));
+      byteLength += buffer.byteLength;
+      if (looksText(buffer)) textFiles[file] = buffer.toString("utf8");
+      else binaryFiles[file] = buffer.toString("base64");
+    }
+    return { folderName: knowledgeAssembly.folderName, metadata: knowledgeAssembly.metadata, generalView, textFiles, binaryFiles, byteLength };
+  })() : null;
 
   const textFiles = {};
   const binaryFiles = {};
+  const serverBinaryFiles = {};
+  const serverStaticFiles = {};
+  const documentProjections = {};
+  const serverKoAssetRoot = join(stagingRoot, "ko-assets");
+  mkdirSync(serverKoAssetRoot);
   folders.forEach((folder, index) => {
     const folderPath = join(root, folder.name);
     for (const path of walk(folderPath).sort()) {
@@ -90,36 +154,98 @@ try {
       if (looksText(buffer)) textFiles[key] = buffer.toString("utf8");
       else {
         binaryFiles[key] = buffer.toString("base64");
-        if (/\.docx$/i.test(path)) textFiles[key] = extractedDocxText(path);
+        if (/\.pdf$/i.test(path)) {
+          const relativePath = relative(folderPath, path).split("\\").join("/");
+          const destination = join(serverKoAssetRoot, String(index + 1), relativePath);
+          mkdirSync(dirname(destination), { recursive: true });
+          copyFileSync(path, destination);
+          serverStaticFiles[key] = {
+            url: `/ko-assets/${[String(index + 1), ...relativePath.split("/")].map(encodeURIComponent).join("/")}`,
+            byteLength: buffer.byteLength,
+          };
+        } else {
+          serverBinaryFiles[key] = binaryFiles[key];
+        }
+        if (/\.docx$/i.test(path)) {
+          const projection = convertDocxToProjection({
+            docxPath: path,
+            knowledgeObjectId: `workshop-ko-${index + 1}`,
+            originalPath: relative(folderPath, path).split("\\").join("/"),
+          });
+          documentProjections[key] = projection;
+          textFiles[key] = documentProjectionToPlainText(projection);
+        }
       }
     }
   });
+  const packagedDocumentProjections = packageDocumentProjectionMedia({
+    records: documentProjections,
+    publicRoot: join(stagingRoot, "docx-assets"),
+  });
 
-  const reactPath = join(workspace, "app/page.tsx");
-  let react = readFileSync(reactPath, "utf8");
-  react = react.replace(/Math\.max\(MIN_OBJECT_COUNT, \d+\)/, `Math.max(MIN_OBJECT_COUNT, ${folders.length})`);
-  react = react.replace(/const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`);
-  react = react.replace(/const DATA_VERSION = "[^"]+";/, `const DATA_VERSION = "${version}";`);
-  react = replaceExactly(react, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "React text payload");
-  react = replaceExactly(react, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const base64ToBytes/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(binaryFiles, 2)};\nconst base64ToBytes`, "React binary payload");
-  writeFileSync(reactPath, react);
+  const generatedPath = join(workspace, "app/generated-ko-data.ts");
+  let generated = readFileSync(generatedPath, "utf8");
+  generated = replaceExactly(generated, /^const OBJECT_FOLDER_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_FOLDER_NAMES = ${JSON.stringify(folderNames)} as const;`, "server KO folder names");
+  generated = replaceExactly(generated, /^const OBJECT_DISPLAY_NAMES = \[[^\n]+\] as const;/m, `const OBJECT_DISPLAY_NAMES = ${JSON.stringify(displayNames)} as const;`, "server metadata display names");
+  generated = replaceExactly(generated, /^const annotationDestinationOverrides:[^\n]+$/m, `const annotationDestinationOverrides: Record<string, Array<{ annotationId: string; targetId: string; kind: string | null; status: string; reason: string | null; declaringSubjectId?: string; filePath?: string }>> = ${serializeForScript(annotationDestinationRecords)};`, "server annotation destinations");
+  generated = replaceExactly(generated, /^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = [^\n]+;/m, `const EMBEDDED_ASSEMBLY: EmbeddedAssembly | null = ${serializeForScript(assemblyPayload)};`, "server assembly payload");
+  generated = replaceExactly(generated, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "server text payload");
+  generated = replaceExactly(generated, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^export \{/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nexport {`, "server binary, static-asset, and document-projection payloads");
+  const stagedGeneratedPath = join(stagingRoot, "generated-ko-data.ts");
+  writeFileSync(stagedGeneratedPath, generated);
 
   const standalonePath = join(workspace, "outputs/Knowledge-Object-Workbench.html");
   let standalone = readFileSync(standalonePath, "utf8");
   standalone = standalone.replace(/Math\.max\(minObjectCount,\d+\)/, `Math.max(minObjectCount,${folders.length})`);
   standalone = standalone.replace(/const objectFolderNames=\[[^\n]+\];/, `const objectFolderNames=${JSON.stringify(folderNames)};`);
+  standalone = replaceExactly(standalone, /^const objectDisplayNames=\[[^\n]+\];/m, `const objectDisplayNames=${JSON.stringify(displayNames)};`, "standalone metadata display names");
+  standalone = replaceExactly(standalone, /^const annotationDestinationOverrides=[^\n]+;$/m, `const annotationDestinationOverrides=${serializeForScript(annotationDestinationRecords)};`, "standalone annotation destinations");
+  standalone = replaceExactly(standalone, /^const embeddedAssembly=[^\n]+;/m, `const embeddedAssembly=${serializeForScript(assemblyPayload).replaceAll("</script", "<\\/script")};`, "standalone assembly payload");
   standalone = standalone.replace(/const dataVersion="[^"]+"/, `const dataVersion="${version}"`);
   const safeText = serializeForScript(textFiles).replaceAll("</script", "<\\/script");
   const safeBinary = serializeForScript(binaryFiles);
   standalone = replaceExactly(
     standalone,
     /^const overrides=\{[\s\S]*?^const base64ToBytes=/m,
-    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst base64ToBytes=`,
+    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst documentProjectionOverrides=${serializeForScript(packagedDocumentProjections.standaloneRecords).replaceAll("</script", "<\\/script")};\nconst base64ToBytes=`,
     "standalone embedded payloads"
   );
-  writeFileSync(standalonePath, standalone);
+  const stagedStandalonePath = join(stagingRoot, "Knowledge-Object-Workbench.html");
+  writeFileSync(stagedStandalonePath, standalone);
 
-  console.log(JSON.stringify({ version, objects: folders.map((folder) => folder.name), textFiles: Object.keys(textFiles).length, binaryFiles: Object.keys(binaryFiles).length }, null, 2));
+  // Validate the complete staged replacement before changing any published path.
+  // All assets referenced by the server payload must exist in the staging tree.
+  if (!generated.includes("const objectStaticAssetOverrides:") ||
+      !standalone.includes("const documentProjectionOverrides=")) {
+    throw new Error("Staged editions did not contain the expected replacement payloads");
+  }
+  validateStagedCode(readFileSync(stagedGeneratedPath, "utf8"), readFileSync(stagedStandalonePath, "utf8"));
+  for (const item of packagedDocumentProjections.assets) {
+    if (!existsSync(item.destination) || statSync(item.destination).size !== item.byteLength) {
+      throw new Error(`Staged document image is missing or incomplete: ${item.destination}`);
+    }
+  }
+  for (const [key, asset] of Object.entries(serverStaticFiles)) {
+    const destination = join(serverKoAssetRoot, ...key.split("/"));
+    if (!existsSync(destination) || statSync(destination).size !== asset.byteLength) {
+      throw new Error(`Staged PDF is missing or incomplete: ${key}`);
+    }
+  }
+  if (!existsSync(join(stagingRoot, "docx-assets"))) mkdirSync(join(stagingRoot, "docx-assets"));
+  try {
+    publishStagedKos({ stagingRoot, replacements: [
+      { staged: serverKoAssetRoot, target: join(workspace, "public", "ko-assets") },
+      { staged: join(stagingRoot, "docx-assets"), target: join(workspace, "public", "docx-assets") },
+      { staged: stagedGeneratedPath, target: generatedPath },
+      { staged: stagedStandalonePath, target: standalonePath },
+    ] });
+  } catch (error) {
+    preserveStaging = error instanceof AggregateError;
+    throw error;
+  }
+
+  console.log(JSON.stringify({ version, objects: folders.map((folder, index) => ({ folder: folder.name, displayName: displayNames[index] })), assembly: knowledgeAssembly?.folderName ?? null, textFiles: Object.keys(textFiles).length, standaloneBinaryFiles: Object.keys(binaryFiles).length, serverBinaryFiles: Object.keys(serverBinaryFiles).length, serverStaticPdfFiles: Object.keys(serverStaticFiles).length, derivedDocumentImages: packagedDocumentProjections.assets.length }, null, 2));
 } finally {
   rmSync(temp, { recursive: true, force: true });
+  if (!preserveStaging) rmSync(stagingRoot, { recursive: true, force: true });
 }

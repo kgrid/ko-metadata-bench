@@ -1,10 +1,11 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { runnerSandboxDocument } from "../app/runner-sandbox-host.js";
 
 const host = readFileSync(new URL("../app/runner-sandbox-host.js", import.meta.url), "utf8");
-const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const react = readServerSourceSync();
 const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
 const standaloneHost = standalone.slice(
   standalone.indexOf("function runnerSandboxDocumentStandalone"),

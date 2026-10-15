@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -15,17 +16,9 @@ import {
   getReusabilityLicenseOptions,
   getReusabilityUnlockState,
 } from "../app/reusability-enrichment.js";
+import { embeddedLogicalEntry } from "./embedded-test-resources.mjs";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
-
-function pageEmbeddedValue(source, key) {
-  const marker = `  ${JSON.stringify(key)}: `;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `${key} is embedded in the React edition`);
-  const valueStart = start + marker.length;
-  return JSON.parse(source.slice(valueStart, source.indexOf(",\n", valueStart)));
-}
 
 function standaloneOverrides(html) {
   const marker = "const overrides=";
@@ -49,39 +42,109 @@ function pageTextOverrides(source) {
 }
 
 function pageBinaryOverrides(source) {
-  return objectLiteralBetween(source, "const objectBinaryOverrides: Record<string, string> = ", ";\nconst base64ToBytes", "React binary bundle");
+  return objectLiteralBetween(source, "const objectBinaryOverrides: Record<string, string> = ", ";\nconst objectStaticAssetOverrides", "React binary bundle");
+}
+
+function pageStaticAssetOverrides(source) {
+  return objectLiteralBetween(source, "const objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ", ";\nconst documentProjectionOverrides", "React static-asset bundle");
 }
 
 function standaloneBinaryOverrides(source) {
-  return objectLiteralBetween(source, "const objectBinaryOverrides=", ";\nconst base64ToBytes", "standalone binary bundle");
+  return objectLiteralBetween(source, "const objectBinaryOverrides=", ";\nconst documentProjectionOverrides", "standalone binary bundle");
+}
+
+function pageDocumentProjectionOverrides(source) {
+  return objectLiteralBetween(source, "const documentProjectionOverrides: Record<string, unknown> = ", ";\nexport {", "React document-projection bundle");
+}
+
+function standaloneDocumentProjectionOverrides(source) {
+  return objectLiteralBetween(source, "const documentProjectionOverrides=", ";\nconst base64ToBytes", "standalone document-projection bundle");
 }
 
 test("React and standalone editions embed identical Findability and Reusability metadata", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
+  const pageFiles = pageTextOverrides(page);
   const overrides = standaloneOverrides(standalone);
   for (let objectId = 1; objectId <= 4; objectId += 1) {
     for (const file of ["findability.metadata.txt", "reusability.metadata.txt"]) {
-      const key = `${objectId}/${file}`;
-      assert.equal(overrides[key], pageEmbeddedValue(page, key), `${key} remains identical in both formats`);
+      const matches = Object.keys(pageFiles).filter((key) => key.startsWith(`${objectId}/`) && key.endsWith(`/${file}`));
+      assert.equal(matches.length, 1, `${file} is discovered exactly once for object ${objectId}`);
+      const [key] = matches;
+      assert.equal(overrides[key], pageFiles[key], `${key} remains identical in both formats`);
     }
   }
 });
 
-test("React and standalone editions embed identical complete KO payloads", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+test("server static KO PDFs and standalone embedded PDFs preserve complete edition payloads", async () => {
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   const pageText = pageTextOverrides(page);
   const standaloneText = standaloneOverrides(standalone);
   const pageBinary = pageBinaryOverrides(page);
+  const pageStatic = pageStaticAssetOverrides(page);
   const standaloneBinary = standaloneBinaryOverrides(standalone);
+  const pageDocuments = pageDocumentProjectionOverrides(page);
+  const standaloneDocuments = standaloneDocumentProjectionOverrides(standalone);
 
   assert.deepEqual(Object.keys(standaloneText).sort(), Object.keys(pageText).sort(), "all embedded text-file paths match");
   assert.deepEqual(standaloneText, pageText, "all embedded text-file contents match");
-  assert.deepEqual(Object.keys(standaloneBinary).sort(), Object.keys(pageBinary).sort(), "all embedded binary-file paths match");
-  assert.deepEqual(standaloneBinary, pageBinary, "all embedded binary-file contents match");
+  const standalonePdfKeys = Object.keys(standaloneBinary).filter((key) => /\.pdf$/i.test(key)).sort();
+  const standaloneNonPdf = Object.fromEntries(Object.entries(standaloneBinary).filter(([key]) => !/\.pdf$/i.test(key)));
+  assert.deepEqual(pageBinary, standaloneNonPdf, "non-PDF binary contents remain identical");
+  assert.deepEqual(Object.keys(pageStatic).sort(), standalonePdfKeys, "every standalone KO PDF has a server static-asset record");
+  assert.deepEqual(Object.keys(pageDocuments).sort(), Object.keys(standaloneDocuments).sort(), "both editions contain the same DOCX projections");
+  for (const key of Object.keys(pageDocuments)) {
+    const serverDocument = pageDocuments[key];
+    const standaloneDocument = standaloneDocuments[key];
+    const withoutTransport = (document) => ({
+      ...document,
+      embeddedImages: document.embeddedImages.map((image) => {
+        const withoutTransportFields = { ...image };
+        delete withoutTransportFields.contentBase64;
+        delete withoutTransportFields.resourceUrl;
+        return withoutTransportFields;
+      }),
+    });
+    assert.deepEqual(withoutTransport(serverDocument), withoutTransport(standaloneDocument), `${key} has edition-neutral document content`);
+    for (let index = 0; index < serverDocument.embeddedImages.length; index += 1) {
+      const serverImage = serverDocument.embeddedImages[index];
+      const standaloneImage = standaloneDocument.embeddedImages[index];
+      assert.equal("contentBase64" in serverImage, false, `${key} server projection contains no image bytes`);
+      assert.match(serverImage.resourceUrl, /^\/docx-assets\//, `${key} server projection uses a same-origin derived image URL`);
+      assert.equal("resourceUrl" in standaloneImage, false, `${key} standalone projection has no server dependency`);
+      const expectedBytes = Buffer.from(standaloneImage.contentBase64, "base64");
+      const servedBytes = await readFile(new URL(`../public${serverImage.resourceUrl}`, import.meta.url));
+      assert.deepEqual(servedBytes, expectedBytes, `${key} derived server image matches its standalone embedded resource`);
+    }
+  }
+  assert.equal(Object.keys(pageBinary).some((key) => /\.pdf$/i.test(key)), false, "server client bundle contains no KO PDF bytes");
+  assert.match(page, /className="koViewPdfButton"/, "server file reader exposes the generic PDF action");
+  assert.match(page, />View PDF<\/button>/, "server PDF action has a clear visible label");
+  assert.match(page, /<EmbeddedEvidenceDialog objectId=\{objectId\} file=\{selectedFile\}/, "server PDF action reuses the embedded PDF viewer");
+  assert.match(standalone, /class="ko-view-pdf-button" hidden>View PDF<\/button>/, "standalone file reader exposes the generic PDF action");
+  assert.match(standalone, /openEmbeddedEvidence\(objectId,encodeURIComponent\(file\)\)/, "standalone PDF action reuses the embedded PDF viewer");
+  assert.match(standalone, /canvas\?\.addEventListener\("pointerdown",\(\)=>queueMicrotask\(sync\)\)/, "standalone PDF control follows the radial's own selection event");
+  assert.doesNotMatch(standalone, /new MutationObserver\(sync\)\.observe\(explorer/, "standalone PDF control does not observe or interfere with radial selection state");
+  assert.match(standalone, /mountKoExplorersBeforeAllRingSelection/, "standalone restores explicit hit-testing for bricks in the four-ring view");
+  assert.match(standalone, /if\(name\)name\.textContent=file;if\(meta\)meta\.textContent=selectedLayer\.label/, "standalone all-ring selection updates file context directly");
+  assert.match(standalone, /mountKoExplorersBeforeSettledPdfAction/, "standalone refreshes the PDF action after every radial selection handler has settled");
+  assert.match(standalone, /canvas\.addEventListener\("pointerdown",\(\)=>setTimeout\(sync,0\)\)/, "standalone multi-ring PDF action follows the completed brick selection");
+  assert.match(standalone, /URL\.createObjectURL\(new Blob\(/, "standalone opens embedded PDFs through a local Blob URL");
+  assert.match(standalone, /window\.open\(pdfUrl,"_blank"\)/, "standalone keeps the opener relationship required by its opaque-origin PDF Blob");
+  assert.doesNotMatch(standalone, /window\.open\(pdfUrl,"_blank","noopener"\)/, "standalone does not sever access to its opaque-origin Blob registry");
+  assert.match(standalone, /URL\.revokeObjectURL\(pdfUrl\)/, "standalone eventually releases the temporary PDF Blob URL");
+  assert.doesNotMatch(standalone, /src="data:application\/pdf;base64,\$\{binary\}"/, "standalone does not hand Chrome's PDF viewer a giant data URL");
+  for (const key of standalonePdfKeys) {
+    const expectedBytes = Buffer.from(standaloneBinary[key], "base64");
+    const asset = pageStatic[key];
+    assert.equal(asset.byteLength, expectedBytes.byteLength, `${key} declares its exact byte length`);
+    assert.match(asset.url, /^\/ko-assets\//, `${key} uses a same-origin static URL`);
+    const servedBytes = await readFile(new URL(`../public${asset.url}`, import.meta.url));
+    assert.deepEqual(servedBytes, expectedBytes, `${key} static bytes match the standalone payload exactly`);
+  }
 });
 
 test("both editions route metadata-dependent views through their working copy", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   for (const consumer of ["searchKnowledgeObjects", "findabilityFacets", "knowledgeObjectPurpose", "reusabilityFacets"]) {
     const start = page.indexOf(`function ${consumer}`);
     assert.notEqual(start, -1, `${consumer} exists in React`);
@@ -95,7 +158,7 @@ test("both editions route metadata-dependent views through their working copy", 
 });
 
 test("metadata completion transitions directly from guided entry to the normal Table view", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   assert.match(page, /findabilityNeedsGuidedEntry[\s\S]*?<FindabilityGuidedEditor/);
   assert.match(page, /reusabilityNeedsGuidedEntry[\s\S]*?<ReusabilityGuidedEditor/);
   assert.match(page, /setRdfView\("human"\); onEdit\(nextValue\)/, "guided edits return React to Table presentation");
@@ -108,11 +171,13 @@ test("metadata completion transitions directly from guided entry to the normal T
 });
 
 test("complete enrichment lasts for the session and reset restores only the selected baseline", async () => {
-  const page = await readFile(pageUrl, "utf8");
-  const canonicalFindability = pageEmbeddedValue(page, "4/findability.metadata.txt");
-  const canonicalReusability = pageEmbeddedValue(page, "4/reusability.metadata.txt");
-  const findabilityKey = "4/findability.metadata.txt";
-  const reusabilityKey = "4/reusability.metadata.txt";
+  const page = await readServerSource();
+  const findabilityEntry = embeddedLogicalEntry(page, 4, "findability.metadata.txt");
+  const reusabilityEntry = embeddedLogicalEntry(page, 4, "reusability.metadata.txt");
+  const canonicalFindability = findabilityEntry.value;
+  const canonicalReusability = reusabilityEntry.value;
+  const findabilityKey = findabilityEntry.key;
+  const reusabilityKey = reusabilityEntry.key;
 
   const findability = constructFindabilityMetadata(canonicalFindability, {
     fullNameConfirmed: true,
@@ -141,7 +206,7 @@ test("complete enrichment lasts for the session and reset restores only the sele
 });
 
 test("neither edition persists learner changes across reloads", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   assert.doesNotMatch(page, /localStorage|sessionStorage|loadDrafts|saveDrafts|DRAFT_STORAGE_KEY/);
   assert.doesNotMatch(page, /Session changes|modifiedCount|changeDot|statusDot/);
   assert.doesNotMatch(standalone, /localStorage|sessionStorage|draftStorageKey|loadStoredDrafts|Saved locally|Recovered locally/);
@@ -150,7 +215,7 @@ test("neither edition persists learner changes across reloads", async () => {
 
 test("both editions retain the same guided-editor contract", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -165,7 +230,7 @@ test("both editions retain the same guided-editor contract", async () => {
     "Select both declared records supporting the knowledge represented by this object.",
     "Resetting will discard edits in progress.",
     "Guided metadata entry",
-    "Simulated AI Support",
+    "Assist Me",
     "This knowledge object uses a diabetic foot ulcer’s initial wound area and duration to place it into a published prognostic group and estimate its probability of healing within 16 weeks.",
     "diabetic foot ulcer healing prognosis",
     "16-week wound healing probability",
@@ -189,7 +254,7 @@ test("both editions retain the same guided-editor contract", async () => {
 
 test("Reset is absent until relevant and occupies the left editor-header position", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -205,7 +270,7 @@ test("Reset is absent until relevant and occupies the left editor-header positio
 });
 
 test("both editions use an in-app Reset confirmation instead of the browser prompt", async () => {
-  const [page, standalone] = await Promise.all([readFile(pageUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
+  const [page, standalone] = await Promise.all([readServerSource(), readFile(standaloneUrl, "utf8")]);
   for (const source of [page, standalone]) {
     assert.ok(source.includes("Reset this metadata?"));
     assert.ok(source.includes("Resetting will discard edits in progress."));
@@ -219,7 +284,7 @@ test("both editions use an in-app Reset confirmation instead of the browser prom
 
 test("both editions share the centered FAIR control-bar arrangement", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
@@ -235,24 +300,27 @@ test("both editions share the centered FAIR control-bar arrangement", async () =
   assert.match(standalone, /exercise-control-cluster/);
 });
 
-test("both editions expose a collapsible Principles control row for each metadata file", async () => {
+test("both editions expose Principles controls only for FAIR metadata files", async () => {
   const [page, styles, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(standaloneUrl, "utf8"),
   ]);
-  for (const label of ["Findability Principles", "Accessibility Principles", "Interoperability Principles", "Reusability Principles", "Existence Principles"]) {
+  for (const label of ["Findability Principles", "Accessibility Principles", "Interoperability Principles", "Reusability Principles"]) {
     assert.ok(page.includes(label), `React includes ${label}`);
     assert.ok(standalone.includes(label), `standalone includes ${label}`);
   }
-  for (const label of ["Unique KO ID", "Unique KO Metadata ID", "KO Access", "KO Metadata Access", "Specified Interface", "Object References", "License", "Dependencies", "Button 1", "Button 2"]) {
+  for (const label of ["Unique KO ID", "Unique KO Metadata ID", "KO Access", "KO Metadata Access", "Specified Interface", "Object References", "License", "Dependencies"]) {
     assert.ok(page.includes(label), `React Principles tray includes ${label}`);
     assert.ok(standalone.includes(label), `standalone Principles tray includes ${label}`);
+  }
+  for (const source of [page, standalone]) {
+    for (const label of ["Existence Principles", '"Button 1"', '"Button 2"']) assert.ok(!source.includes(label), `${label} is not a Principles control`);
   }
   assert.match(page, /aria-expanded=\{principlesOpen\}/);
   assert.match(page, /principlesControlRow/);
   assert.match(styles, /\.principlesControlRow \{/);
-  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;render\(side\)/);
+  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;if\(!s\.principlesOpen\)s\.uniqueKoIdOnly=false;render\(side\)/);
   assert.match(standalone, /class="principles-control-row"/);
   assert.match(styles, /justify-content: center/);
   assert.match(standalone, /justify-content:center/);
@@ -267,13 +335,14 @@ test("both editions expose a collapsible Principles control row for each metadat
 
 test("both editions place existence metadata between reusability metadata and metadata.json", async () => {
   const [page, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(standaloneUrl, "utf8"),
   ]);
   for (const source of [page, standalone]) {
-    const reusability = source.indexOf('"reusability.metadata.txt"');
-    const existence = source.indexOf('"existence.metadata.txt"');
-    const information = source.indexOf('"metadata.json"', existence);
+    const fileList = source.match(/(?:FILTERED_FILES|filteredFiles)\s*=\s*\[([^\]]+)\]/)?.[1] ?? "";
+    const reusability = fileList.indexOf('"reusability.metadata.txt"');
+    const existence = fileList.indexOf('"existence.metadata.txt"');
+    const information = fileList.indexOf('"metadata.json"', existence);
     assert.ok(reusability >= 0 && existence > reusability && information > existence);
     assert.ok(source.includes('"existence.metadata.txt":"Existence"') || source.includes('"existence.metadata.txt": "Existence"'));
   }

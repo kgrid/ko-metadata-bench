@@ -1,4 +1,5 @@
 import { runnerManifestErrors } from "./runner-contract.js";
+import { discoverResourceMap } from "./resource-discovery.js";
 
 export const RUNNER_MANIFEST_PATH = "runner/runner.manifest.json";
 
@@ -27,13 +28,15 @@ function metadataIdentity(metadata) {
  */
 export function discoverRunnerAvailability({ files, readText }) {
   const fileSet = new Set(Array.isArray(files) ? files : []);
-  if (!fileSet.has(RUNNER_MANIFEST_PATH)) {
+  const resources = discoverResourceMap({ files: [...fileSet], readText });
+  const manifestPath = resources.resolve(RUNNER_MANIFEST_PATH);
+  if (!manifestPath) {
     return unavailable("No browser Runner is supplied by this knowledge object.");
   }
 
   let manifest;
   try {
-    manifest = JSON.parse(text(readText(RUNNER_MANIFEST_PATH)) ?? "");
+    manifest = JSON.parse(text(readText(manifestPath)) ?? "");
   } catch {
     return unavailable("The Runner manifest is not valid JSON.");
   }
@@ -43,7 +46,8 @@ export function discoverRunnerAvailability({ files, readText }) {
 
   let metadata;
   try {
-    metadata = JSON.parse(text(readText("metadata.json")) ?? "");
+    const metadataPath = resources.resolve("metadata.json");
+    metadata = JSON.parse(text(metadataPath ? readText(metadataPath) : null) ?? "");
   } catch {
     return unavailable("The knowledge object identity record is not valid JSON.", manifest);
   }

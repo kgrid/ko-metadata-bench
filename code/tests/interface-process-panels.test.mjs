@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -6,13 +7,13 @@ const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
 test("React five-stage interface uses profile shapes, exact rail dies, and a transformation press", async () => {
-  const page = await read("app/page.tsx");
+  const page = await readServerSource();
   assert.doesNotMatch(page, /function ProfileFixture/);
   assert.match(page, /function ProfileTransformation/);
   assert.match(page, /className="profileTransformation interfaceStageGraphic" viewBox="35 3 90 70"/);
   assert.match(page, /function RailBindingDie/);
   assert.match(page, /RailBindingDie profile=\{inputObject\.profile\} direction="input"/);
-  assert.match(page, /<ProfileTransformation inputProfile=\{inputObject\.profile\} outputProfile=\{outputObject\.profile\}/);
+  assert.match(page, /<ProfileTransformation \/>/);
   assert.match(page, /RailBindingDie profile=\{outputObject\.profile\} direction="output"/);
   assert.match(page, /className="railDieCavity" d=\{shape\.path\}/);
   assert.doesNotMatch(page, /<ProfileFixture/);
@@ -37,7 +38,7 @@ test("both editions style all five diagrams as a coherent process row", async ()
 });
 
 test("outcomes remain case controls and projections rather than a process panel or outcome rail", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /className="state3CaseSelector"/);
   assert.match(page, /showCaseDetail && simulationCase/);
   assert.doesNotMatch(page, /interfaceOutcomeRail|Outcome rail/);
@@ -46,7 +47,7 @@ test("outcomes remain case controls and projections rather than a process panel 
 });
 
 test("interface animation carries and transforms the generated profile contour", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /function InterfaceProcessToken/);
   assert.match(page, /className="tokenInput"/);
   assert.match(page, /className="tokenOutput"/);
@@ -59,7 +60,7 @@ test("interface animation carries and transforms the generated profile contour",
 });
 
 test("both editions use one explicit continuous motion path instead of card-center arithmetic", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /const station = interfaceMotionFrame\(motionPhase, step\)/);
   assert.match(page, /data-motion-station=\{station\.stage\}/);
   assert.match(page, /<span className="interfaceMotionPath"/);
@@ -75,7 +76,7 @@ test("both editions use one explicit continuous motion path instead of card-cent
 });
 
 test("both editions expose deliberate binding-fit phases", async () => {
-  const [page, motion, styles, html] = await Promise.all([read("app/page.tsx"), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, motion, styles, html] = await Promise.all([readServerSource(), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   for (const phase of ["input-approach", "input-align", "input-snap", "input-seated", "output-approach", "output-snap-in", "output-seated", "output-release", "output-snap-out"]) {
     assert.match(motion, new RegExp(phase));
     assert.match(html, new RegExp(phase));
@@ -106,7 +107,7 @@ test("both editions render input snap as one mechanical catch with reduced-motio
 });
 
 test("both editions seat one persistent object inside an exact matching die", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /function RailBindingDie/);
   assert.match(page, /className="railDieCavity" d=\{shape\.path\}/);
   assert.match(page, /className="railDieLip" d=\{shape\.path\}/);
@@ -126,7 +127,7 @@ test("both editions seat one persistent object inside an exact matching die", as
 });
 
 test("both editions confine the input-to-output change to the operation", async () => {
-  const [page, motion, styles, html] = await Promise.all([read("app/page.tsx"), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, motion, styles, html] = await Promise.all([readServerSource(), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   for (const phase of ["operation-entry", "stamp-down", "stamp-contact", "stamp-transform", "stamp-up"]) {
     assert.match(motion, new RegExp(phase));
     assert.match(html, new RegExp(phase));
@@ -145,7 +146,7 @@ test("both editions confine the input-to-output change to the operation", async 
 });
 
 test("both editions render the operation as a four-part stamping sequence", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /className="transformationFrame"/);
   assert.match(page, /className="transformationAnvil"/);
   assert.match(html, /class="transformation-frame"/);
@@ -168,7 +169,7 @@ test("both editions render the operation as a four-part stamping sequence", asyn
 });
 
 test("both editions restyle generated output as a distinct graphite material", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /kind\?: "input" \| "output"/);
   assert.match(page, /kind="output"/);
   assert.match(styles, /\.interfaceProcessToken \.tokenOutput path \{ fill: #3a3a3c; stroke: #1d1d1f; \}/);
@@ -201,7 +202,7 @@ test("both editions finish with a visible delivery handoff", async () => {
 });
 
 test("each declared failure point has a distinct physical animation", async () => {
-  const [page, motion, styles, html] = await Promise.all([read("app/page.tsx"), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, motion, styles, html] = await Promise.all([readServerSource(), read("app/interface-motion.js"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   assert.match(page, /failure-\$\{failurePoint\}/);
   assert.match(page, /className="tokenFracture"/);
   assert.match(page, /className="transformationFault"/);
@@ -222,7 +223,7 @@ test("each declared failure point has a distinct physical animation", async () =
 });
 
 test("interface animation uses concise action text without a redundant trace paragraph", async () => {
-  const [page, motion, html] = await Promise.all([read("app/page.tsx"), read("app/interface-motion.js"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, motion, html] = await Promise.all([readServerSource(), read("app/interface-motion.js"), read("outputs/Knowledge-Object-Workbench.html")]);
   for (const phrase of ["Input data object checked.", "Input moving above its binding.", "Input centered over the matching cavity.", "Input descending into the binding.", "Input fully seated in the binding.", "Input held in the matching cavity.", "Input entering operation.", "Press closing over input.", "Input clamped in the press.", "Input enclosed during computation.", "Press opening to reveal output.", "Output centered over its binding.", "Output snapping into binding.", "Output fully seated in the binding.", "Output held in the matching cavity.", "Output lifting out of the binding.", "Output clear of the binding.", "Output moving to delivery.", "Output delivered.", "Input data object rejected.", "Input binding rejected.", "Operation failed.", "Output binding rejected.", "Output data object rejected."]) {
     assert.match(`${page}\n${motion}`, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.match(html, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
@@ -232,7 +233,7 @@ test("interface animation uses concise action text without a redundant trace par
 });
 
 test("both editions provide responsive and accessible interface interaction", async () => {
-  const [page, styles, html] = await Promise.all([read("app/page.tsx"), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
+  const [page, styles, html] = await Promise.all([readServerSource(), read("app/globals.css"), read("outputs/Knowledge-Object-Workbench.html")]);
   for (const token of ["aria-busy", "aria-atomic", "aria-relevant", "aria-controls", "ArrowLeft", "ArrowRight", "Home", "End"]) {
     assert.match(page, new RegExp(token));
     assert.match(html, new RegExp(token));

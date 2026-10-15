@@ -1,8 +1,9 @@
+import { readServerSourceSync } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const react = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const react = readServerSourceSync();
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 const standalone = readFileSync(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
 const runnerConfig = readFileSync(new URL("../app/runner-input-config.js", import.meta.url), "utf8");
@@ -85,12 +86,20 @@ test("structured KO errors and host execution failures use distinct presentation
 });
 
 test("both editions contain Runner failures and keep technical details collapsed", () => {
-  for (const edition of [react, standalone]) {
-    assert.match(edition, /Runner unavailable\./);
-    assert.match(edition, /Execution timed out\./);
-    assert.match(edition, /Output unavailable\./);
-    assert.match(edition, /Technical details/);
-    assert.doesNotMatch(edition, /error\?\.stack|error\.stack/);
+  const runnerSections = [
+    [react, "function RunnerOutputProjection", "function graphicAbstractFile"],
+    [standalone, "function renderRunnerOutputModel", "function mountKoFlips"],
+  ];
+  for (const [edition, startMarker, endMarker] of runnerSections) {
+    const start = edition.indexOf(startMarker);
+    const end = edition.indexOf(endMarker, start + startMarker.length);
+    assert.ok(start >= 0 && end > start, `Runner UI boundaries must exist: ${startMarker} to ${endMarker}`);
+    const runnerUi = edition.slice(start, end);
+    assert.match(runnerUi, /Runner unavailable\./);
+    assert.match(runnerUi, /Execution timed out\./);
+    assert.match(runnerUi, /Output unavailable\./);
+    assert.match(runnerUi, /Technical details/);
+    assert.doesNotMatch(runnerUi, /error\?\.stack|error\.stack/);
   }
   assert.match(react, /RunnerMalformedOutputError/);
   assert.match(standalone, /RunnerMalformedOutputError/);
@@ -107,7 +116,7 @@ test("Runner output and failure text cannot be interpreted as parent-page HTML",
 
 test("closing a Runner removes only its full-screen layer and preserves the Knowledge Objects view", () => {
   assert.match(react, /onClose=\{\(\) => setGraphicView\(null\)\}/);
-  assert.match(react, /<div className="koGrid">\{OBJECT_IDS\.map/);
+  assert.match(react, /<div className="koGrid"(?: key=\{koPanelReset\})?>\{activeObjectIds\.map/);
   assert.match(standalone, /close=\(\)=>\{sandbox\?\.dispose\(\);document\.removeEventListener\("keydown",escape\);view\.remove\(\)\}/);
   assert.match(standalone, /class="ko-grid"/);
   assert.doesNotMatch(standalone, /close=\(\)=>\{[^}]*workspace\.innerHTML/);

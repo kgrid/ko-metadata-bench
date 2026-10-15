@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -39,7 +40,7 @@ function standaloneFrozenValue(source, name) {
 
 test("production and standalone editions retain the same Interface process contract", async () => {
   const [page, motion, styles, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("app/interface-motion.js"),
     read("app/globals.css"),
     read("outputs/Knowledge-Object-Workbench.html"),
@@ -88,7 +89,7 @@ test("standalone motion phases exactly match the production motion contract", as
 
 test("both editions retain the same interface playback cadence and accessible terminal behavior", async () => {
   const [page, styles, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("app/globals.css"),
     read("outputs/Knowledge-Object-Workbench.html"),
   ]);
@@ -111,7 +112,7 @@ test("both editions retain the same interface playback cadence and accessible te
 
 test("both editions preserve the same failure materials and motion-independent cues", async () => {
   const [page, styles, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("app/globals.css"),
     read("outputs/Knowledge-Object-Workbench.html"),
   ]);
@@ -139,7 +140,7 @@ test("standalone Completed selection returns to the first stage rather than the 
 
 test("both editions keep only stages preceding an error available for inspection", async () => {
   const [page, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("outputs/Knowledge-Object-Workbench.html"),
   ]);
   assert.match(page, /const locked = Boolean\(failureStep && step >= failureStep\)/);
@@ -152,7 +153,7 @@ test("both editions keep only stages preceding an error available for inspection
 
 test("both editions cancel prior animation work before case or stage changes", async () => {
   const [page, standalone] = await Promise.all([
-    read("app/page.tsx"),
+    readServerSource(),
     read("outputs/Knowledge-Object-Workbench.html"),
   ]);
   assert.match(page, /const selectOutcome = \(outcome: string\) => \{ clearInterfaceAnimationTimers\(\)/);

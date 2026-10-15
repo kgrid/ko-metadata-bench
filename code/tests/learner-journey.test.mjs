@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -18,25 +19,17 @@ import {
   getReusabilityLicenseOptions,
   getReusabilityUnlockState,
 } from "../app/reusability-enrichment.js";
+import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const standaloneUrl = new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url);
-
-function embeddedValue(source, key) {
-  const marker = `  ${JSON.stringify(key)}: `;
-  const start = source.indexOf(marker);
-  assert.notEqual(start, -1, `${key} is embedded`);
-  const valueStart = start + marker.length;
-  return JSON.parse(source.slice(valueStart, source.indexOf(",\n", valueStart)));
-}
 
 function progress(state) {
   return { completed: state.completed, total: state.total, unlocked: state.unlocked };
 }
 
 test("Findability learner journey stays guided until every requirement is complete", async () => {
-  const page = await readFile(pageUrl, "utf8");
-  const canonical = embeddedValue(page, "4/findability.metadata.txt");
+  const page = await readServerSource();
+  const canonical = embeddedLogicalValue(page, 4, "findability.metadata.txt");
   const subjects = getFindabilitySubjectOptions(canonical);
   const outputs = getFindabilityOutputTermOptions(canonical);
   const baseline = createFindabilityEnrichmentBaseline(canonical);
@@ -67,8 +60,8 @@ test("Findability learner journey stays guided until every requirement is comple
 });
 
 test("Reusability learner journey requires both evidence sources before Table and Source", async () => {
-  const page = await readFile(pageUrl, "utf8");
-  const canonical = embeddedValue(page, "4/reusability.metadata.txt");
+  const page = await readServerSource();
+  const canonical = embeddedLogicalValue(page, 4, "reusability.metadata.txt");
   const licenses = getReusabilityLicenseOptions(canonical);
   const evidence = getReusabilityEvidenceOptions(canonical);
   const baseline = createReusabilityEnrichmentBaseline(canonical);
@@ -98,7 +91,7 @@ test("Reusability learner journey requires both evidence sources before Table an
 
 test("both editions expose the same learner gates and reload from embedded baselines", async () => {
   const [page, standalone] = await Promise.all([
-    readFile(pageUrl, "utf8"),
+    readServerSource(),
     readFile(standaloneUrl, "utf8"),
   ]);
 
@@ -112,8 +105,8 @@ test("both editions expose the same learner gates and reload from embedded basel
     assert.doesNotMatch(source, /localStorage|sessionStorage/);
   }
 
-  const findabilityBaseline = createFindabilityEnrichmentBaseline(embeddedValue(page, "4/findability.metadata.txt"));
-  const reusabilityBaseline = createReusabilityEnrichmentBaseline(embeddedValue(page, "4/reusability.metadata.txt"));
+  const findabilityBaseline = createFindabilityEnrichmentBaseline(embeddedLogicalValue(page, 4, "findability.metadata.txt"));
+  const reusabilityBaseline = createReusabilityEnrichmentBaseline(embeddedLogicalValue(page, 4, "reusability.metadata.txt"));
   assert.equal(getFindabilityUnlockState(findabilityBaseline).unlocked, false);
   assert.equal(getReusabilityUnlockState(reusabilityBaseline).unlocked, false);
 });

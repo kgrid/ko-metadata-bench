@@ -186,7 +186,8 @@ export function createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles, getW
     const content = options.content || "embedded";
     if (!new Set(["embedded", "working"]).has(content)) return failure(object.id, "content-not-supported", "Content must be 'embedded' or 'working'.");
     try {
-      const files = (content === "working" ? getWorkingFiles(object) : getEmbeddedFiles(object)).map((file) => ({ path: safePath(file.path), content: file.content }));
+      const suppliedFiles = await (content === "working" ? getWorkingFiles(object) : getEmbeddedFiles(object));
+      const files = suppliedFiles.map((file) => ({ path: safePath(file.path), content: file.content }));
       if (!files.length) return failure(object.id, "knowledge-object-empty", "The embedded knowledge object contains no files.");
       const archiveName = `${slug(object.id)}${content === "working" ? "-working-copy" : ""}.zip`;
       const bytes = createStoredZip(files, slug(object.id));
@@ -232,14 +233,16 @@ export function createKnowledgeObjectAccessApi({ objects, getEmbeddedFiles, getW
     anchor.click();
     anchor.remove();
     environment.setTimeout(() => environment.URL.revokeObjectURL(url), 1000);
-    const { blob: _blob, ...receipt } = prepared;
+    const receipt = { ...prepared };
+    delete receipt.blob;
     const result = { ...receipt, ok: true, status: "download-started" };
     emit(environment, result);
     return result;
   }
 
   async function downloadKnowledgeObject(options = {}) {
-    const { password: _ignoredPassword, ...request } = options;
+    const request = { ...options };
+    delete request.password;
     const prepared = await requestPassword(environment, (password) => prepareKnowledgeObjectZip({ ...request, password }));
     if (prepared === null) {
       const cancelled = failure(options.knowledgeObjectId, "authentication-cancelled", "Password entry was cancelled. No knowledge object was downloaded.");

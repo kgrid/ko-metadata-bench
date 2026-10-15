@@ -1,16 +1,14 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { Parser } from "n3";
-import { confirmFindabilityFullName, constructFindabilityMetadata, createFindabilityEnrichmentBaseline, evaluateFindabilityEnrichment, FINDABILITY_ENRICHMENT_TARGET, getCanonicalFindabilityName, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions, getFindabilityUnlockState, setFindabilityControlledSubjects, setFindabilityDescription, setFindabilityOutputTerms, setFindabilitySearchTerms } from "../app/findability-enrichment.js";
+import { confirmFindabilityFullName, constructFindabilityMetadata, createFindabilityEnrichmentBaseline, evaluateFindabilityEnrichment, FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, getCanonicalFindabilityName, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions, getFindabilityUnlockState, setFindabilityControlledSubjects, setFindabilityDescription, setFindabilityOutputTerms, setFindabilitySearchTerms } from "../app/findability-enrichment.js";
+import { embeddedLogicalValue } from "./embedded-test-resources.mjs";
 
 async function canonicalTargetSource() {
-  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  const key = `  "${FINDABILITY_ENRICHMENT_TARGET}/findability.metadata.txt": `;
-  const start = source.indexOf(key);
-  assert.notEqual(start, -1, "canonical target metadata is embedded");
-  const valueStart = start + key.length;
-  return JSON.parse(source.slice(valueStart, source.indexOf(",\n", valueStart)));
+  assert.equal(FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, "workshop-ko-4");
+  const source = await readServerSource();
+  return embeddedLogicalValue(source, 4, "findability.metadata.txt");
 }
 
 test("KO 4 begins with valid incomplete Findability working metadata", async () => {
@@ -34,10 +32,12 @@ test("complete canonical KO 4 metadata satisfies all Findability unlock requirem
 test("KO 4 full name is canonical and can only be confirmed, not renamed", async () => {
   const canonical = await canonicalTargetSource();
   const baseline = createFindabilityEnrichmentBaseline(canonical);
-  assert.equal(getCanonicalFindabilityName(canonical), "Two-Factor Prognostic Model for Diabetic Foot Ulcer Healing by 16 Weeks");
+  const canonicalName = getCanonicalFindabilityName(canonical);
+  assert.ok(canonicalName, "canonical metadata supplies the name to confirm");
+  assert.ok(!baseline.includes(`schema:name "${canonicalName}"`));
   const confirmed = confirmFindabilityFullName(baseline, canonical);
   assert.equal(evaluateFindabilityEnrichment(confirmed).fullName, true);
-  assert.match(confirmed, /schema:name "Two-Factor Prognostic Model for Diabetic Foot Ulcer Healing by 16 Weeks"/);
+  assert.ok(confirmed.includes(`schema:name "${canonicalName}"`));
 });
 
 test("Findability working baseline generation is deterministic", async () => {

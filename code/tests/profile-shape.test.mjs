@@ -1,3 +1,4 @@
+import { readServerSource } from "./server-source.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -65,7 +66,7 @@ test("binding sockets reuse the exact canonical profile contour and a stable sea
 });
 
 test("React and standalone editions both render deterministic profile shapes", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const page = await readServerSource();
   const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
   assert.match(page, /function ProfileShape/);
   assert.match(page, /data-profile-shape/);
