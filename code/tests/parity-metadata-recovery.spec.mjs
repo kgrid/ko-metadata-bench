@@ -84,7 +84,7 @@ test("both editions recover from a malformed working metadata file", async ({ br
   await standalonePage.close();
 });
 
-async function uniqueKoIdFilterJourney(page, url) {
+async function findabilityIdentityFilterJourney(page, url) {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
   const panel = page.getByText("DFU Severity Score KO", { exact: true }).first().locator("xpath=ancestor::details[1]");
@@ -92,7 +92,8 @@ async function uniqueKoIdFilterJourney(page, url) {
   const interaction = page.getByRole("dialog", { name: "DFU Severity Score KO", exact: true });
   await fileButton(interaction, "findability.metadata.txt").click();
   await interaction.getByRole("button", { name: "Findability Principles" }).click();
-  const filter = interaction.getByRole("button", { name: "Unique KO ID", exact: true });
+  const koFilter = interaction.getByRole("button", { name: "Unique KO ID", exact: true });
+  const metadataFilter = interaction.getByRole("button", { name: "Unique KO Metadata ID", exact: true });
   const rows = rdfTable(interaction).locator("tbody > tr[data-statement-id]");
   const unfilteredCount = await rows.count();
   expect(unfilteredCount).toBeGreaterThan(2);
@@ -100,10 +101,16 @@ async function uniqueKoIdFilterJourney(page, url) {
   const koSubject = unfilteredIds[0]?.split(" ")[0];
   const expectedIdentityIds = unfilteredIds.filter((id) => id?.startsWith(`${koSubject} `)
     && (id.includes("https://schema.org/identifier") || id.includes("https://schema.org/version")));
+  const expectedMetadataIds = unfilteredIds.filter((id) => id?.startsWith(`${koSubject} `)
+    && id.includes("https://schema.org/subjectOf"));
   expect(expectedIdentityIds.length).toBeGreaterThanOrEqual(2);
-  await filter.click();
-  await expect(filter).toHaveAttribute("aria-pressed", "true");
-  await expect(filter).toHaveClass(/active/);
+  expect(expectedMetadataIds).toHaveLength(1);
+  await expect(koFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "false");
+  await koFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(koFilter).toHaveClass(/active/);
   await expect(rows).toHaveCount(expectedIdentityIds.length);
   const statementIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
   expect(statementIds).toEqual(expectedIdentityIds);
@@ -112,17 +119,28 @@ async function uniqueKoIdFilterJourney(page, url) {
   await interaction.getByRole("button", { name: "Source", exact: true }).click();
   await interaction.getByRole("button", { name: "Table", exact: true }).click();
   await expect(rows).toHaveCount(expectedIdentityIds.length);
-  await filter.click();
-  await expect(filter).toHaveAttribute("aria-pressed", "false");
+  await metadataFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(metadataFilter).toHaveClass(/active/);
+  await expect(rows).toHaveCount(expectedIdentityIds.length + expectedMetadataIds.length);
+  expect(await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")))).toEqual(unfilteredIds.filter((id) => expectedIdentityIds.includes(id) || expectedMetadataIds.includes(id)));
+  await koFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "true");
+  expect(await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")))).toEqual(expectedMetadataIds);
+  await expect(rows.first().locator("td").nth(1)).toHaveText("subject of");
+  await metadataFilter.click();
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "false");
   await expect(rows).toHaveCount(unfilteredCount);
   await interaction.getByRole("button", { name: "Close metadata interaction", exact: true }).click();
 }
 
-test("both editions toggle the Unique KO ID table filter without changing source", async ({ browser }) => {
+test("both editions independently toggle KO and metadata identity filters without changing source", async ({ browser }) => {
   const serverPage = await browser.newPage();
   const standalonePage = await browser.newPage();
-  await uniqueKoIdFilterJourney(serverPage, editions.server);
-  await uniqueKoIdFilterJourney(standalonePage, editions.standalone);
+  await findabilityIdentityFilterJourney(serverPage, editions.server);
+  await findabilityIdentityFilterJourney(standalonePage, editions.standalone);
   await serverPage.close();
   await standalonePage.close();
 });

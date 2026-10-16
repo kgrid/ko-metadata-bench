@@ -320,7 +320,7 @@ test("both editions expose Principles controls only for FAIR metadata files", as
   assert.match(page, /aria-expanded=\{principlesOpen\}/);
   assert.match(page, /principlesControlRow/);
   assert.match(styles, /\.principlesControlRow \{/);
-  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;if\(!s\.principlesOpen\)s\.uniqueKoIdOnly=false;render\(side\)/);
+  assert.match(standalone, /s\.principlesOpen=!s\.principlesOpen;if\(!s\.principlesOpen\)\{s\.uniqueKoIdOnly=false;s\.uniqueKoMetadataIdOnly=false;\}render\(side\)/);
   assert.match(standalone, /class="principles-control-row"/);
   assert.match(styles, /justify-content: center/);
   assert.match(standalone, /justify-content:center/);

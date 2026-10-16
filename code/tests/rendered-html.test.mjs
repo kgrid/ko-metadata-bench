@@ -473,7 +473,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /function buildHumanRdfProjection\(graph\)\{return graph\.statements\.filter\(statement=>statement\.subject\.termType!=="BlankNode"\)\.map\(statement=>projectRdfStatement\(graph,statement\)\)\}/);
   assert.doesNotMatch(html, /a\.projected\.relationship\.order-b\.projected\.relationship\.order/);
   assert.doesNotMatch(html, /children=graph\.statements[^\n]*\.sort\(/);
-  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\)/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false,uniqueKoMetadataIdOnly=false\)/);
   assert.match(html, /data-rdf-view="human" class="active"/);
   assert.doesNotMatch(html, />Compact RDF<\/button>/);
   assert.match(html, /data-rdf-view="source"/);
@@ -482,7 +482,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /Human view unavailable/);
   assert.match(html, /Invalid Turtle source/);
   assert.match(html, /Your source has been preserved/);
-  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\).*graph\.diagnostics\.length/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false,uniqueKoMetadataIdOnly=false\).*graph\.diagnostics\.length/);
   assert.match(html, /const updateRdfValidity=/);
   assert.match(html, /graphButton\.disabled=diagnostics\.length>0/);
   assert.match(html, /Authoritative Turtle source/);
