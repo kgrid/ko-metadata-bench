@@ -268,3 +268,77 @@ test("both editions independently filter CKS interfaces and qualified object ref
     await page.close();
   }
 });
+
+test("both editions filter only the KO-level license statement", async ({ browser }) => {
+  for (const url of Object.values(editions)) {
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+    const panel = page.locator("details.metadataRigCard, details.metadata-rig-card").first();
+    await panel.getByRole("button", { name: "Interact", exact: true }).click();
+    const interaction = page.getByRole("dialog", { name: "DFU Severity Score KO", exact: true });
+    await fileButton(interaction, "reusability.metadata.txt").click();
+    const rows = rdfTable(interaction).locator("tbody > tr[data-statement-id]");
+    const unfilteredCount = await rows.count();
+    expect(unfilteredCount).toBeGreaterThan(1);
+    await interaction.getByRole("button", { name: "Reusability Principles" }).click();
+    const license = interaction.getByRole("button", { name: "License", exact: true });
+    await expect(license).toHaveAttribute("aria-pressed", "false");
+    await license.click();
+    await expect(license).toHaveAttribute("aria-pressed", "true");
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toHaveAttribute("data-statement-id", /https:\/\/schema\.org\/license/);
+    await expect(rows.first()).toContainText("MIT");
+    await interaction.getByRole("button", { name: "Source", exact: true }).click();
+    await expect(interaction.getByRole("textbox", { name: /Editing reusability\.metadata\.txt/ })).toHaveValue(/schema:license/);
+    await interaction.getByRole("button", { name: "Table", exact: true }).click();
+    await expect(rows).toHaveCount(1);
+    await license.click();
+    await expect(license).toHaveAttribute("aria-pressed", "false");
+    await expect(rows).toHaveCount(unfilteredCount);
+    await page.close();
+  }
+});
+
+test("both editions filter declared dependencies independently of license", async ({ browser }) => {
+  for (const url of Object.values(editions)) {
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+    const panels = page.locator("details.metadataRigCard, details.metadata-rig-card");
+    for (const [index, name, expectedDependencies] of [
+      [0, "DFU Severity Score KO", 0],
+      [2, "HBOT Regimen Burden KO", 2],
+    ]) {
+      await panels.nth(index).getByRole("button", { name: "Interact", exact: true }).click();
+      const interaction = page.getByRole("dialog", { name, exact: true });
+      await fileButton(interaction, "reusability.metadata.txt").click();
+      const rows = rdfTable(interaction).locator("tbody > tr[data-statement-id]");
+      const unfilteredCount = await rows.count();
+      await interaction.getByRole("button", { name: "Reusability Principles" }).click();
+      const license = interaction.getByRole("button", { name: "License", exact: true });
+      const dependencies = interaction.getByRole("button", { name: "Dependencies", exact: true });
+      await expect(dependencies).toHaveAttribute("aria-pressed", "false");
+      await dependencies.click();
+      await expect(dependencies).toHaveAttribute("aria-pressed", "true");
+      await expect(license).toHaveAttribute("aria-pressed", "false");
+      await expect(rows).toHaveCount(expectedDependencies);
+      if (expectedDependencies) {
+        const ids = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+        expect(ids.every((id) => id.includes("https://schema.org/softwareRequirements"))).toBe(true);
+        await expect(rdfTable(interaction)).toContainText("ajv ^8.17.1");
+        await expect(rdfTable(interaction)).toContainText("ajv-formats ^3.0.1");
+      }
+      await license.click();
+      await expect(dependencies).toHaveAttribute("aria-pressed", "true");
+      await expect(license).toHaveAttribute("aria-pressed", "true");
+      await expect(rows).toHaveCount(expectedDependencies + 1);
+      await dependencies.click();
+      await expect(rows).toHaveCount(1);
+      await license.click();
+      await expect(rows).toHaveCount(unfilteredCount);
+      await interaction.getByRole("button", { name: "Close metadata interaction", exact: true }).click();
+    }
+    await page.close();
+  }
+});

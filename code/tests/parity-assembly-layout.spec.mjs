@@ -16,6 +16,9 @@ for (const edition of editions) {
       await page.getByRole("button", { name: "Orchestration", exact: true }).click();
       const dialog = page.getByRole("dialog", { name: "Orchestration" });
       await expect(dialog).toBeVisible();
+      const instruction = dialog.locator(".assemblyPuzzleInstruction, .assembly-puzzle-instruction");
+      await expect(instruction).toContainText("the severity score feeds the treatment decision");
+      await expect(instruction).toHaveCSS("text-align", "center");
       const pieces = dialog.getByRole("complementary", { name: "Knowledge Objects to assemble" });
       const board = dialog.getByRole("region", { name: "Assembly puzzle" });
       await expect(pieces.locator("[data-assembly-piece]")).toHaveCount(4);
@@ -97,6 +100,7 @@ for (const edition of editions) {
     await place("margolis", 3);
     await place("burden", 4);
     await expect(board).toHaveCount(0);
+    await expect(dialog.locator(".assemblyPuzzleInstruction, .assembly-puzzle-instruction")).toHaveCount(0);
     const cases = dialog.getByRole("navigation", { name: "Teaching cases" });
     await expect(cases.getByRole("button", { name: "Case 1" })).toBeVisible();
     await expect(cases.getByRole("button", { name: "Case 1" })).toBeFocused();

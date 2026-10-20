@@ -2148,6 +2148,7 @@ document.head.insertAdjacentHTML("beforeend",`<style>
 .context-destinations .files-return:disabled{cursor:default;opacity:.55}
 .assembly-exercise,.assembly-exercise .view-sticky-controls{background:#e5eae5}
 .assembly-exercise .view-sticky-controls{position:relative;top:auto;z-index:auto;width:100%;margin:0;padding:0 0 10px}
+.assembly-puzzle-instruction{max-width:900px;margin:8px auto 0;color:#3a3a3c;font-size:12px;line-height:1.4;text-align:center;text-wrap:balance}
 .app:has(.assembly-exercise){height:100dvh;min-height:0;overflow:hidden}
 .app:has(.assembly-exercise) .workspaces{min-height:0;grid-template-rows:minmax(0,1fr)}
 .assembly-exercise{height:100%;min-height:0;overflow:hidden;padding-bottom:20px}
@@ -2580,14 +2581,14 @@ function openAssemblyCaseView(trigger){
     return `<div class="assembly-workspace assembly-puzzle-workspace"><aside class="assembly-puzzle-pieces" aria-label="Knowledge Objects to assemble"><h3>Knowledge Objects</h3><div class="assembly-puzzle-piece-list">${puzzlePieces}</div><button type="button" class="assembly-puzzle-return" ${selectedPuzzlePiece?"":"disabled"}>Return selected KO here</button></aside><section class="assembly-puzzle-board" aria-label="Assembly puzzle"><div class="assembly-puzzle-slots" aria-label="Four Knowledge Object positions">${puzzleSlots}</div><p class="assembly-puzzle-message${puzzleCheck.status!=="incomplete"?` ${puzzleCheck.status}`:""}" role="status">${escapeHtml(puzzleFeedback)}</p><div class="assembly-flow-to-assembly" aria-label="The second, third, and fourth positions feed the assembly"><span aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span></div><div class="assembly-puzzle-destination">Assembly decisions</div></section></div>`;
   };
   const overlay=document.createElement("div");overlay.className="assembly-case-backdrop";overlay.setAttribute("role","dialog");overlay.setAttribute("aria-modal","true");overlay.setAttribute("aria-label","Orchestration");
-  overlay.innerHTML=`<button type="button" class="assembly-case-close" aria-label="Close orchestration">×</button><section class="knowledge-objects-exercise assembly-exercise" aria-label="Knowledge Assembly explorer"><div class="view-sticky-controls"><div class="view-title"><h2>Assembly Orchestration</h2></div></div>${loaded.error?`<div class="assembly-workspace-error" role="alert">${escapeHtml(loaded.error)}</div>`:puzzleComplete?`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`:renderPuzzle()}</section>`;
+  overlay.innerHTML=`<button type="button" class="assembly-case-close" aria-label="Close orchestration">×</button><section class="knowledge-objects-exercise assembly-exercise" aria-label="Knowledge Assembly explorer"><div class="view-sticky-controls"><div class="view-title"><h2>Assembly Orchestration</h2></div>${!loaded.error&&!puzzleComplete?`<p class="assembly-puzzle-instruction">Arrange the four Knowledge Objects so the severity score feeds the treatment decision. The treatment decision, regimen burden estimate, and prognostic indicator then contribute to the assembly’s treatment-target classification.</p>`:""}</div>${loaded.error?`<div class="assembly-workspace-error" role="alert">${escapeHtml(loaded.error)}</div>`:puzzleComplete?`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`:renderPuzzle()}</section>`;
   document.body.append(overlay);
   const close=()=>{window.clearTimeout(puzzleResetTimer);document.removeEventListener("keydown",onEscape);overlay.remove();trigger?.focus()},onEscape=event=>{if(event.key==="Escape"&&!document.querySelector(".assembly-ko-exchange-backdrop"))close()};
   document.addEventListener("keydown",onEscape);
   overlay.querySelector(".assembly-case-close").addEventListener("click",close);
   overlay.querySelector(".assembly-case-close").focus();
   const repaintPuzzle=focusSelector=>{const workspace=overlay.querySelector(".assembly-puzzle-workspace");if(!workspace)return;workspace.outerHTML=renderPuzzle();if(focusSelector)overlay.querySelector(focusSelector)?.focus()};
-  const showCaseView=()=>{const workspace=overlay.querySelector(".assembly-puzzle-workspace");if(!workspace)return;puzzleComplete=true;workspace.outerHTML=`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`;overlay.querySelector('[data-assembly-case="case-1"]')?.focus()};
+  const showCaseView=()=>{const workspace=overlay.querySelector(".assembly-puzzle-workspace");if(!workspace)return;puzzleComplete=true;overlay.querySelector(".assembly-puzzle-instruction")?.remove();workspace.outerHTML=`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`;overlay.querySelector('[data-assembly-case="case-1"]')?.focus()};
   const placePuzzlePiece=(role,slot)=>{window.clearTimeout(puzzleResetTimer);puzzlePlacement=moveAssemblyPuzzlePiece(puzzlePlacement,role,slot);selectedPuzzlePiece=null;puzzleMessage=slot?`${puzzleName(role)} moved to position ${ASSEMBLY_PUZZLE_SLOTS.indexOf(slot)+1}.`:`${puzzleName(role)} returned to the starting area.`;const check=evaluateAssemblyPuzzle(puzzlePlacement);if(check.status==="workable"){showCaseView();return}repaintPuzzle(slot?`[data-assembly-slot="${slot}"]`:`[data-assembly-piece="${role}"]`);if(check.status==="unworkable"){const failure=assemblyPuzzleFailureMessage(check.reason);puzzleResetTimer=window.setTimeout(()=>{puzzlePlacement={};selectedPuzzlePiece=null;puzzleMessage=`${failure} All four KOs have returned to the starting area. Try again.`;repaintPuzzle(`[data-assembly-piece="${puzzlePieceOrder[0]}"]`)},1800)}};
   overlay.addEventListener("click",event=>{
     const piece=event.target.closest("[data-assembly-piece]"),slot=event.target.closest("[data-assembly-slot]");
@@ -2952,6 +2953,7 @@ document.head.insertAdjacentHTML("beforeend",`<style>.term-insight-relationship-
 document.head.insertAdjacentHTML("beforeend",`<style>.term-insight-statement strong{display:inline-block;max-width:100%;margin-bottom:14px;padding:7px 11px;border:1px solid #9bb7d0;border-radius:8px;background:#e8f0f7;color:#263f55;font-size:15px;line-height:1.35;overflow-wrap:anywhere}</style>`);
 document.head.insertAdjacentHTML("beforeend",`<style>.rdf-term-details-backdrop{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.rdf-term-details{height:auto;min-height:calc(100vh - 28px);overflow:visible}.rdf-term-details>header{position:sticky;top:-14px;z-index:2;border-radius:12px 12px 0 0;background:rgba(250,250,252,.98)}.rdf-term-details-body{width:min(1120px,calc(100% - 48px));padding:28px 0 42px;overflow:visible}.rdf-term-details-backdrop::-webkit-scrollbar{width:10px}.rdf-term-details-backdrop::-webkit-scrollbar-track{background:transparent}.rdf-term-details-backdrop::-webkit-scrollbar-thumb{border:3px solid transparent;border-radius:999px;background:#a9adb2;background-clip:padding-box}</style>`);
 document.head.insertAdjacentHTML("beforeend",`<style>.rdf-term-source-link{min-height:34px;display:inline-flex;align-items:center;justify-content:center;gap:5px;margin-left:auto;padding:0 13px;border:1px solid #b8b8bd;border-radius:9px;background:#fff;color:#1d1d1f;font-size:10px;font-weight:700;text-decoration:none;white-space:nowrap}.rdf-term-source-link:hover{border-color:#7c8fa1;background:#f5f7f9}.rdf-term-source-link:focus-visible{outline:3px solid #79a7d3;outline-offset:2px}.rdf-term-details>header>button{margin-left:10px}</style>`);
+document.head.insertAdjacentHTML("beforeend",`<style>.rdf-term-details>header>div{flex:1 1 auto;min-width:0}.rdf-term-source-link{flex:0 0 auto;margin-left:12px}.rdf-term-details>header>button{flex:0 0 42px;margin-left:10px}</style>`);
 document.head.insertAdjacentHTML("beforeend",`<style>.relationship-backdrop{z-index:1050}.rdf-term-button:focus-visible{border-radius:3px;outline:3px solid #79a7d3;outline-offset:3px;border-bottom-color:#1d1d1f;color:#000}</style>`);
 /* LOCAL_TERM_DETAILS_END */
 const learnerLinkLabels={"https://schema.org/about":"Controlled subject","https://schema.org/valueReference":"Output vocabulary","https://schema.org/hasDefinedTerm":"Output term","https://schema.org/usageInfo":"Scope","https://schema.org/license":"License","https://schema.org/citation":"Evidence"};
@@ -3063,6 +3065,53 @@ render=function(side){
     button.setAttribute("aria-pressed",String(Boolean(s[key])));
     button.addEventListener("click",()=>{s[key]=!s[key];render(side)});
   }
+};
+const renderHumanRdfWithoutReusabilityFilters=renderHumanRdfForFiles;
+renderHumanRdfForFiles=function(source,uniqueKoIdOnly=false,uniqueKoMetadataIdOnly=false){
+  const current=state.left;
+  if(current.file!=="reusability.metadata.txt"||(!current.licenseOnly&&!current.dependenciesOnly))return renderHumanRdfWithoutReusabilityFilters(source,uniqueKoIdOnly,uniqueKoMetadataIdOnly);
+  const full=renderHumanRdfWithoutReusabilityFilters(source,uniqueKoIdOnly,uniqueKoMetadataIdOnly);
+  if(full.includes('class="metadata-file-error"')||full.includes('class="invalid-rdf-source"'))return full;
+  const graph=buildCanonicalRdfGraph(source);
+  const root=graph.statements.find(statement=>statement.subject.termType==="NamedNode")?.subject.id;
+  const rows=graph.statements.filter(statement=>(current.licenseOnly&&statement.subject.id===root&&statement.predicate.value==="https://schema.org/license")||(current.dependenciesOnly&&statement.predicate.value==="https://schema.org/softwareRequirements")).map(statement=>{
+    const projected=projectRdfStatement(graph,statement),value={...projected.value,children:[]};
+    return `<tr data-statement-id="${escapeHtml(statement.id)}"><td>${renderRdfTermButton(projected.subject.rdfTerm,projected.subject.display,statement,"subject")}</td><td>${renderRdfTermButton(projected.predicate,projected.relationship.human,statement,"predicate")}</td><td>${renderHumanRdfValue(value,graph,statement)}</td></tr>`;
+  }).join("");
+  return `<div class="turtle-view human-rdf-view"><div class="triple-table-wrap"><table class="triple-table human-rdf-table"><thead><tr><th>Subject</th><th>Relationship</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+};
+const renderWithoutReusabilityControls=render;
+let lastReusabilityFilterObject=null;
+render=function(side){
+  const s=state[side];
+  if(lastReusabilityFilterObject!==s.object){s.licenseOnly=false;s.dependenciesOnly=false;lastReusabilityFilterObject=s.object}
+  if(s.file!=="reusability.metadata.txt"||!s.principlesOpen){s.licenseOnly=false;s.dependenciesOnly=false}
+  renderWithoutReusabilityControls(side);
+  if(s.file!=="reusability.metadata.txt"||!s.principlesOpen)return;
+  const buttons=[...document.querySelectorAll("#"+side+"Pane .principles-tray-buttons button")];
+  for(const [label,key] of [["License","licenseOnly"],["Dependencies","dependenciesOnly"]]){
+    const button=buttons.find(candidate=>candidate.textContent.trim()===label);
+    if(!button)continue;
+    button.classList.toggle("active",Boolean(s[key]));
+    button.setAttribute("aria-pressed",String(Boolean(s[key])));
+    button.addEventListener("click",()=>{s[key]=!s[key];render(side)});
+  }
+};
+// Keep blank-node statement identities stable between table rendering and inspection.
+// N3 generates fresh blank-node IDs on each parse, even for unchanged Turtle text.
+const parseCanonicalRdfGraph=buildCanonicalRdfGraph;
+const canonicalRdfGraphCache=new Map();
+buildCanonicalRdfGraph=function(source){
+  if(canonicalRdfGraphCache.has(source)){
+    const graph=canonicalRdfGraphCache.get(source);
+    canonicalRdfGraphCache.delete(source);
+    canonicalRdfGraphCache.set(source,graph);
+    return graph;
+  }
+  const graph=parseCanonicalRdfGraph(source);
+  canonicalRdfGraphCache.set(source,graph);
+  if(canonicalRdfGraphCache.size>16)canonicalRdfGraphCache.delete(canonicalRdfGraphCache.keys().next().value);
+  return graph;
 };
 document.head.insertAdjacentHTML("beforeend",`<style>.human-rdf-table tr.interoperability-cks-subject td:first-child{background:#e8f0f7;box-shadow:inset 3px 0 #6387a5}</style>`);
     openKnowledgeObjects();updateHeader();

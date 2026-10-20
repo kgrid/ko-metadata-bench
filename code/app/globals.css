@@ -1491,6 +1491,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .knowledgeObjectsExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
 .assemblyExercise, .assemblyExercise .viewStickyControls { background: #e5eae5; }
 .assemblyExercise .viewStickyControls { position: relative; top: auto; z-index: auto; width: 100%; margin: 0; padding: 0 0 10px; }
+.assemblyPuzzleInstruction { max-width: 900px; margin: 8px auto 0; color: #3a3a3c; font-size: 12px; line-height: 1.4; text-align: center; text-wrap: balance; }
 main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden; }
 .assemblyExercise { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 20px; }
 .assemblyLanding, .assemblyLanding .viewStickyControls { background: #e5eae5; }
@@ -1880,13 +1881,13 @@ body:has(> .assemblyCaseBackdrop) > main { height: 100dvh; min-height: 0; overfl
 .rdfTermDetailsBackdrop { position: fixed; inset: 0; z-index: 1250; padding: 14px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; background: #6f8296; }
 .rdfTermDetails { width: 100%; min-height: calc(100vh - 28px); overflow: visible; border: 1px solid #aeaeb2; border-radius: 12px; background: rgba(250,250,252,.99); box-shadow: 0 18px 55px rgba(0,0,0,.18); }
 .rdfTermDetails > header { position: sticky; top: -14px; z-index: 2; min-height: 72px; display: flex; align-items: center; padding: 10px 22px 10px 28px; border-bottom: 1px solid #d2d2d7; border-radius: 12px 12px 0 0; background: rgba(250,250,252,.98); }
-.rdfTermDetails header div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rdfTermDetails > header > div { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .rdfTermDetails header span { color: #6e6e73; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
 .rdfTermDetails header h2 { margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(18px,2vw,26px); font-weight: 650; letter-spacing: -.02em; }
-.rdfTermSourceLink { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-left: auto; padding: 0 13px; border: 1px solid #b8b8bd; border-radius: 9px; background: #fff; color: #1d1d1f; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.rdfTermSourceLink { min-height: 34px; display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 5px; margin-left: 12px; padding: 0 13px; border: 1px solid #b8b8bd; border-radius: 9px; background: #fff; color: #1d1d1f; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .rdfTermSourceLink:hover { border-color: #7c8fa1; background: #f5f7f9; }
 .rdfTermSourceLink:focus-visible { outline: 3px solid #79a7d3; outline-offset: 2px; }
-.rdfTermDetails > header > button { width: 42px; height: 42px; margin-left: 10px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
+.rdfTermDetails > header > button { flex: 0 0 42px; width: 42px; height: 42px; margin-left: 10px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
 .rdfTermDetailsBody { width: min(1120px,calc(100% - 48px)); margin: 0 auto; padding: 28px 0 42px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-content: start; }
 .rdfTermDetailsBackdrop::-webkit-scrollbar { width: 10px; }
 .rdfTermDetailsBackdrop::-webkit-scrollbar-track { background: transparent; }
