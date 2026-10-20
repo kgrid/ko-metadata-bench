@@ -1105,14 +1105,63 @@ function learnerAddedLinks(graph: CanonicalRdfGraph, baselineSource?: string) {
   const existing = new Set(baseline.statements.filter((statement) => statement.object.termType === "NamedNode").map(linkKey));
   return graph.statements.filter((statement) => statement.object.termType === "NamedNode" && LEARNER_LINK_LABELS[statement.predicate.value] && !existing.has(linkKey(statement)));
 }
-function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false, uniqueKoMetadataIdOnly = false }: { source: string; file: FileName; baselineSource?: string; uniqueKoIdOnly?: boolean; uniqueKoMetadataIdOnly?: boolean }) {
+function accessRouteStatementIds(graph: CanonicalRdfGraph, koAccess: boolean, metadataAccess: boolean) {
+  const schema = "https://schema.org/";
+  const rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+  const selected = new Set<string>();
+  const statementsFrom = (subjectId: string) => graph.statements.filter((statement) => statement.subject.id === subjectId);
+  for (const link of graph.statements.filter((statement) => statement.predicate.value === `${schema}potentialAction` && statement.object.termType === "BlankNode")) {
+    const action = statementsFrom(link.object.id);
+    const type = action.find((statement) => statement.predicate.value === rdfType && ["ViewAction", "DownloadAction"].some((name) => statement.object.value === `${schema}${name}`));
+    const target = action.find((statement) => statement.predicate.value === `${schema}target` && statement.object.termType === "BlankNode");
+    if (!type || !target) continue;
+    const targetStatements = statementsFrom(target.object.id);
+    const url = targetStatements.find((statement) => statement.predicate.value === `${schema}urlTemplate` && statement.object.termType === "Literal");
+    const identifier = targetStatements.find((statement) => statement.predicate.value === `${schema}identifier` && statement.object.termType === "Literal");
+    const service = targetStatements.find((statement) => statement.predicate.value === `${schema}name` && statement.object.termType === "Literal" && statement.object.value === "FDO Bench KO Access API 1.0");
+    const isExistenceRecord = type.object.value === `${schema}ViewAction` && Boolean(url && /(?:^|\/)existence\.metadata\.txt(?:[?#]|$)/.test(url.object.value));
+    const isKoDirectory = type.object.value === `${schema}ViewAction` && Boolean(url && !isExistenceRecord && /\/tree\//.test(url.object.value));
+    const isBenchDownload = type.object.value === `${schema}DownloadAction` && Boolean(identifier && service);
+    if ((metadataAccess && isExistenceRecord) || (koAccess && (isKoDirectory || isBenchDownload))) selected.add(link.id);
+  }
+  return selected;
+}
+function interoperabilityStatementIds(graph: CanonicalRdfGraph, specifiedInterface: boolean, objectReferences: boolean) {
+  const schema = "https://schema.org/";
+  const conformsTo = "http://purl.org/dc/terms/conformsTo";
+  const root = graph.statements.find((statement) => statement.subject.termType === "NamedNode")?.subject.id;
+  const selected = new Set<string>();
+  if (!root) return selected;
+  const rootStatements = graph.statements.filter((statement) => statement.subject.id === root);
+  const select = (statement: CanonicalRdfStatement | undefined) => { if (statement) selected.add(statement.id); };
+  if (specifiedInterface) {
+    for (const action of rootStatements.filter((statement) => statement.predicate.value === `${schema}potentialAction` && statement.object.termType === "BlankNode")) {
+      select(action);
+      select(graph.statements.find((statement) => statement.subject.id === action.object.id && statement.predicate.value === `${schema}target`));
+    }
+  }
+  if (objectReferences) {
+    for (const statement of rootStatements.filter((candidate) => [`${schema}object`, `${schema}result`].includes(candidate.predicate.value))) select(statement);
+    for (const binding of rootStatements.filter((statement) => statement.predicate.value === conformsTo && statement.object.termType === "BlankNode")) {
+      select(binding);
+      for (const statement of graph.statements.filter((candidate) => candidate.subject.id === binding.object.id && [`${schema}object`, `${schema}result`].includes(candidate.predicate.value))) select(statement);
+    }
+  }
+  return selected;
+}
+function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false, uniqueKoMetadataIdOnly = false, koAccessOnly = false, koMetadataAccessOnly = false, specifiedInterfaceOnly = false, objectReferencesOnly = false }: { source: string; file: FileName; baselineSource?: string; uniqueKoIdOnly?: boolean; uniqueKoMetadataIdOnly?: boolean; koAccessOnly?: boolean; koMetadataAccessOnly?: boolean; specifiedInterfaceOnly?: boolean; objectReferencesOnly?: boolean }) {
   const graph = buildCanonicalRdfGraph(source);
   const koSubject = graph.statements.find((statement) => statement.subject.termType === "NamedNode")?.subject.id;
   const identityPredicates = new Set(["https://schema.org/identifier", "https://schema.org/version"]);
   const identityStatements = new Set(graph.statements.filter((statement) => statement.subject.id === koSubject && identityPredicates.has(statement.predicate.value)).map((statement) => statement.id));
   const metadataIdentityStatements = new Set(graph.statements.filter((statement) => statement.subject.id === koSubject && statement.predicate.value === "https://schema.org/subjectOf").map((statement) => statement.id));
-  const filtersActive = uniqueKoIdOnly || uniqueKoMetadataIdOnly;
-  const projection = buildHumanRdfProjection(graph).filter((statement) => !filtersActive || (uniqueKoIdOnly && identityStatements.has(statement.id)) || (uniqueKoMetadataIdOnly && metadataIdentityStatements.has(statement.id)));
+  const accessFiltersActive = file === "access.metadata.txt" && (koAccessOnly || koMetadataAccessOnly);
+  const interoperabilityFiltersActive = file === "interoperability.metadata.txt" && (specifiedInterfaceOnly || objectReferencesOnly);
+  const filtersActive = uniqueKoIdOnly || uniqueKoMetadataIdOnly || accessFiltersActive || interoperabilityFiltersActive;
+  const accessStatements = accessFiltersActive ? accessRouteStatementIds(graph, koAccessOnly, koMetadataAccessOnly) : null;
+  const interoperabilityStatements = interoperabilityFiltersActive ? interoperabilityStatementIds(graph, specifiedInterfaceOnly, objectReferencesOnly) : null;
+  const selectedStatements = accessStatements ?? interoperabilityStatements;
+  const projection = selectedStatements ? graph.statements.filter((statement) => selectedStatements.has(statement.id)).map((statement) => { const projected = projectRdfStatement(graph, statement); return { ...projected, value: { ...projected.value, children: [] } }; }) : buildHumanRdfProjection(graph).filter((statement) => !filtersActive || (uniqueKoIdOnly && identityStatements.has(statement.id)) || (uniqueKoMetadataIdOnly && metadataIdentityStatements.has(statement.id)));
   const addedLinks = learnerAddedLinks(graph, baselineSource);
   const [selectedTerm, setSelectedTerm] = useState<RdfTermSelection | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<string | null>(null);
@@ -1136,7 +1185,8 @@ function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false, un
     const isAccessInstance = statement.relationship.human === "access instance";
     const subordinateChildren = isAccessInstance ? statement.value.children : statement.value.children.filter((child) => child.predicate.value === "https://schema.org/valueReference");
     const parentValue = isAccessInstance ? { ...statement.value, children: [] } : statement.value;
-    return <Fragment key={statement.id}><tr data-statement-id={statement.id} className={selectedStatement === statement.id ? "rdfStatementSelected" : ""} onClick={() => window.dispatchEvent(new CustomEvent("rdf-statement-select", { detail: { statementId: statement.id } }))}><td><RdfTermButton term={statement.subject.rdfTerm} label={statement.subject.display} statement={sourceStatement} role="subject" graph={graph} onSelect={setSelectedTerm} /></td><td><RdfTermButton term={statement.predicate} label={statement.relationship.human} statement={sourceStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={parentValue} statement={sourceStatement} graph={graph} onSelect={setSelectedTerm} /></td></tr>{subordinateChildren.map((child) => { const childStatement = graph.statements.find((candidate) => candidate.id === child.id); return childStatement ? <tr className="humanRdfSubordinateRow" key={`${statement.id}-${child.id}`}><td aria-label="Subordinate relationship" /><td><RdfTermButton term={child.predicate} label={child.relationship.human} statement={childStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={child.value} statement={childStatement} graph={graph} onSelect={setSelectedTerm} />{child.predicate.value === "https://schema.org/valueReference" && <code>{child.value.rdfTerm.compact}</code>}</td></tr> : null; })}</Fragment>;
+    const cksInterface = interoperabilityFiltersActive && specifiedInterfaceOnly && sourceStatement.predicate.value === "https://schema.org/potentialAction" && sourceStatement.subject.termType === "NamedNode" && sourceStatement.subject.value.startsWith("https://kgrid.org/cks/");
+    return <Fragment key={statement.id}><tr data-statement-id={statement.id} className={[selectedStatement === statement.id && "rdfStatementSelected", cksInterface && "interoperabilityCksSubject"].filter(Boolean).join(" ")} onClick={() => window.dispatchEvent(new CustomEvent("rdf-statement-select", { detail: { statementId: statement.id } }))}><td><RdfTermButton term={statement.subject.rdfTerm} label={statement.subject.display} statement={sourceStatement} role="subject" graph={graph} onSelect={setSelectedTerm} /></td><td><RdfTermButton term={statement.predicate} label={statement.relationship.human} statement={sourceStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={parentValue} statement={sourceStatement} graph={graph} onSelect={setSelectedTerm} /></td></tr>{subordinateChildren.map((child) => { const childStatement = graph.statements.find((candidate) => candidate.id === child.id); return childStatement ? <tr className="humanRdfSubordinateRow" key={`${statement.id}-${child.id}`}><td aria-label="Subordinate relationship" /><td><RdfTermButton term={child.predicate} label={child.relationship.human} statement={childStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={child.value} statement={childStatement} graph={graph} onSelect={setSelectedTerm} />{child.predicate.value === "https://schema.org/valueReference" && <code>{child.value.rdfTerm.compact}</code>}</td></tr> : null; })}</Fragment>;
   })}{graph.diagnostics.map((text, index) => <tr className="turtleRaw" key={`diagnostic-${index}`}><td colSpan={3}><span>Rendering Issue</span>{text}</td></tr>)}{!filtersActive && graph.comments.length > 0 && <tr className="turtleComment"><td colSpan={3}><span>Comment</span>{graph.comments.join("\n")}</td></tr>}</tbody></table></div></div>;
 }
 
@@ -2048,6 +2098,10 @@ function WorkspacePane({
   const [principlesOpen, setPrinciplesOpen] = useState(false);
   const [uniqueKoIdOnly, setUniqueKoIdOnly] = useState(false);
   const [uniqueKoMetadataIdOnly, setUniqueKoMetadataIdOnly] = useState(false);
+  const [koAccessOnly, setKoAccessOnly] = useState(false);
+  const [koMetadataAccessOnly, setKoMetadataAccessOnly] = useState(false);
+  const [specifiedInterfaceOnly, setSpecifiedInterfaceOnly] = useState(false);
+  const [objectReferencesOnly, setObjectReferencesOnly] = useState(false);
   if (objectId === 0) {
     return (
       <section className="pane" aria-label={`${side} editor pane`}>
@@ -2055,7 +2109,7 @@ function WorkspacePane({
           <div><h2>Select a knowledge object</h2></div>
           <label className="selectWrap">
             <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
-            <select value="" onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}>
+            <select value="" onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}>
               <option value="" disabled>Choose object…</option>
               {OBJECT_IDS.map((id) => (
                 <option key={id} value={id} disabled={id === otherObjectId}>{objectName(id)}{id === otherObjectId ? " · in use" : ""}</option>
@@ -2094,7 +2148,7 @@ function WorkspacePane({
           <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
           <select
             value={objectId}
-            onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}
+            onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}
           >
             {OBJECT_IDS.map((id) => (
               <option key={id} value={id} disabled={id === otherObjectId}>
@@ -2116,7 +2170,7 @@ function WorkspacePane({
               <button
                 key={fileName}
                 className={fileName === file ? "fileButton active" : "fileButton"}
-                onClick={() => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); onFileChange(fileName); }}
+                onClick={() => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); onFileChange(fileName); }}
                 title={fileName}
               >
                 <span className="fileIcon" aria-hidden="true">{fileName.endsWith(".json") ? "{}" : "T"}</span>
@@ -2130,14 +2184,14 @@ function WorkspacePane({
           <div className="editorBar">
             {modified && <button className="editorControlButton editorResetButton" type="button" onClick={() => setResetConfirmationOpen(true)}>Reset</button>}
             {file === "metadata.json" && <button className="informationPageButton" type="button" onClick={() => openEmbeddedInformationPage(objectId)}>Information Page</button>}
-            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); } return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
+            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); } return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
             <div className="editorControls">
               {isTurtle && !metadataNeedsGuidedEntry && <button className="editorControlButton" type="button" onClick={() => setRelationshipOpen(true)} disabled={turtleDiagnostics.length > 0} title={turtleDiagnostics.length ? "Correct the Turtle source before graphing it" : undefined}>Graph</button>}
               {isTurtle && !metadataNeedsGuidedEntry && <div className="rdfViewControl" role="group" aria-label="RDF presentation">{(["human", "source"] as const).map((mode) => <button type="button" key={mode} className={rdfView === mode ? "active" : ""} aria-pressed={rdfView === mode} onClick={() => setRdfView(mode)}>{mode === "human" ? "Table" : "Source"}</button>)}</div>}
             </div>
           </div>
-          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => label === "Unique KO ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoIdOnly} onClick={() => { setUniqueKoIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Unique KO Metadata ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoMetadataIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoMetadataIdOnly} onClick={() => { setUniqueKoMetadataIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
-          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} uniqueKoIdOnly={uniqueKoIdOnly && file === "findability.metadata.txt"} uniqueKoMetadataIdOnly={uniqueKoMetadataIdOnly && file === "findability.metadata.txt"} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
+          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => label === "Unique KO ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoIdOnly} onClick={() => { setUniqueKoIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Unique KO Metadata ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoMetadataIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoMetadataIdOnly} onClick={() => { setUniqueKoMetadataIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "KO Access" && file === "access.metadata.txt" ? <button key={label} className={`principlesTrayButton${koAccessOnly ? " active" : ""}`} type="button" aria-pressed={koAccessOnly} onClick={() => { setKoAccessOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "KO Metadata Access" && file === "access.metadata.txt" ? <button key={label} className={`principlesTrayButton${koMetadataAccessOnly ? " active" : ""}`} type="button" aria-pressed={koMetadataAccessOnly} onClick={() => { setKoMetadataAccessOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Specified Interface" && file === "interoperability.metadata.txt" ? <button key={label} className={`principlesTrayButton${specifiedInterfaceOnly ? " active" : ""}`} type="button" aria-pressed={specifiedInterfaceOnly} onClick={() => { setSpecifiedInterfaceOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Object References" && file === "interoperability.metadata.txt" ? <button key={label} className={`principlesTrayButton${objectReferencesOnly ? " active" : ""}`} type="button" aria-pressed={objectReferencesOnly} onClick={() => { setObjectReferencesOnly((active) => !active); setRdfView("human"); }}>{label}</button> : <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
+          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} uniqueKoIdOnly={uniqueKoIdOnly && file === "findability.metadata.txt"} uniqueKoMetadataIdOnly={uniqueKoMetadataIdOnly && file === "findability.metadata.txt"} koAccessOnly={koAccessOnly && file === "access.metadata.txt"} koMetadataAccessOnly={koMetadataAccessOnly && file === "access.metadata.txt"} specifiedInterfaceOnly={specifiedInterfaceOnly && file === "interoperability.metadata.txt"} objectReferencesOnly={objectReferencesOnly && file === "interoperability.metadata.txt"} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
             value={value}
             onChange={(event) => onEdit(event.target.value)}
             spellCheck={false}

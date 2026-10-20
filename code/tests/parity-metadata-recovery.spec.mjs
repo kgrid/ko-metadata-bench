@@ -144,3 +144,127 @@ test("both editions independently toggle KO and metadata identity filters withou
   await serverPage.close();
   await standalonePage.close();
 });
+
+async function accessFilterJourney(page, url) {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+  const panel = page.getByText("DFU Severity Score KO", { exact: true }).first().locator("xpath=ancestor::details[1]");
+  await panel.getByRole("button", { name: "Interact", exact: true }).click();
+  const interaction = page.getByRole("dialog", { name: "DFU Severity Score KO", exact: true });
+  await fileButton(interaction, "access.metadata.txt").click();
+  const table = rdfTable(interaction);
+  const rows = table.locator("tbody > tr[data-statement-id]");
+  await expect(table).toBeVisible();
+  const unfilteredCount = await rows.count();
+  await interaction.getByRole("button", { name: "Accessibility Principles" }).click();
+  const koFilter = interaction.getByRole("button", { name: "KO Access", exact: true });
+  const metadataFilter = interaction.getByRole("button", { name: "KO Metadata Access", exact: true });
+  await expect(koFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "false");
+  await koFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(rows).toHaveCount(2);
+  await expect(rows.locator("td:nth-child(2)")).toHaveText(["access instance", "access instance"]);
+  await expect(table).toContainText("Open tagged repository directory through HTTPS");
+  await expect(table).toContainText("Download from FDO Bench");
+  await expect(table).not.toContainText("View existence metadata through HTTPS");
+  await metadataFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.locator("td:nth-child(2)")).toHaveText(["access instance", "access instance", "access instance"]);
+  await expect(table).toContainText("View existence metadata through HTTPS");
+  await koFilter.click();
+  await expect(koFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(metadataFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(rows).toHaveCount(1);
+  await expect(table).not.toContainText("Download from FDO Bench");
+  await interaction.getByRole("button", { name: "Source", exact: true }).click();
+  await expect(interaction.getByRole("textbox", { name: /Editing access\.metadata\.txt/ })).toHaveValue(/Download from FDO Bench/);
+  await interaction.getByRole("button", { name: "Table", exact: true }).click();
+  await expect(rows).toHaveCount(1);
+  await metadataFilter.click();
+  await expect(rows).toHaveCount(unfilteredCount);
+  expect(pageErrors, `${url} produced no uncaught browser errors`).toEqual([]);
+  await interaction.getByRole("button", { name: "Close metadata interaction", exact: true }).click();
+}
+
+test("both editions independently filter KO and metadata access routes", async ({ browser }) => {
+  const serverPage = await browser.newPage();
+  const standalonePage = await browser.newPage();
+  await accessFilterJourney(serverPage, editions.server);
+  await accessFilterJourney(standalonePage, editions.standalone);
+  await serverPage.close();
+  await standalonePage.close();
+});
+
+async function interoperabilityFilterJourney(page, url, loadAssembly = false) {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  if (loadAssembly) {
+    await page.getByRole("button", { name: "Knowledge Assembly", exact: true }).click();
+    await page.getByRole("button", { name: "Load as Knowledge Object", exact: true }).click();
+    await expect(page.getByRole("status")).toHaveText("Loaded as a Knowledge Object");
+  }
+  await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+  const name = loadAssembly ? "HBOT Treatment Target KA" : "DFU Severity Score KO";
+  const panels = page.locator("details.metadataRigCard, details.metadata-rig-card");
+  await expect(panels).toHaveCount(loadAssembly ? 5 : 4);
+  const panel = loadAssembly ? panels.last() : panels.first();
+  await expect(panel).toContainText(name);
+  await panel.getByRole("button", { name: "Interact", exact: true }).click();
+  const interaction = page.getByRole("dialog", { name, exact: true });
+  await fileButton(interaction, "interoperability.metadata.txt").click();
+  const table = rdfTable(interaction);
+  const rows = table.locator("tbody > tr[data-statement-id]");
+  await expect(table).toBeVisible();
+  const unfilteredCount = await rows.count();
+  expect(unfilteredCount).toBeGreaterThan(7);
+  await interaction.getByRole("button", { name: "Interoperability Principles" }).click();
+  const interfaceFilter = interaction.getByRole("button", { name: "Specified Interface", exact: true });
+  const referencesFilter = interaction.getByRole("button", { name: "Object References", exact: true });
+  await expect(interfaceFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(referencesFilter).toHaveAttribute("aria-pressed", "false");
+  await interfaceFilter.click();
+  await expect(interfaceFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(referencesFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(rows).toHaveCount(2);
+  const interfaceIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+  expect(interfaceIds.some((id) => id.includes("https://schema.org/potentialAction"))).toBe(true);
+  expect(interfaceIds.some((id) => id.includes("https://schema.org/target"))).toBe(true);
+  expect(interfaceIds.find((id) => id.includes("https://schema.org/potentialAction"))).toContain(loadAssembly ? "github.com/kgrid-objects/FAIR-DO-Workshop/tree/hbot-treatment-target-ka" : "https://kgrid.org/cks/");
+  await expect(table.locator("tr.interoperabilityCksSubject, tr.interoperability-cks-subject")).toHaveCount(loadAssembly ? 0 : 1);
+  await referencesFilter.click();
+  await expect(interfaceFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(referencesFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(rows).toHaveCount(7);
+  await interfaceFilter.click();
+  await expect(interfaceFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(referencesFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(rows).toHaveCount(5);
+  const referenceIds = await rows.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-statement-id")));
+  expect(referenceIds.filter((id) => id.includes("https://schema.org/object"))).toHaveLength(2);
+  expect(referenceIds.filter((id) => id.includes("https://schema.org/result"))).toHaveLength(2);
+  expect(referenceIds.filter((id) => id.includes("http://purl.org/dc/terms/conformsTo"))).toHaveLength(1);
+  await interaction.getByRole("button", { name: "Source", exact: true }).click();
+  await expect(interaction.getByRole("textbox", { name: /Editing interoperability\.metadata\.txt/ })).toHaveValue(/schema:potentialAction/);
+  await interaction.getByRole("button", { name: "Table", exact: true }).click();
+  await expect(rows).toHaveCount(5);
+  await referencesFilter.click();
+  await expect(rows).toHaveCount(unfilteredCount);
+  await interaction.getByRole("button", { name: "Close metadata interaction", exact: true }).click();
+  expect(pageErrors, `${url} produced no uncaught browser errors`).toEqual([]);
+}
+
+test("both editions independently filter CKS interfaces and qualified object references", async ({ browser }) => {
+  for (const url of Object.values(editions)) {
+    const page = await browser.newPage();
+    await interoperabilityFilterJourney(page, url);
+    await interoperabilityFilterJourney(page, url, true);
+    await page.close();
+  }
+});

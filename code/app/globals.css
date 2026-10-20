@@ -1508,6 +1508,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyLoadedStatus { box-shadow: inset 0 5px 9px #53675650, inset 0 1px 2px #35483a66; background: #c5d0c7; color: #334b3a; }
 @media (prefers-reduced-motion: reduce) { .assemblyLoadControl button { transition: none; } }
 .assemblyCaseBackdrop { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; min-height: 0; background: #e5eae5; }
+body:has(> .assemblyCaseBackdrop) > main { height: 100dvh; min-height: 0; overflow: hidden; }
 .assemblyCaseBackdrop .assemblyExercise { width: 100%; height: 100%; }
 .assemblyCaseClose { position: absolute; top: 18px; right: 22px; z-index: 2; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
 .assemblyCaseClose:hover { background: #dcdce1; }
@@ -1852,6 +1853,7 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .humanRdfTable td { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 10px; line-height: 1.45; }
 .humanRdfTable th:nth-child(1) { width: 28%; }.humanRdfTable th:nth-child(2) { width: 20%; }.humanRdfTable th:nth-child(3) { width: 52%; }
 .humanRdfTable td:nth-child(2) { text-transform: none; }
+.humanRdfTable tr.interoperabilityCksSubject td:first-child { background: #e8f0f7; box-shadow: inset 3px 0 #6387a5; }
 .humanRdfNested { font-weight: 600; }
 .humanRdfChildren { margin-top: 7px; overflow: hidden; border: 1px solid #dedee2; border-radius: 6px; background: #fafafa; font-weight: 400; }
 .humanRdfChild { display: grid; grid-template-columns: minmax(82px, 26%) minmax(0,1fr); gap: 9px; padding: 7px 9px; border-top: 1px solid #e8e8eb; }
