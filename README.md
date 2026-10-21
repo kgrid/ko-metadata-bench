@@ -49,6 +49,8 @@ npm test
 └── code/outputs/           # Generated standalone artifacts
 ```
 
+The [acronym-bubble feature contract](code/docs/ACRONYM-BUBBLES.md) records which KO and KA banner names may reveal written-out acronyms, the approved forms, and their shared interaction behavior.
+
 The browser runner is deliberately narrow: compatible KOs expose one JSON-compatible input/output boundary and execute without network, filesystem, or persistent state. The bench supplies the sandbox and controls; each object remains responsible for translating that boundary to its own implementation.
 
 ## Scope

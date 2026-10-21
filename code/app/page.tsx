@@ -30,6 +30,10 @@ import { evidenceCategoryPulseKeys } from "./evidence-subgraph-layout.js";
 import { inspectEvidenceSubgraphNode, inspectEvidenceSubgraphRelationship } from "./evidence-subgraph-inspector.js";
 import { planEvidenceSubgraphActions } from "./evidence-subgraph-actions.js";
 import { evidenceNexusIndicator } from "./evidence-linking-category.js";
+import { ACRONYM_BUBBLE_REGISTRY } from "./acronym-bubble-registry.js";
+import { createAcronymBubbleBehavior } from "./acronym-bubble-behavior.js";
+import { createAcronymBubbleElement, positionAcronymBubble } from "./acronym-bubble-view.js";
+import { installAcronymBannerBubbles } from "./acronym-bubble-attachment.js";
 import { markVerifiedPassage } from "./passage-navigation.js";
 import { OBJECT_FOLDER_NAMES, OBJECT_DISPLAY_NAMES, annotationDestinationOverrides, EMBEDDED_ASSEMBLY, objectFileOverrides, objectBinaryOverrides, objectStaticAssetOverrides, documentProjectionOverrides } from "./generated-ko-data";
 
@@ -1252,6 +1256,24 @@ function AbstractDialog({ onClose }: { onClose: () => void }) {
   return <div className="abstractBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="abstractDialog" role="dialog" aria-modal="true" aria-labelledby="abstract-title"><header><div><span>Embedded document</span><h2 id="abstract-title">Workshop Abstract</h2></div><button type="button" onClick={onClose} aria-label="Close abstract">×</button></header><iframe title="Representing Computable Biomedical Knowledge abstract" src={embeddedAbstractPdf} /></section></div>;
 }
 
+function AboutDialog({ onClose }: { onClose: () => void }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeButton.current?.focus();
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [onClose]);
+  return <div className="abstractBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="abstractDialog aboutDialog" role="dialog" aria-modal="true" aria-labelledby="about-title"><header><div><span>FAIR Knowledge Object Bench</span><h2 id="about-title">About this Bench</h2></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Close About this Bench">×</button></header><div className="aboutDialogBody">
+    <p>The FAIR Knowledge Object Bench is a place to explore how knowledge can be packaged so that people and computers can find it, understand it, and use it. It is designed for learning: you can see what an object contains and how information about that object changes what you are able to do with it.</p>
+    <section><h3>What is a Knowledge Object?</h3><p>A Knowledge Object brings computable knowledge together with the materials needed to describe and use it. Those materials may include a specification of what the knowledge does, an implementation that carries it out, supporting documents, and metadata. A Knowledge Assembly is also a Knowledge Object. It coordinates the work of other Knowledge Objects to produce a result.</p></section>
+    <section><h3>Why does metadata matter?</h3><p>Metadata is information <em>about</em> an object. It can tell you what the object is, how to locate and obtain it, what its inputs and outputs mean, what it is based on, and where its use is limited.</p></section>
+    <section><h3>What can you do here?</h3><ul><li>Explore an object’s contents and metadata.</li><li>Try the metadata exercises and see what changes.</li><li>Run compatible objects and examine their results.</li><li>Download an object or your working version.</li></ul></section>
+    <p>The Bench is a general-purpose teaching environment. The objects available in it may change; the questions it helps you ask remain the same. The Knowledge Objects and Assemblies in the Bench are educational examples only and not for real-world use of any kind.</p>
+    <footer><strong>Created by the Knowledge Systems Lab</strong><br />Department of Learning Health Sciences · University of Michigan Medical School<br /><a href="https://github.com/kgrid/ko-metadata-bench" target="_blank" rel="noopener noreferrer">Workbench repository ↗</a></footer>
+  </div></section></div>;
+}
+
 function EmbeddedTestDialog({ objectId, file, source, onClose }: { objectId: ObjectId; file: FileName; source: string; onClose: () => void }) {
   return <div className="testViewerBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="testViewerDialog" role="dialog" aria-modal="true" aria-labelledby="test-viewer-title"><header><div><span>Embedded test</span><h2 id="test-viewer-title">{objectName(objectId)} · {file.split("/").at(-1)}</h2><small>{file}</small></div><button type="button" onClick={onClose} aria-label="Close embedded test">×</button></header><pre><code>{source}</code></pre><footer>Read-only · Embedded in this knowledge object</footer></section></div>;
 }
@@ -2312,7 +2334,7 @@ function KnowledgeAssemblyCaseView() {
   const exchange = selectedKoRole && selectedCase ? projectAssemblyKoExchange(selectedCase, selectedKoRole) : null;
   return <><section className="knowledgeObjectsExercise assemblyExercise" aria-label="Knowledge Assembly explorer">
     <div className="viewStickyControls">
-      <div className="viewTitle"><h2>Assembly Orchestration</h2></div>
+      <div className="viewTitle"><h2>{puzzleComplete ? "Cases Processed with a Knowledge Assembly" : "Orchestrating KOs in a Knowledge Assembly"}</h2></div>
       {!puzzleComplete && !loaded.error && <p className="assemblyPuzzleInstruction">Arrange the four Knowledge Objects so the severity score feeds the treatment decision. The treatment decision, regimen burden estimate, and prognostic indicator then contribute to the assembly’s treatment-target classification.</p>}
     </div>
     {loaded.error ? <div className="assemblyWorkspaceError" role="alert">{loaded.error}</div> :
@@ -2459,6 +2481,8 @@ export default function Home() {
   const [interoperabilitySessions, setInteroperabilitySessions] = useState<Partial<Record<ObjectId, InteroperabilitySimulationSession>>>({});
   const [interoperabilityStagesObject, setInteroperabilityStagesObject] = useState<ObjectId | null>(null);
   const [abstractOpen, setAbstractOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const aboutButtonRef = useRef<HTMLButtonElement>(null);
   const [openTest, setOpenTest] = useState<{ objectId: ObjectId; file: FileName } | null>(null);
   const [openEvidence, setOpenEvidence] = useState<{ objectId: ObjectId; file: FileName } | null>(null);
   const [accessErrors, setAccessErrors] = useState<Partial<Record<ObjectId, string>>>({});
@@ -2467,6 +2491,13 @@ export default function Home() {
   const activeObjectIds: ObjectId[] = useMemo(() => activeObjects.map((object) => object.kind === "knowledge-assembly" ? ASSEMBLY_OBJECT_ID : object.objectId), [activeObjects]);
   const [metadataInteractObject, setMetadataInteractObject] = useState<ObjectId | null>(null);
   const [koPanelReset, setKoPanelReset] = useState(0);
+
+  useEffect(() => installAcronymBannerBubbles(document, {
+    registry: ACRONYM_BUBBLE_REGISTRY,
+    createBehavior: createAcronymBubbleBehavior,
+    createBubble: createAcronymBubbleElement,
+    positionBubble: positionAcronymBubble,
+  }), []);
 
   useEffect(() => {
     const access = createKnowledgeObjectAccessApi({
@@ -2505,6 +2536,7 @@ export default function Home() {
             <h1>FAIR Knowledge Object Bench</h1>
           </div>
           <div className="topActions">
+            <button ref={aboutButtonRef} type="button" className="abstractButton aboutButton" onClick={() => setAboutOpen(true)}>About this Bench</button>
             <button type="button" className="abstractButton" onClick={() => setAbstractOpen(true)}>Workshop Abstract</button>
           </div>
         </header>
@@ -2697,6 +2729,7 @@ export default function Home() {
         </nav>
       </footer>
       {abstractOpen && <AbstractDialog onClose={() => setAbstractOpen(false)} />}
+      {aboutOpen && <AboutDialog onClose={() => { setAboutOpen(false); requestAnimationFrame(() => aboutButtonRef.current?.focus()); }} />}
       {openTest && <EmbeddedTestDialog objectId={openTest.objectId} file={openTest.file} source={workingFileValue(openTest.objectId, openTest.file, drafts)} onClose={() => setOpenTest(null)} />}
       {openEvidence && <EmbeddedEvidenceDialog objectId={openEvidence.objectId} file={openEvidence.file} onClose={() => setOpenEvidence(null)} />}
       {openKnowledgeSubgraph && createPortal(<KnowledgeSubgraphDialog objectId={openKnowledgeSubgraph.objectId} model={openKnowledgeSubgraph.model} metadata={openKnowledgeSubgraph.metadata} onClose={() => setOpenKnowledgeSubgraph(null)} />, document.body)}

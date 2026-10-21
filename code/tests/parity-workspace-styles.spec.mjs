@@ -86,3 +86,77 @@ test("server and standalone editions share main backgrounds and workspace styles
   await serverPage.close();
   await standalonePage.close();
 });
+
+test("Metadata Rig and F/A/I/R share a 920-pixel grid limit in both editions", async ({ browser }) => {
+  const grids = [
+    { control: "Metadata Rig", selector: ".metadataRigGrid, .metadata-rig-grid" },
+    { control: "F exercise", selector: ".searchResults, .search-results" },
+    { control: "A exercise", selector: ".accessibilityGrid, .accessibility-grid" },
+    { control: "I exercise", selector: ".interoperabilityGrid, .interoperability-grid" },
+    { control: "R exercise", selector: ".reusabilityGrid, .reusability-grid" },
+  ];
+  for (const [edition, url] of Object.entries(editions)) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    for (const { control, selector } of grids) {
+      await page.getByRole("button", { name: control, exact: true }).click();
+      const grid = page.locator(selector).first();
+      await expect(grid).toBeVisible();
+      expect(await grid.evaluate((node) => node.getBoundingClientRect().width), `${edition}: ${control}`).toBe(920);
+    }
+    await page.close();
+  }
+});
+
+test("Knowledge banners use the 1040-pixel grid cap in both editions", async ({ browser }) => {
+  for (const [edition, url] of Object.entries(editions)) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "K exercise", exact: true }).click();
+    const grid = page.locator(".knowledgeGrid, .knowledge-grid");
+    await expect(grid).toBeVisible();
+    expect(await grid.evaluate((node) => node.getBoundingClientRect().width), `${edition}: Knowledge grid`).toBe(1040);
+    await page.close();
+  }
+});
+
+test("KO banners share their base treatment across views and editions", async ({ browser }) => {
+  const banners = [
+    { control: "Knowledge Objects", selector: ".koObjectShade, .ko-object-shade" },
+    { control: "Metadata Rig", selector: ".metadataRigCard, .metadata-rig-card" },
+    { control: "K exercise", selector: ".knowledgeCard, .knowledge-card" },
+    { control: "F exercise", selector: ".resultGroup, .result-group" },
+    { control: "A exercise", selector: ".accessibilityCard, .accessibility-card" },
+    { control: "I exercise", selector: ".interoperabilityPanel, .interoperability-panel" },
+    { control: "R exercise", selector: ".reusabilityCard, .reusability-card" },
+  ];
+  for (const [edition, url] of Object.entries(editions)) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    for (const { control, selector } of banners) {
+      if (control !== "Knowledge Objects") await page.getByRole("button", { name: control, exact: true }).click();
+      const banner = page.locator(selector).first();
+      await expect(banner, `${edition}: ${control} banner`).toBeVisible();
+      const treatment = await banner.evaluate((node) => {
+        const summary = node.querySelector(":scope > summary");
+        const name = summary?.querySelector(":scope > strong");
+        const box = getComputedStyle(node);
+        const summaryStyle = getComputedStyle(summary);
+        const nameStyle = getComputedStyle(name);
+        return {
+          borderWidth: box.borderTopWidth,
+          radius: box.borderTopLeftRadius,
+          minHeight: summaryStyle.minHeight,
+          chevron: getComputedStyle(summary, "::before").content,
+          nameSize: nameStyle.fontSize,
+          nameWeight: nameStyle.fontWeight,
+        };
+      });
+      expect(treatment, `${edition}: ${control} shared banner treatment`).toEqual({
+        borderWidth: "1px", radius: "11px", minHeight: "42px",
+        chevron: '"›"', nameSize: "12px", nameWeight: "650",
+      });
+    }
+    await page.close();
+  }
+});

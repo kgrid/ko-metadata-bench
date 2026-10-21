@@ -24,6 +24,12 @@ button, select, textarea { font: inherit; }
 button, select { color: inherit; }
 button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(31, 92, 69, .25); outline-offset: 1px; }
 
+.acronymBubbleAnchor { display: inline; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-weight: inherit; letter-spacing: inherit; text-decoration: underline dotted #6e6e73 1px; text-underline-offset: 3px; cursor: pointer; }
+.acronymBubbleAnchor:focus-visible { border-radius: 2px; outline: 2px solid #636366; outline-offset: 3px; }
+.acronymBubble { position: fixed; z-index: 1400; width: max-content; max-width: min(320px, calc(100vw - 24px)); padding: 10px 13px; border: 1px solid #8e8e93; border-radius: 9px; background: #fafafc; color: #1d1d1f; box-shadow: 0 7px 18px rgba(0,0,0,.16), 0 1px 3px rgba(0,0,0,.07); font: 650 12px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif; text-align: center; white-space: normal; overflow-wrap: anywhere; pointer-events: none; }
+.acronymBubble::after { content: ""; position: absolute; top: -5px; left: var(--acronym-bubble-pointer-x, 50%); width: 8px; height: 8px; border-top: 1px solid #8e8e93; border-left: 1px solid #8e8e93; background: #fafafc; transform: translateX(-50%) rotate(45deg); }
+.acronymBubble[data-side="above"]::after { top: auto; bottom: -5px; border-top: 0; border-left: 0; border-right: 1px solid #8e8e93; border-bottom: 1px solid #8e8e93; }
+
 main { min-height: 100vh; display: flex; flex-direction: column; }
 .persistentHeader { position: sticky; top: 0; z-index: 100; }
 .topbar {
@@ -38,10 +44,16 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 }
 .brandCopy h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.025em; }
 .brandCopy p { margin: 3px 0 0; color: var(--muted); font-size: 12px; letter-spacing: 0; }
-.topActions { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 12px; }
+.topActions { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; }
 .abstractButton { min-width: 132px; height: 31px; display: grid; place-items: center; border: 1px solid var(--line); background:#fff; padding: 0 10px; border-radius: 7px; font-size: 12px; }
 .abstractButton { cursor: pointer; }
 .abstractButton:hover { background: #f0f0f2; }
+.aboutButton { width: 132px; }
+
+@media (max-width: 760px) {
+  .topbar { flex-wrap: wrap; row-gap: 10px; }
+  .brandCopy { flex: 0 0 100%; }
+}
 
 .contextBar { display: flex; align-items: center; padding: 10px 28px; border-bottom: 1px solid var(--line); background: #f5f5f7; }
 .contextBar > .contextBarLayout { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 18px; }
@@ -208,7 +220,7 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 @media (max-width: 680px) { .searchControls { flex-direction: column; align-items: stretch; } .findabilityGrid { grid-template-columns: 1fr; } }
 .accessibilityExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
 .knowledgeExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
-.knowledgeGrid { width: min(1240px, 100%); display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: start; gap: 12px; margin-top: 18px; }
+.knowledgeGrid { width: min(1040px, 100%); display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: start; gap: 12px; margin-top: 18px; }
 .accessibilityCard.knowledgeCard > summary { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; column-gap: 9px; height: 42px; min-height: 42px; padding-block: 0; }
 .knowledgeCard > summary::before { grid-column: 1; align-self: center; }
 .knowledgeCard > summary > strong { grid-column: 2; }
@@ -1283,6 +1295,8 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .metadataInteractWorkspace .findabilityEnrichmentGate,
 .metadataInteractWorkspace .editorColumn > textarea { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
 @media (max-width:680px) { .metadataRigGrid { grid-template-columns: 1fr; } .metadataRigCard > summary { grid-template-columns: auto minmax(0,1fr) 68px 54px; } }
+/* One width limit for the Metadata Rig and F/A/I/R object grids. */
+.metadataRigGrid, .searchResults, .accessibilityGrid, .interoperabilityGrid, .reusabilityGrid { width: min(920px, 100%); }
 .pane { min-width: 0; display: flex; flex-direction: column; background: var(--panel); border: 1px solid #c7c7cc; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 .paneHead { height: 68px; padding: 12px 14px 12px 18px; display: flex; align-items: center; border-bottom: 1px solid var(--line); }
 .paneHead h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.015em; }
@@ -1488,6 +1502,15 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .abstractDialog > header h2 { margin: 3px 0 0; font-size: 15px; font-weight: 650; }
 .abstractDialog > header button { width: 30px; height: 30px; margin-left: auto; border: 0; border-radius: 50%; background: #e8e8ed; color: #3a3a3c; font-size: 20px; line-height: 1; cursor: pointer; }
 .abstractDialog > iframe { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
+.aboutDialogBody { flex: 1; min-height: 0; overflow-y: auto; padding: 28px clamp(20px, 5vw, 58px); background: #fff; color: #3a3a3c; font-size: 14px; line-height: 1.6; }
+.aboutDialogBody > * { max-width: 710px; margin: 0 auto 22px; }
+.aboutDialogBody h3 { margin: 0 0 7px; color: #1d1d1f; font-size: 15px; line-height: 1.3; }
+.aboutDialogBody p, .aboutDialogBody ul { margin-top: 0; }
+.aboutDialogBody ul { padding-left: 20px; }
+.aboutDialogBody footer { padding-top: 18px; border-top: 1px solid #d2d2d7; color: #6e6e73; font-size: 12px; }
+.aboutDialogBody footer strong { color: #1d1d1f; }
+.aboutDialogBody footer a { display: inline-block; margin-top: 9px; color: #1d1d1f; }
+@media (max-width: 600px) { .aboutDialog { width: 100%; height: 100%; } .abstractBackdrop:has(.aboutDialog) { padding: 6px; } .aboutDialogBody { padding: 20px; } }
 .knowledgeObjectsExercise { flex: 1; min-height: 585px; display: flex; flex-direction: column; align-items: center; padding: 34px 24px 48px; }
 .assemblyExercise, .assemblyExercise .viewStickyControls { background: #e5eae5; }
 .assemblyExercise .viewStickyControls { position: relative; top: auto; z-index: auto; width: 100%; margin: 0; padding: 0 0 10px; }
@@ -1498,9 +1521,9 @@ main:has(> .assemblyExercise) { height: 100dvh; min-height: 0; overflow: hidden;
 .assemblyLanding .koInstrumentMark { background: #516052; }
 .assemblyObjectBar { width: min(760px,100%); min-height: 42px; margin-top: 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 0 10px; border: 1px solid #c7c7cc; border-radius: 12px; background: #eeeef0; color: #1d1d1f; }
 .assemblyObjectBar strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
-.assemblyObjectBar button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
-.assemblyObjectBar button:hover { background: #f5f5f7; }
-.assemblyObjectBar button:focus-visible, .assemblyLoadControl button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
+.assemblyObjectBar > button { padding: 4px 10px; border: 1px solid #8e8e93; border-radius: 999px; background: #fff; color: #3a3a3c; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.assemblyObjectBar > button:hover { background: #f5f5f7; }
+.assemblyObjectBar > button:focus-visible, .assemblyLoadControl button:focus-visible, .assemblyCaseClose:focus-visible { outline: 2px solid #636366; outline-offset: 3px; }
 .assemblyLoadControl { flex: 1; min-height: 160px; width: 100%; display: grid; place-items: center; padding: 24px; }
 .assemblyLoadControl button, .assemblyLoadedStatus { box-sizing: border-box; display: inline-grid; place-items: center; min-width: min(310px,100%); min-height: 64px; padding: 15px 24px; border: 2px solid #78877e; border-radius: 10px; background: #d8e0d9; color: #26372c; font-size: 12px; font-weight: 750; letter-spacing: .035em; text-align: center; }
 .assemblyLoadControl button { cursor: pointer; box-shadow: inset 0 2px 0 #f5f8f5, 0 6px 0 #87998a, 0 9px 16px #51605242; transform: translateY(-3px); transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease; }
@@ -2019,3 +2042,53 @@ textarea:focus { outline-offset: -3px; }
   .fileIcon { display: none; }
   textarea { padding: 14px; }
 }
+
+/* Shared KO banner treatment. Layouts, status colors, and view backgrounds stay local. */
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard, .assemblyObjectBar) {
+  border: 1px solid var(--ko-banner-border, #c7c7cc);
+  border-radius: 11px;
+}
+.metadataRigCard { --ko-banner-border: rgba(43,57,70,.42); }
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary {
+  min-height: 42px;
+  color: #1d1d1f;
+  cursor: pointer;
+  list-style: none;
+}
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary::-webkit-details-marker { display: none; }
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary::before {
+  content: "›";
+  color: #6e6e73;
+  font-size: 18px;
+  transform: rotate(90deg);
+  transition: transform .15s ease;
+}
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard):not([open]) > summary::before { transform: rotate(0deg); }
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary > strong,
+.assemblyObjectBar > strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 650;
+}
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px #636366;
+}
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary :is(.koShadeGraphic, .metadataInteractButton, .knowledgeTabExplore, .findabilityAuditButton, .resultCount, .interoperabilityStagesButton),
+.assemblyObjectBar > button {
+  box-sizing: border-box;
+  height: 21px;
+  min-height: 21px;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+:is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary :is(.koShadeGraphic, .metadataInteractButton, .knowledgeTabExplore, .findabilityAuditButton, .resultCount, .interoperabilityStagesButton):focus-visible,
+.assemblyObjectBar > button:focus-visible { outline: 2px solid #636366; outline-offset: 2px; }

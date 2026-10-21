@@ -211,7 +211,7 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 @media(max-height:720px){.ko-grid,.search-results,.accessibility-grid,.interoperability-grid,.reusability-grid,.metadata-rig-grid{max-height:calc(100vh - 272px)}}
   .knowledge-exercise{grid-column:1/-1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:34px 24px 28px}
   .knowledge-mark{background:#5c5c5f;color:#fff}
-  .knowledge-grid{width:min(1240px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:18px;flex:0 1 auto;min-height:0;max-height:calc(100vh - 300px);overflow-x:hidden;overflow-y:auto}
+  .knowledge-grid{width:min(1040px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:18px;flex:0 1 auto;min-height:0;max-height:calc(100vh - 300px);overflow-x:hidden;overflow-y:auto}
   .knowledge-card>summary{display:grid;grid-template-columns:14px minmax(0,1fr) auto;column-gap:9px;height:42px;min-height:42px;padding-block:0}
   .knowledge-card>summary::before{grid-column:1;align-self:center}
   .knowledge-card>summary>strong{grid-column:2}
@@ -420,11 +420,39 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
   @media(max-width:680px){.knowledge-grid{grid-template-columns:1fr}}
   @media(max-height:720px){.knowledge-grid{max-height:calc(100vh - 272px)}}
 </style>
+<style>
+.acronymBubbleAnchor{display:inline;margin:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;letter-spacing:inherit;text-decoration:underline dotted #6e6e73 1px;text-underline-offset:3px;cursor:pointer}
+.acronymBubbleAnchor:focus-visible{border-radius:2px;outline:2px solid #636366;outline-offset:3px}
+.acronymBubble{position:fixed;z-index:1400;width:max-content;max-width:min(320px,calc(100vw - 24px));padding:10px 13px;border:1px solid #8e8e93;border-radius:9px;background:#fafafc;color:#1d1d1f;box-shadow:0 7px 18px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.07);font:650 12px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;text-align:center;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+.acronymBubble::after{content:"";position:absolute;top:-5px;left:var(--acronym-bubble-pointer-x,50%);width:8px;height:8px;border-top:1px solid #8e8e93;border-left:1px solid #8e8e93;background:#fafafc;transform:translateX(-50%) rotate(45deg)}
+.acronymBubble[data-side="above"]::after{top:auto;bottom:-5px;border-top:0;border-left:0;border-right:1px solid #8e8e93;border-bottom:1px solid #8e8e93}
+.top{display:flex;align-items:center}
+.top .status{margin-left:auto;gap:8px}
+.top .about-button{width:132px}
+</style>
+<style>.about-dialog-body{flex:1;min-height:0;overflow-y:auto;padding:28px clamp(20px,5vw,58px);background:#fff;color:#3a3a3c;font-size:14px;line-height:1.6}.about-dialog-body>*{max-width:710px;margin:0 auto 22px}.about-dialog-body h3{margin:0 0 7px;color:#1d1d1f;font-size:15px;line-height:1.3}.about-dialog-body p,.about-dialog-body ul{margin-top:0}.about-dialog-body ul{padding-left:20px}.about-dialog-body footer{padding-top:18px;border-top:1px solid #d2d2d7;color:#6e6e73;font-size:12px}.about-dialog-body footer strong{color:#1d1d1f}.about-dialog-body footer a{display:inline-block;margin-top:9px;color:#1d1d1f}@media(max-width:600px){.about-dialog{width:100%;height:100%}.abstract-backdrop:has(.about-dialog){padding:6px}.about-dialog-body{padding:20px}}</style>
+<style>
+@media(max-width:760px){.top{flex-wrap:wrap;row-gap:10px}.top .brand{flex:0 0 100%}}
+.metadata-rig-grid,.search-results,.accessibility-grid,.interoperability-grid,.reusability-grid{width:min(920px,100%)}
+</style>
+<!-- Shared KO banner treatment keeps layout and status colors view-specific. -->
+<style>
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card,.assembly-object-bar):is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card,.assembly-object-bar){border:1px solid var(--ko-banner-border,#c7c7cc);border-radius:11px}
+.metadata-rig-card{--ko-banner-border:rgba(43,57,70,.42)}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary{min-height:42px;color:#1d1d1f;cursor:pointer;list-style:none}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary::-webkit-details-marker{display:none}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary::before{content:"›";color:#6e6e73;font-size:18px;transform:rotate(90deg);transition:transform .15s ease}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card):not([open])>summary::before{transform:rotate(0deg)}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary>strong,.assembly-object-bar>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:650}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #636366}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary :is(.ko-shade-graphic,.metadata-interact-button,.knowledge-tab-explore,.findability-audit-button,.result-count,.interoperability-stages-button),.assembly-object-bar>button{box-sizing:border-box;height:21px;min-height:21px;padding-top:0;padding-bottom:0;border-radius:999px;font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap}
+:is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary :is(.ko-shade-graphic,.metadata-interact-button,.knowledge-tab-explore,.findability-audit-button,.result-count,.interoperability-stages-button):focus-visible,.assembly-object-bar>button:focus-visible{outline:2px solid #636366;outline-offset:2px}
+</style>
 </head>
 <body>
 <div class="app">
   <div class="persistent-header">
-  <header class="top"><div class="brand"><h1>FAIR Knowledge Object Bench</h1></div><div class="status"><button type="button" class="abstract-button" id="abstractButton">Workshop Abstract</button></div></header>
+  <header class="top"><div class="brand"><h1>FAIR Knowledge Object Bench</h1></div><div class="status"><button type="button" class="abstract-button about-button" id="aboutButton">About this Bench</button><button type="button" class="abstract-button" id="abstractButton">Workshop Abstract</button></div></header>
   <div class="context"><div class="context-destinations context-destinations-left" aria-label="Knowledge object controls"><button type="button" class="files-return active-destination" id="knowledgeObjectsButton" aria-pressed="true">Knowledge Objects</button><button type="button" class="files-return" id="filesReturn" aria-pressed="false">Metadata Rig</button></div><div class="exercise-control-cluster"><div class="exercise-buttons" aria-label="Exercise controls"><button type="button" class="knowledge-exercise-button" data-exercise="K" aria-label="K exercise" aria-pressed="false">K</button><button type="button" data-exercise="F" aria-label="F exercise" aria-pressed="false">F</button><button type="button" data-exercise="A" aria-label="A exercise" aria-pressed="false">A</button><button type="button" data-exercise="I" aria-label="I exercise" aria-pressed="false">I</button><button type="button" data-exercise="R" aria-label="R exercise" aria-pressed="false">R</button></div><span class="label">Metadata Exercises</span></div><div class="context-destinations" aria-label="Knowledge assembly controls"><button type="button" class="files-return" id="knowledgeAssemblyButton" aria-pressed="false" disabled>Knowledge Assembly</button></div></div>
   </div>
   <div class="workspaces"><section class="pane" id="leftPane"></section></div>
@@ -614,6 +642,7 @@ const koAccessApi=(()=>{
   return Object.freeze({version:apiVersion,listKnowledgeObjects:()=>objects.map(({id,name})=>({id,name})),prepareKnowledgeObjectZip,savePreparedDownload,downloadKnowledgeObject,activateAssembly});
 })();
 window.FDOBench=Object.freeze({...window.FDOBench,access:koAccessApi});
+function openAbout(){const opener=document.getElementById("aboutButton"),backdrop=document.createElement("div");backdrop.className="abstract-backdrop";backdrop.innerHTML=`<section class="abstract-dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title"><header><div><span>FAIR Knowledge Object Bench</span><h2 id="about-title">About this Bench</h2></div><button type="button" aria-label="Close About this Bench">×</button></header><div class="about-dialog-body"><p>The FAIR Knowledge Object Bench is a place to explore how knowledge can be packaged so that people and computers can find it, understand it, and use it. It is designed for learning: you can see what an object contains and how information about that object changes what you are able to do with it.</p><section><h3>What is a Knowledge Object?</h3><p>A Knowledge Object brings computable knowledge together with the materials needed to describe and use it. Those materials may include a specification of what the knowledge does, an implementation that carries it out, supporting documents, and metadata. A Knowledge Assembly is also a Knowledge Object. It coordinates the work of other Knowledge Objects to produce a result.</p></section><section><h3>Why does metadata matter?</h3><p>Metadata is information <em>about</em> an object. It can tell you what the object is, how to locate and obtain it, what its inputs and outputs mean, what it is based on, and where its use is limited.</p></section><section><h3>What can you do here?</h3><ul><li>Explore an object’s contents and metadata.</li><li>Try the metadata exercises and see what changes.</li><li>Run compatible objects and examine their results.</li><li>Download an object or your working version.</li></ul></section><p>The Bench is a general-purpose teaching environment. The objects available in it may change; the questions it helps you ask remain the same. The Knowledge Objects and Assemblies in the Bench are educational examples only and not for real-world use of any kind.</p><footer><strong>Created by the Knowledge Systems Lab</strong><br>Department of Learning Health Sciences · University of Michigan Medical School<br><a href="https://github.com/kgrid/ko-metadata-bench" target="_blank" rel="noopener noreferrer">Workbench repository ↗</a></footer></div></section>`;document.body.appendChild(backdrop);const closeButton=backdrop.querySelector("header button"),close=()=>{document.removeEventListener("keydown",escape);backdrop.remove();opener.focus()},escape=event=>{if(event.key==="Escape")close()};closeButton.addEventListener("click",close);backdrop.addEventListener("mousedown",event=>{if(event.target===backdrop)close()});document.addEventListener("keydown",escape);closeButton.focus()}
 function openAbstract(){const backdrop=document.createElement("div");backdrop.className="abstract-backdrop";backdrop.innerHTML='<section class="abstract-dialog" role="dialog" aria-modal="true" aria-labelledby="abstract-title"><header><div><span>Embedded document</span><h2 id="abstract-title">Workshop Abstract</h2></div><button type="button" aria-label="Close abstract">×</button></header><iframe title="Representing Computable Biomedical Knowledge abstract"></iframe></section>';document.body.appendChild(backdrop);backdrop.querySelector("iframe").src=embeddedAbstractPdf;const closeButton=backdrop.querySelector("header button"),close=()=>{document.removeEventListener("keydown",escape);backdrop.remove()},escape=event=>{if(event.key==="Escape")close()};closeButton.addEventListener("click",close);backdrop.addEventListener("mousedown",event=>{if(event.target===backdrop)close()});document.addEventListener("keydown",escape)}
 function updateHeader(){}
 const normalizeText=text=>text.normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
@@ -2156,9 +2185,9 @@ document.head.insertAdjacentHTML("beforeend",`<style>
 .assembly-landing .ko-instrument-mark{background:#516052}
 .assembly-object-bar{width:min(760px,100%);min-height:42px;margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:0 10px;border:1px solid #c7c7cc;border-radius:12px;background:#eeeef0;color:#1d1d1f}
 .assembly-object-bar strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:650}
-.assembly-object-bar button{padding:4px 10px;border:1px solid #8e8e93;border-radius:999px;background:#fff;color:#3a3a3c;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
-.assembly-object-bar button:hover{background:#f5f5f7}
-.assembly-object-bar button:focus-visible,.assembly-load-control button:focus-visible,.assembly-case-close:focus-visible{outline:2px solid #636366;outline-offset:3px}
+.assembly-object-bar>button{padding:4px 10px;border:1px solid #8e8e93;border-radius:999px;background:#fff;color:#3a3a3c;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.assembly-object-bar>button:hover{background:#f5f5f7}
+.assembly-object-bar>button:focus-visible,.assembly-load-control button:focus-visible,.assembly-case-close:focus-visible{outline:2px solid #636366;outline-offset:3px}
 .assembly-load-control{flex:1;min-height:160px;width:100%;display:grid;place-items:center;padding:24px}
 .assembly-load-control button,.assembly-loaded-status{box-sizing:border-box;display:inline-grid;place-items:center;min-width:min(310px,100%);min-height:64px;padding:15px 24px;border:2px solid #78877e;border-radius:10px;background:#d8e0d9;color:#26372c;font-size:12px;font-weight:750;letter-spacing:.035em;text-align:center}
 .assembly-load-control button{cursor:pointer;box-shadow:inset 0 2px 0 #f5f8f5,0 6px 0 #87998a,0 9px 16px #51605242;transform:translateY(-3px);transition:transform 200ms ease,box-shadow 200ms ease,background-color 200ms ease}
@@ -2290,6 +2319,293 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 .assembly-workspace-error{width:min(760px,100%);margin-top:24px;padding:16px 18px;border:1px solid #dfa7a2;border-radius:10px;background:#fff0ef;color:var(--status-red);font-size:14px}
 @media(max-width:680px){.assembly-workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:10px}.assembly-case-selector{padding:8px;overflow-x:auto}.assembly-case-selector h3{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.assembly-case-buttons{display:flex;gap:6px;min-width:max-content}.assembly-case-selector button{width:auto;min-width:66px;text-align:center}.assembly-case-detail{padding:22px 18px}.assembly-band-pair{grid-template-columns:minmax(0,1fr)}}
 </style>`);
+/* ACRONYM_BUBBLE_VIEW_START */
+/** Build the shared, text-only bubble; attachment to banners is separate. */
+function createAcronymBubbleElement(document, expansion) {
+  if (!document?.createElement || typeof expansion !== "string" || !expansion.trim()) {
+    throw new TypeError("A document and nonempty written-out form are required.");
+  }
+  const bubble = document.createElement("div");
+  bubble.className = "acronymBubble";
+  bubble.setAttribute("role", "tooltip");
+  bubble.textContent = expansion;
+  return bubble;
+}
+
+/** Place a fixed bubble without changing the anchor or its banner's layout. */
+function positionAcronymBubble({ anchor, bubble, viewport, avoidRects = [] }) {
+  if (!anchor?.getBoundingClientRect || !bubble?.getBoundingClientRect || !bubble?.style || !bubble?.dataset) {
+    throw new TypeError("An anchor and a measurable bubble are required.");
+  }
+  const view = viewport ?? anchor.ownerDocument?.defaultView;
+  const width = view?.innerWidth;
+  const height = view?.innerHeight;
+  if (!(width > 0 && height > 0)) throw new TypeError("A positive viewport is required.");
+  const target = anchor.getBoundingClientRect();
+  const measured = bubble.getBoundingClientRect();
+  const bubbleWidth = Math.min(measured.width, width - 24);
+  const bubbleHeight = Math.min(measured.height, height - 24);
+  const margin = 12;
+  const gap = 12;
+  const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+  const positions = [
+    (target.left + target.right - bubbleWidth) / 2,
+    target.left,
+    target.right - bubbleWidth,
+  ].map((left) => clamp(left, margin, Math.max(margin, width - margin - bubbleWidth)));
+  const candidates = [];
+  for (const side of ["below", "above"]) {
+    const top = side === "below" ? target.bottom + gap : target.top - gap - bubbleHeight;
+    if (top < margin || top + bubbleHeight > height - margin) continue;
+    for (const left of positions) {
+      const rect = { left, top, right: left + bubbleWidth, bottom: top + bubbleHeight };
+      const overlap = avoidRects.reduce((sum, item) => sum + Math.max(0, Math.min(rect.right, item.right) - Math.max(rect.left, item.left)) * Math.max(0, Math.min(rect.bottom, item.bottom) - Math.max(rect.top, item.top)), 0);
+      candidates.push({ side, left, top, overlap, offset: Math.abs((left + bubbleWidth / 2) - (target.left + target.right) / 2) });
+    }
+  }
+  candidates.sort((a, b) => a.overlap - b.overlap || a.offset - b.offset);
+  const chosen = candidates[0] ?? {
+    side: "below",
+    left: positions[0],
+    top: clamp(target.bottom + gap, margin, Math.max(margin, height - margin - bubbleHeight)),
+  };
+  bubble.style.left = `${chosen.left}px`;
+  bubble.style.top = `${chosen.top}px`;
+  bubble.style.setProperty("--acronym-bubble-pointer-x", `${clamp((target.left + target.right) / 2 - chosen.left, 10, Math.max(10, bubbleWidth - 10))}px`);
+  bubble.dataset.side = chosen.side;
+  return { left: chosen.left, top: chosen.top, side: chosen.side };
+}
+/* ACRONYM_BUBBLE_VIEW_END */
+/* ACRONYM_BUBBLE_ATTACHMENT_START */
+// Only the main-view KO/KA banner names may receive acronym anchors.
+const ACRONYM_BANNER_SELECTORS = Object.freeze([
+  'section[aria-label="Knowledge Objects explorer"] .koObjectShade > summary > strong',
+  'section[aria-label="Knowledge Objects explorer"] .ko-object-shade > summary > strong',
+  'section[aria-label="Metadata rig"] .metadataRigCard > summary > strong',
+  'section[aria-label="Metadata rig"] .metadata-rig-card > summary > strong',
+  'section[aria-label="Knowledge exercise"] .knowledgeCard > summary > strong',
+  'section[aria-label="Knowledge exercise"] .knowledge-card > summary > strong',
+  'section[aria-label="Findability exercise"] .resultGroup > summary > strong',
+  'section[aria-label="Findability exercise"] .result-group > summary > strong',
+  'section[aria-label="Accessibility exercise"] .accessibilityCard > summary > strong',
+  'section[aria-label="Accessibility exercise"] .accessibility-card > summary > strong',
+  'section[aria-label="Interoperability exercise"] .interoperabilityPanel > summary > strong',
+  'section[aria-label="Interoperability exercise"] .interoperability-panel > summary > strong',
+  'section[aria-label="Reusability exercise"] .reusabilityCard > summary > strong',
+  'section[aria-label="Reusability exercise"] .reusability-card > summary > strong',
+  'section[aria-label="Knowledge Assembly explorer"].assemblyLanding .assemblyObjectBar > strong',
+  'section[aria-label="Knowledge Assembly explorer"].assembly-landing .assembly-object-bar > strong',
+]);
+
+function splitAcronymBannerName(name, registry) {
+  if (typeof name !== "string" || !registry || typeof registry !== "object") return [];
+  const acronyms = Object.keys(registry).filter((key) => /^[A-Z][A-Z0-9]*$/.test(key));
+  if (!acronyms.length) return [{ text: name }];
+  const expression = new RegExp(`\\b(${acronyms.sort((a, b) => b.length - a.length).join("|")})\\b`, "g");
+  const parts = [];
+  let cursor = 0;
+  for (const match of name.matchAll(expression)) {
+    if (match.index > cursor) parts.push({ text: name.slice(cursor, match.index) });
+    parts.push({ text: match[0], expansion: registry[match[0]] });
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < name.length) parts.push({ text: name.slice(cursor) });
+  return parts.length ? parts : [{ text: name }];
+}
+
+function installAcronymBannerBubbles(document, { registry, createBehavior, createBubble, positionBubble }) {
+  const view = document.defaultView;
+  if (!document.body || !view?.MutationObserver) throw new TypeError("A browser document is required.");
+  const registrations = new Map();
+  let visibleBubble = null;
+  const show = ({ anchor, expansion }) => {
+    visibleBubble?.remove();
+    visibleBubble = createBubble(document, expansion);
+    visibleBubble.id = "active-acronym-bubble";
+    document.body.append(visibleBubble);
+    anchor.setAttribute("aria-describedby", visibleBubble.id);
+    reposition();
+  };
+  const hide = ({ anchor }) => {
+    anchor.removeAttribute("aria-describedby");
+    visibleBubble?.remove();
+    visibleBubble = null;
+  };
+  const behavior = createBehavior({ root: document, onShow: show, onHide: hide });
+  function reposition() {
+    const active = behavior.active();
+    if (!active || !visibleBubble || !active.anchor.isConnected) return;
+    const banner = active.anchor.closest("summary, .assemblyObjectBar, .assembly-object-bar");
+    const avoidRects = [...(banner?.querySelectorAll("button, a, [role='button']") ?? [])]
+      .filter((item) => item !== active.anchor && item.getBoundingClientRect().width)
+      .map((item) => item.getBoundingClientRect());
+    positionBubble({ anchor: active.anchor, bubble: visibleBubble, viewport: view, avoidRects });
+  }
+  const decorate = () => {
+    for (const [anchor, remove] of registrations) {
+      if (!anchor.isConnected) { remove(); registrations.delete(anchor); }
+    }
+    for (const strong of document.querySelectorAll(ACRONYM_BANNER_SELECTORS.join(","))) {
+      if (strong.querySelector(".acronymBubbleAnchor")) continue;
+      const parts = splitAcronymBannerName(strong.textContent ?? "", registry);
+      if (!parts.some((part) => part.expansion)) continue;
+      strong.replaceChildren(...parts.map((part) => {
+        if (!part.expansion) return document.createTextNode(part.text);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "acronymBubbleAnchor";
+        button.textContent = part.text;
+        button.setAttribute("aria-label", `${part.text}: ${part.expansion}`);
+        button.addEventListener("click", (event) => {
+          const summary = button.closest("summary");
+          if (!summary) return;
+          event.preventDefault();
+          event.stopPropagation();
+          behavior.hide(button);
+          summary.click();
+        });
+        button.addEventListener("keydown", (event) => { if (event.key !== "Escape") event.stopPropagation(); });
+        registrations.set(button, behavior.register(button, part.expansion));
+        return button;
+      }));
+    }
+  };
+  const observer = new view.MutationObserver(decorate);
+  observer.observe(document.querySelector(".workspaces") ?? document.body, { childList: true, subtree: true });
+  view.addEventListener("resize", reposition);
+  view.addEventListener("scroll", reposition, true);
+  decorate();
+  return () => {
+    observer.disconnect();
+    view.removeEventListener("resize", reposition);
+    view.removeEventListener("scroll", reposition, true);
+    behavior.destroy();
+    for (const anchor of registrations.keys()) {
+      const strong = anchor.parentElement;
+      if (strong?.matches?.("strong") && strong.isConnected) strong.textContent = strong.textContent;
+    }
+    registrations.clear();
+    visibleBubble?.remove();
+    visibleBubble = null;
+  };
+}
+/* ACRONYM_BUBBLE_ATTACHMENT_END */
+/* ACRONYM_BUBBLE_BEHAVIOR_START */
+/**
+ * Shared, presentation-independent interaction for one floating acronym bubble.
+ * The caller supplies the anchor, written-out form, and show/hide rendering hooks.
+ */
+function createAcronymBubbleBehavior({ root, onShow, onHide }) {
+  if (!root?.addEventListener || !root?.removeEventListener || typeof onShow !== "function" || typeof onHide !== "function") {
+    throw new TypeError("A document root and show/hide callbacks are required.");
+  }
+
+  const registrations = new Map();
+  let active = null;
+  let touchAnchor = null;
+
+  const hide = (anchor = null) => {
+    if (!active || (anchor && active.anchor !== anchor)) return;
+    const previous = active;
+    active = null;
+    onHide(previous);
+  };
+  const show = (anchor) => {
+    const expansion = registrations.get(anchor)?.expansion;
+    if (!expansion || active?.anchor === anchor) return;
+    hide();
+    active = { anchor, expansion };
+    onShow(active);
+  };
+  const toggle = (anchor) => active?.anchor === anchor ? hide(anchor) : show(anchor);
+
+  const onRootPointerDown = (event) => {
+    const outside = !active?.anchor.contains(event.target);
+    if (active && outside) hide();
+    if (outside || event.pointerType !== "touch") touchAnchor = null;
+  };
+  const onRootKeyDown = (event) => {
+    if (event.key !== "Escape" || !active) return;
+    event.preventDefault();
+    event.stopPropagation();
+    hide();
+  };
+  root.addEventListener("pointerdown", onRootPointerDown);
+  root.addEventListener("keydown", onRootKeyDown);
+
+  return {
+    register(anchor, expansion) {
+      if (!anchor?.addEventListener || !anchor?.removeEventListener || !anchor?.contains || typeof expansion !== "string" || !expansion.trim()) {
+        throw new TypeError("An anchor and a nonempty written-out form are required.");
+      }
+      if (registrations.has(anchor)) throw new Error("This acronym anchor is already registered.");
+      const onPointerEnter = (event) => { if (event.pointerType !== "touch") show(anchor); };
+      const onPointerLeave = (event) => { if (event.pointerType !== "touch") hide(anchor); };
+      const onPointerDown = (event) => {
+        if (event.pointerType !== "touch") return;
+        touchAnchor = anchor;
+        toggle(anchor);
+      };
+      const onFocus = () => { if (touchAnchor !== anchor) show(anchor); };
+      const onBlur = () => { hide(anchor); if (touchAnchor === anchor) touchAnchor = null; };
+      anchor.addEventListener("pointerenter", onPointerEnter);
+      anchor.addEventListener("pointerleave", onPointerLeave);
+      anchor.addEventListener("pointerdown", onPointerDown);
+      anchor.addEventListener("focus", onFocus);
+      anchor.addEventListener("blur", onBlur);
+      const remove = () => {
+        if (!registrations.has(anchor)) return;
+        hide(anchor);
+        anchor.removeEventListener("pointerenter", onPointerEnter);
+        anchor.removeEventListener("pointerleave", onPointerLeave);
+        anchor.removeEventListener("pointerdown", onPointerDown);
+        anchor.removeEventListener("focus", onFocus);
+        anchor.removeEventListener("blur", onBlur);
+        if (touchAnchor === anchor) touchAnchor = null;
+        registrations.delete(anchor);
+      };
+      registrations.set(anchor, { expansion, remove });
+      return remove;
+    },
+    hide,
+    active: () => active,
+    destroy() {
+      for (const { remove } of registrations.values()) remove();
+      root.removeEventListener("pointerdown", onRootPointerDown);
+      root.removeEventListener("keydown", onRootKeyDown);
+    },
+  };
+}
+/* ACRONYM_BUBBLE_BEHAVIOR_END */
+/* ACRONYM_BUBBLE_REGISTRY_START */
+// Written-out forms only. View eligibility is defined separately in acronym-bubble-scope.js.
+const ACRONYM_BUBBLE_REGISTRY = Object.freeze({
+  DFU: "Diabetic Foot Ulcer",
+  HBOT: "Hyperbaric Oxygen Therapy",
+});
+
+function acronymBubbleExpansion(acronym) {
+  return Object.hasOwn(ACRONYM_BUBBLE_REGISTRY, acronym) ? ACRONYM_BUBBLE_REGISTRY[acronym] : null;
+}
+/* ACRONYM_BUBBLE_REGISTRY_END */
+/* ACRONYM_BUBBLE_SCOPE_START */
+// Only KO/KA names on the main view banners are eligible for acronym bubbles.
+// This is a display scope, not a rule for changing source metadata or names.
+const ACRONYM_BUBBLE_SCOPE = Object.freeze({
+  "knowledge-objects": "ko-banner-name",
+  "metadata-rig": "ko-banner-name",
+  knowledge: "ko-banner-name",
+  findability: "ko-banner-name",
+  access: "ko-banner-name",
+  interoperability: "ko-banner-name",
+  reusability: "ko-banner-name",
+  "knowledge-assembly": "ka-banner-name",
+});
+
+function isAcronymBubbleInScope(view, surface) {
+  return Object.hasOwn(ACRONYM_BUBBLE_SCOPE, view) && ACRONYM_BUBBLE_SCOPE[view] === surface;
+}
+/* ACRONYM_BUBBLE_SCOPE_END */
 /* ASSEMBLY_PUZZLE_RULE_START */
 // Puzzle roles follow the four constituent KO contributions, not their display names.
 const ASSEMBLY_PUZZLE_PIECES = Object.freeze(["wagner", "decision", "margolis", "burden"]);
@@ -2581,7 +2897,7 @@ function openAssemblyCaseView(trigger){
     return `<div class="assembly-workspace assembly-puzzle-workspace"><aside class="assembly-puzzle-pieces" aria-label="Knowledge Objects to assemble"><h3>Knowledge Objects</h3><div class="assembly-puzzle-piece-list">${puzzlePieces}</div><button type="button" class="assembly-puzzle-return" ${selectedPuzzlePiece?"":"disabled"}>Return selected KO here</button></aside><section class="assembly-puzzle-board" aria-label="Assembly puzzle"><div class="assembly-puzzle-slots" aria-label="Four Knowledge Object positions">${puzzleSlots}</div><p class="assembly-puzzle-message${puzzleCheck.status!=="incomplete"?` ${puzzleCheck.status}`:""}" role="status">${escapeHtml(puzzleFeedback)}</p><div class="assembly-flow-to-assembly" aria-label="The second, third, and fourth positions feed the assembly"><span aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span><span class="assembly-flow-arrow" aria-hidden="true"></span></div><div class="assembly-puzzle-destination">Assembly decisions</div></section></div>`;
   };
   const overlay=document.createElement("div");overlay.className="assembly-case-backdrop";overlay.setAttribute("role","dialog");overlay.setAttribute("aria-modal","true");overlay.setAttribute("aria-label","Orchestration");
-  overlay.innerHTML=`<button type="button" class="assembly-case-close" aria-label="Close orchestration">×</button><section class="knowledge-objects-exercise assembly-exercise" aria-label="Knowledge Assembly explorer"><div class="view-sticky-controls"><div class="view-title"><h2>Assembly Orchestration</h2></div>${!loaded.error&&!puzzleComplete?`<p class="assembly-puzzle-instruction">Arrange the four Knowledge Objects so the severity score feeds the treatment decision. The treatment decision, regimen burden estimate, and prognostic indicator then contribute to the assembly’s treatment-target classification.</p>`:""}</div>${loaded.error?`<div class="assembly-workspace-error" role="alert">${escapeHtml(loaded.error)}</div>`:puzzleComplete?`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`:renderPuzzle()}</section>`;
+  overlay.innerHTML=`<button type="button" class="assembly-case-close" aria-label="Close orchestration">×</button><section class="knowledge-objects-exercise assembly-exercise" aria-label="Knowledge Assembly explorer"><div class="view-sticky-controls"><div class="view-title"><h2>${puzzleComplete?"Cases Processed with a Knowledge Assembly":"Orchestrating KOs in a Knowledge Assembly"}</h2></div>${!loaded.error&&!puzzleComplete?`<p class="assembly-puzzle-instruction">Arrange the four Knowledge Objects so the severity score feeds the treatment decision. The treatment decision, regimen burden estimate, and prognostic indicator then contribute to the assembly’s treatment-target classification.</p>`:""}</div>${loaded.error?`<div class="assembly-workspace-error" role="alert">${escapeHtml(loaded.error)}</div>`:puzzleComplete?`<div class="assembly-workspace"><nav class="assembly-case-selector" aria-label="Teaching cases"><h3>Cases</h3><div class="assembly-case-buttons">${caseList}</div></nav>${renderAssemblyCaseDetail(selected,loaded.cases)}</div>`:renderPuzzle()}</section>`;
   document.body.append(overlay);
   const close=()=>{window.clearTimeout(puzzleResetTimer);document.removeEventListener("keydown",onEscape);overlay.remove();trigger?.focus()},onEscape=event=>{if(event.key==="Escape"&&!document.querySelector(".assembly-ko-exchange-backdrop"))close()};
   document.addEventListener("keydown",onEscape);
@@ -2617,6 +2933,7 @@ function openKnowledgeAssembly(){
 }
 for(const control of [knowledgeObjectsButton,filesReturn,...exerciseButtons])control.addEventListener("click",()=>{knowledgeAssemblyButton.classList.remove("active-destination");knowledgeAssemblyButton.setAttribute("aria-pressed","false")});
 knowledgeAssemblyButton.addEventListener("click",()=>{findOpen=false;knowledgeObjectsButton.classList.remove("active-destination");knowledgeObjectsButton.setAttribute("aria-pressed","false");filesReturn.classList.remove("active-destination");filesReturn.setAttribute("aria-pressed","false");for(const control of exerciseButtons){control.classList.remove("active");control.setAttribute("aria-pressed","false")}knowledgeAssemblyButton.classList.add("active-destination");knowledgeAssemblyButton.setAttribute("aria-pressed","true");openKnowledgeAssembly()});
+document.getElementById("aboutButton").addEventListener("click",openAbout);
 document.getElementById("abstractButton").addEventListener("click",openAbstract);
 exerciseButtons.forEach(button=>button.addEventListener("click",()=>{knowledgeObjectsButton.classList.remove("active-destination");knowledgeObjectsButton.setAttribute("aria-pressed","false");filesReturn.classList.remove("active-destination");filesReturn.setAttribute("aria-pressed","false");exerciseButtons.forEach(item=>{item.classList.toggle("active",item===button);item.setAttribute("aria-pressed",String(item===button))});if(button.dataset.exercise==="F"&&!findOpen){findOpen=true;workspace.innerHTML='<section class="search-exercise" aria-label="Findability exercise"><div class="view-sticky-controls"><div class="view-title"><div class="search-mark">F</div><h2>Findability</h2></div><p>Search knowledge object metadata</p><div class="search-controls"><form class="search-form"><span class="search-icon" aria-hidden="true"></span><input type="search" aria-label="Search knowledge objects" aria-keyshortcuts="Enter" enterkeyhint="search" placeholder="Search knowledge objects"><button type="button" class="clear-search" aria-label="Clear search" hidden>×</button><button type="submit">Search</button></form></div></div><div class="search-results"></div></section>';const form=workspace.querySelector("form"),input=workspace.querySelector("input"),clearButton=workspace.querySelector(".clear-search"),resultBox=workspace.querySelector(".search-results");let currentResults=[],searched=false,submittedQuery="";const paintResults=()=>{resultBox.innerHTML=renderGroupedResults(currentResults,searched);resultBox.querySelectorAll("[data-findability-results]").forEach(resultButton=>resultButton.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();const objectId=Number(resultButton.dataset.findabilityResults);openFindabilityResults(objectId,submittedQuery,currentResults.filter(result=>result.objectId===objectId))}));resultBox.querySelectorAll(".match-zero").forEach(zeroMatch=>zeroMatch.addEventListener("click",event=>{event.preventDefault();event.stopPropagation()}))};input.addEventListener("input",()=>{clearButton.hidden=!input.value;if(!input.value){currentResults=[];searched=false;submittedQuery="";paintResults()}});clearButton.addEventListener("click",()=>{input.value="";clearButton.hidden=true;currentResults=[];searched=false;submittedQuery="";paintResults();input.focus()});form.addEventListener("submit",event=>{event.preventDefault();submittedQuery=input.value.trim();if(!submittedQuery){currentResults=[];searched=false}else{currentResults=searchAll(submittedQuery);searched=true}paintResults()});paintResults();input.focus()}}));
 knowledgeObjectsButton.addEventListener("click",()=>{findOpen=false;filesReturn.classList.remove("active-destination");filesReturn.setAttribute("aria-pressed","false");exerciseButtons.forEach(button=>{button.classList.remove("active");button.setAttribute("aria-pressed","false")});knowledgeObjectsButton.classList.add("active-destination");knowledgeObjectsButton.setAttribute("aria-pressed","true");openKnowledgeObjects()});
@@ -3114,6 +3431,7 @@ buildCanonicalRdfGraph=function(source){
   return graph;
 };
 document.head.insertAdjacentHTML("beforeend",`<style>.human-rdf-table tr.interoperability-cks-subject td:first-child{background:#e8f0f7;box-shadow:inset 3px 0 #6387a5}</style>`);
+    if(document.defaultView?.MutationObserver)installAcronymBannerBubbles(document,{registry:ACRONYM_BUBBLE_REGISTRY,createBehavior:createAcronymBubbleBehavior,createBubble:createAcronymBubbleElement,positionBubble:positionAcronymBubble});
     openKnowledgeObjects();updateHeader();
 })();
 
