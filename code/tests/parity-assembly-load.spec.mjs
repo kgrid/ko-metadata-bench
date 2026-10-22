@@ -140,7 +140,8 @@ async function rosters(page, expected) {
           graph: await visibleText(graph.locator(".knowledgeSubgraphBody")),
         });
         await graph.getByRole("button", { name: "Close evidence subgraph" }).click();
-        await panel.locator("summary").click();
+        await expect(graph).toHaveCount(0);
+        await panel.locator("summary").click({ position: { x: 8, y: 20 } });
         await expect(panel.locator(".knowledgeElementCard, .knowledge-element-card")).toHaveCount(elements);
         if (index === 4) await expect(panel.locator(".knowledgeEmptyState, .knowledge-empty-state")).toContainText("No evidential basis declared anywhere in this KO.");
       }
@@ -231,6 +232,34 @@ test("both editions keep four KOs before load, project the KA fifth, and reset o
   expect(standalone).toEqual(server);
   await serverPage.close();
   await standalonePage.close();
+});
+
+test("evidence graph column headers remain visible while rows scroll in both editions", async ({ browser }) => {
+  for (const [edition, url] of Object.entries(editions)) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 560 } });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "K exercise", exact: true }).click();
+    const burden = page.locator("details.knowledgeCard, details.knowledge-card").nth(2);
+    await burden.locator("summary .knowledgeOpenButton").click();
+    const dialog = page.getByRole("dialog", { name: "HBOT Regimen Burden KO", exact: true });
+    const graph = dialog.getByRole("region", { name: "Evidence-linking graph" });
+    const header = graph.locator(".knowledgeGraphHead");
+    await expect(header.locator("span")).toHaveText([
+      "Evidence", "Declaring subject", "Specification passages", "Implementation passages",
+    ]);
+    const positions = await graph.evaluate((node) => {
+      const head = node.querySelector(".knowledgeGraphHead");
+      const firstLane = node.querySelector(".knowledgeGraphLane");
+      const before = { header: head.getBoundingClientRect().top, lane: firstLane.getBoundingClientRect().top };
+      node.scrollTop = node.scrollHeight;
+      const after = { header: head.getBoundingClientRect().top, lane: firstLane.getBoundingClientRect().top };
+      return { before, after, overflow: node.scrollHeight > node.clientHeight };
+    });
+    expect(positions.overflow, `${edition} graph has scrollable rows`).toBe(true);
+    expect(Math.abs(positions.after.header - positions.before.header), `${edition} header stays fixed`).toBeLessThan(2);
+    expect(positions.after.lane, `${edition} rows move beneath the header`).toBeLessThan(positions.before.lane - 50);
+    await page.close();
+  }
 });
 
 test("both editions keep the KO-scoped K graph usable at narrow width", async ({ browser }) => {

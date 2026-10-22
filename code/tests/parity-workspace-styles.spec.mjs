@@ -120,6 +120,21 @@ test("Knowledge banners use the 1040-pixel grid cap in both editions", async ({ 
   }
 });
 
+test("footer text has the same readable size and gray in both editions", async ({ browser }) => {
+  for (const [edition, url] of Object.entries(editions)) {
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    const footer = page.locator(".appFooter, .footer").last();
+    await expect(footer).toBeVisible();
+    const style = await footer.evaluate((node) => ({
+      size: getComputedStyle(node).fontSize,
+      color: getComputedStyle(node).color,
+    }));
+    expect(style, `${edition} footer`).toEqual({ size: "11px", color: "rgb(85, 85, 89)" });
+    await page.close();
+  }
+});
+
 test("KO banners share their base treatment across views and editions", async ({ browser }) => {
   const banners = [
     { control: "Knowledge Objects", selector: ".koObjectShade, .ko-object-shade" },

@@ -276,7 +276,7 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 .knowledgeSubgraphBody .knowledgeFollowIntro{margin-bottom:12px}
 .knowledgeSubgraphBody .knowledgeGraph{padding:0;overflow:hidden}
 .knowledgeGraphHead,.knowledgeGraphLane{display:grid;grid-template-columns:minmax(138px,.65fr) minmax(145px,.82fr) minmax(175px,1fr) minmax(175px,1fr)}
-.knowledgeGraphHead{background:#f5f5f7;border-bottom:1px solid #d2d2d7;color:#6e6e73;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.knowledgeGraphHead{position:sticky;top:0;z-index:4;background:#f5f5f7;border-bottom:1px solid #d2d2d7;color:#6e6e73;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .knowledgeGraphHead span{padding:10px 12px}
 .knowledgeGraphLane+.knowledgeGraphLane{border-top:1px solid #d2d2d7;background:#f6f3ee}
 /* Trial Convergent field: remove this class and its two rules to revert the row treatment. */
@@ -435,8 +435,9 @@ textarea{color:#1d1d1f;font-family:"SFMono-Regular","SF Mono",Menlo,Consolas,mon
 @media(max-width:760px){.top{flex-wrap:wrap;row-gap:10px}.top .brand{flex:0 0 100%}}
 .metadata-rig-grid,.search-results,.accessibility-grid,.interoperability-grid,.reusability-grid{width:min(920px,100%)}
 </style>
-<!-- Shared KO banner treatment keeps layout and status colors view-specific. -->
+<!-- Shared footer readability and KO banner treatments. -->
 <style>
+.footer{color:#555559;font-size:11px}
 :is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card,.assembly-object-bar):is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card,.assembly-object-bar){border:1px solid var(--ko-banner-border,#c7c7cc);border-radius:11px}
 .metadata-rig-card{--ko-banner-border:rgba(43,57,70,.42)}
 :is(.ko-object-shade,.metadata-rig-card,.result-group,.accessibility-card)>summary{min-height:42px;color:#1d1d1f;cursor:pointer;list-style:none}
