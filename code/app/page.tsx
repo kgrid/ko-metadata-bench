@@ -549,7 +549,7 @@ function InterfaceSpecificationProjection({ detail, traceStep = 1, motionPhase =
   const animationFailed = animationHasRun && traceOutcome !== "success" && traceStep === failureStep;
   const runningStatus = interfaceMotionFrame(motionPhase, traceStep).status;
   const failureStatus: Record<string, string> = { "input-data-object": "Input data object rejected.", "input-binding": "Input binding rejected.", operation: "Operation failed.", "output-binding": "Output binding rejected.", "output-data-object": "Output data object rejected." };
-  const interfaceStatus = animationRunning ? runningStatus : animationHasRun ? (traceOutcome === "success" ? "Output delivered." : failureStatus[simulationCase?.failurePoint ?? ""] ?? "Interface stopped.") : "Try the interface to follow the declared input-to-output path.";
+  const interfaceStatus = animationRunning ? runningStatus : animationHasRun ? (traceOutcome === "success" ? "Example output delivered." : failureStatus[simulationCase?.failurePoint ?? ""] ?? "Interface stopped.") : "Replay the selected example; the KO is not called.";
   const selectedStepLabel = INTERFACE_STEP_LABELS[INTERFACE_PROCESS_STAGES[Math.max(0, traceStep - 1)]] ?? "Interface step";
   const accessibleProcessSummary = traceOutcome === "success"
     ? "Successful case selected. The input object passes both bindings, the operation transforms it, and the output object is delivered."
@@ -594,6 +594,24 @@ function State2ObjectPreview({ label, detail, profile, value }: { label: "Input"
   return <section className={`state2ObjectPreview ${label === "Input" ? "inputObjectPreview" : "outputObjectPreview"}${expanded ? " expanded" : ""}`}><AnnotatedExecutionReadout label={label} state={2} detail={detail} profile={profile} value={value} />{hiddenRows > 0 && <button type="button" className="state2ExpandButton" aria-expanded={expanded} onClick={() => setExpanded((current) => !current)}>{expanded ? "Show less" : `Show ${hiddenRows} more ${hiddenRows === 1 ? "row" : "rows"}`}</button>}</section>;
 }
 
+function stageExampleValue(value: unknown): string {
+  if (Array.isArray(value)) return `${value.length} values`;
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value);
+    const array = entries.find(([key, item]) => Array.isArray(item) && /responses|answers|values/i.test(key)) ?? entries.find(([, item]) => Array.isArray(item));
+    if (array && Array.isArray(array[1])) return `${array[1].length} ${humanizeBoundaryName(array[0]).toLowerCase()}`;
+    const scalar = entries.find(([, item]) => item === null || ["string", "number", "boolean"].includes(typeof item));
+    if (scalar) return `${scalar[0]}: ${String(scalar[1])}`;
+    return `${entries.length} fields`;
+  }
+  return String(value ?? "No value supplied");
+}
+function StageExampleOverview({ input, output, semantics, meanings }: { input: unknown; output: unknown; semantics: boolean; meanings: InteroperabilityExerciseKit["semanticDetails"] }) {
+  return <div className="stageExampleOverview" aria-label="Supplied input and response examples">
+    <div><strong>Input example</strong><span>{stageExampleValue(input)}</span>{semantics && <small>{meanings.input.meaning}</small>}</div>
+    <div><strong>Response example</strong><span>{stageExampleValue(output)}</span>{semantics && <small>{meanings.output.meaning}</small>}</div>
+  </div>;
+}
 function InteroperabilityExecutionPanel({ exerciseKit, selectedState, result }: { exerciseKit: InteroperabilityExerciseKit; selectedState: number; result: InteroperabilitySimulationSession["executionResult"]; onResult: (state: number) => void }) {
   const execution = exerciseKit.execution;
   const runState = Math.max(0, Math.min(3, selectedState));
@@ -623,9 +641,18 @@ function InteroperabilityExecutionPanel({ exerciseKit, selectedState, result }: 
   };
   if (!execution) return <section className="executionPanel"><header><strong>Execution simulation</strong><span>Not supplied by this knowledge object</span></header></section>;
   return <section className="executionPanel" aria-label="Interoperability execution simulation">
-    <div className="simulationTag">Simulation</div>
+    <div className="simulationTag">Fixture replay · KO not invoked</div>
     {result && result.status !== "completed" && <div className="executionResult simulationFailure"><div className="executionResultHeading"><strong>Simulation unavailable</strong><span>Not run</span></div><p>{result.message}</p></div>}
-    {result?.status === "completed" && result.mode === "raw" && <div className="executionResult">{runState >= 2 && <div className="executionResultHeading">{runState === 2 && <div className="state2ProjectionToggle" role="group" aria-label="State 2 projection"><button type="button" className={state2View === "table" ? "active" : ""} aria-pressed={state2View === "table"} onClick={() => setState2View("table")}>Table</button><button type="button" className={state2View === "source" ? "active" : ""} aria-pressed={state2View === "source"} onClick={() => setState2View("source")}>Source</button></div>}</div>}{runState === 2 && state2View === "source" ? <div className="executionIo state2Source"><JsonReadout label="Input table source" value={state2ProjectionSource(exerciseKit.semanticDetails.input, exerciseKit.profileDetails.input, execution.contractInput)} /><JsonReadout label="Output table source" value={state2ProjectionSource(exerciseKit.semanticDetails.output, exerciseKit.profileDetails.output, result.output)} /></div> : runState === 2 ? <div className="state2ObjectList"><State2ObjectPreview label="Input" detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.contractInput} /><State2ObjectPreview label="Output" detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div> : <div className="executionIo"><AnnotatedExecutionReadout label="Input" state={runState} detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.rawInput} /><AnnotatedExecutionReadout label="Output" state={runState} detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div>}<p>{runState === 1 ? "No formal data object is defined at State 1. The raw values are unchanged; only their human-readable meaning has been supplied." : `No KO implementation was invoked. The same input and output are progressively annotated with the boundary information available at State ${runState}.`}</p></div>}
+    {result?.status === "completed" && result.mode === "raw" && <div className="executionResult">
+      {runState <= 1 ? <>
+        <StageExampleOverview input={execution.rawInput} output={result.output} semantics={runState === 1} meanings={exerciseKit.semanticDetails} />
+        <details className="stageExampleDetail"><summary>Inspect supplied example details</summary><div className="executionIo"><AnnotatedExecutionReadout label="Input" state={runState} detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.rawInput} /><AnnotatedExecutionReadout label="Output" state={runState} detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div></details>
+      </> : <>
+        <div className="executionResultHeading"><div className="state2ProjectionToggle" role="group" aria-label="State 2 projection"><button type="button" className={state2View === "table" ? "active" : ""} aria-pressed={state2View === "table"} onClick={() => setState2View("table")}>Table</button><button type="button" className={state2View === "source" ? "active" : ""} aria-pressed={state2View === "source"} onClick={() => setState2View("source")}>Source</button></div></div>
+        {state2View === "source" ? <div className="executionIo state2Source"><JsonReadout label="Input table source" value={state2ProjectionSource(exerciseKit.semanticDetails.input, exerciseKit.profileDetails.input, execution.contractInput)} /><JsonReadout label="Output table source" value={state2ProjectionSource(exerciseKit.semanticDetails.output, exerciseKit.profileDetails.output, result.output)} /></div> : <div className="state2ObjectList"><State2ObjectPreview label="Input" detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.contractInput} /><State2ObjectPreview label="Output" detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div>}
+        <p>The input example is unchanged. The output fixture changes from a raw value to a structured result; it is not merely the raw output with annotations. No KO implementation was invoked.</p>
+      </>}
+    </div>}
     {result?.status === "completed" && result.mode === "contract" && <div className="executionResult contractResult"><InterfaceSpecificationProjection detail={exerciseKit.interfaceDetails} traceStep={traceStep || 1} motionPhase={interfaceMotionPhase} traceOutcome={traceOutcome} showCaseDetail={showCaseDetail} animationRunning={interfaceAnimationRunning} animationHasRun={interfaceAnimationHasRun} outcomeOptions={outcomeOptions} inputObject={{ detail: exerciseKit.semanticDetails.input, profile: exerciseKit.profileDetails.input }} outputObject={{ detail: exerciseKit.semanticDetails.output, profile: exerciseKit.profileDetails.output }} inputValue={execution.contractInput} outputValue={result.output} onSelectStep={selectInterfaceStep} onSelectOutcome={selectOutcome} onTryInterface={tryInterface} /></div>}
   </section>;
 }
@@ -673,6 +700,29 @@ function InteroperabilityBoundaryPanel({ published, exerciseKit, session, onExec
     <div className="boundaryQuestions">{boundary.questions.map((item) => <details className={item.answered ? "declaredFacet" : "missingFacet"} key={item.number}><summary><span className="boundaryQuestionNumber">{item.number}</span><span className="boundaryQuestionCopy"><b>{item.facet}</b><strong>{item.question}</strong></span><span className={item.answered ? "answered" : "unanswered"}>{item.answered ? "✓ Complete" : "Not declared"}</span></summary><div className="boundaryAnswer">{item.fields.map((entry) => <div key={entry.label}><strong>{entry.label}</strong><p className={item.answered && entry.value ? "defined" : "undefined"}>{item.answered ? entry.value || "Not defined" : "Unknown"}</p></div>)}{item.number === 3 && item.answered && <code>await knowledgeObject.run(input)</code>}<small>{item.explanation}</small></div></details>)}</div>
     {boundary.complete && <p className="boundaryConclusion">This capability has an explicit interoperability boundary.</p>}
   </section>;
+}
+
+function InteroperabilityStageBoundaryDiagram({ state }: { state: number }) {
+  const dimension = (name: string, revealed: boolean) => <span className={`stageBoundaryDimension${revealed ? " revealed" : ""}`} aria-label={`${name}: ${revealed ? "revealed" : "withheld"}`}>{name}</span>;
+  return <section className="stageBoundaryDiagram" aria-label="Interoperability boundary diagram" data-stage={state}>
+    <article className="stageBoundarySystem"><span className="stageBoundaryServerGlyph" aria-hidden="true"><i/><i/></span><strong>Requesting system</strong></article>
+    <div className="stageBoundaryExchange" role="group" aria-label="Request and response across the system boundary">
+      <div className="stageBoundaryFlow" aria-label="Input request to the system hosting the KO"><span>Input / request</span><b aria-hidden="true">→</b></div>
+      <div className="stageBoundaryFlow" aria-label="Output response to the requesting system"><b aria-hidden="true">←</b><span>Output / response</span></div>
+    </div>
+    <article className="stageBoundarySystem host"><span className="stageBoundaryServerGlyph" aria-hidden="true"><i/><i/></span><strong>System hosting the KO</strong><span className="stageBoundaryContainedKo">KO</span></article>
+    <div className="stageBoundaryDimensions" role="group" aria-label="Descriptions of the system-to-system exchange">{dimension("Semantics", state >= 1)}{dimension("Data object profiles", state >= 2)}{dimension("Interface", state >= 3)}</div>
+  </section>;
+}
+const INTEROPERABILITY_STAGE_PROGRESS = [
+  { can: "See supplied example input and response values.", unknown: "What the values mean, what complete objects are valid, and how to invoke the KO." },
+  { can: "Use supplied meanings to interpret the example input and response values.", unknown: "What complete objects are valid and how to invoke the KO." },
+  { can: "Use supplied meanings and profiles to prepare or check complete input and output objects.", unknown: "How those objects bind to an invocation, including success and failure." },
+  { can: "Use supplied descriptions to interpret objects and follow an invocation and response contract.", unknown: "Whether real systems can follow that agreement successfully." },
+] as const;
+function InteroperabilityStageProgress({ state }: { state: number }) {
+  const progress = INTEROPERABILITY_STAGE_PROGRESS[state] ?? INTEROPERABILITY_STAGE_PROGRESS[0];
+  return <section className="stageProgress" aria-label="What this stage reveals to the requesting system"><p><strong>Can now</strong><span>{progress.can}</span></p><p><strong>Still unknown</strong><span>{progress.unknown}</span></p></section>;
 }
 
 const normalizeText = (value: string) => value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -2689,7 +2739,7 @@ export default function Home() {
             <div className="viewStickyControls"><div className="viewTitle"><div className="searchInstrumentMark">I</div><h2>Interoperability</h2></div><p>See how metadata bring greater interoperability</p></div>
             <div className="interoperabilityGrid">{activeObjectIds.map(panel)}</div>
           </section>
-          {stageObject && stageKit && stageSession && createPortal(<div className="interoperabilityStagesBackdrop" role="dialog" aria-modal="true" aria-labelledby="interoperability-stages-title"><section className="interoperabilityStagesDialog"><header><div><span>Interoperability stages</span><h2 id="interoperability-stages-title">{objectName(stageObject)}</h2></div><button type="button" className="modalClose" autoFocus aria-label="Close interoperability stages" onClick={() => setInteroperabilityStagesObject(null)}>×</button></header><div className="interoperabilityStagesToolbar"><div className="stateSelector modeStateSelector" role="group" aria-label="Choose interoperability simulation stage">{["Opaque", "Meaning", "Data Objects", "Interface"].map((label, state) => <button type="button" key={label} className={stageSession.selectedState === state ? "active" : ""} aria-pressed={stageSession.selectedState === state} onClick={() => chooseStage(stageObject, stageKit, state)}><span>{label}</span></button>)}</div></div><div className="interoperabilityStagesBody"><InteroperabilityBoundaryPanel published={publishedInteroperabilityModel(stageObject, drafts)} exerciseKit={stageKit} session={stageSession} onRepair={() => undefined} onExecutionResult={(state) => chooseStage(stageObject, stageKit, state)} /></div></section></div>, document.body)}
+          {stageObject && stageKit && stageSession && createPortal(<div className="interoperabilityStagesBackdrop" role="dialog" aria-modal="true" aria-labelledby="interoperability-stages-title"><section className="interoperabilityStagesDialog"><header><div><span>Interoperability stages</span><h2 id="interoperability-stages-title">{objectName(stageObject)}</h2></div><button type="button" className="modalClose" autoFocus aria-label="Close interoperability stages" onClick={() => setInteroperabilityStagesObject(null)}>×</button></header><div className="interoperabilityStagesToolbar"><div className="stateSelector modeStateSelector" role="group" aria-label="Choose interoperability simulation stage">{["Unexpressive", "Semantics", "Data object profiles", "Interface"].map((label, state) => <button type="button" key={label} className={stageSession.selectedState === state ? "active" : ""} aria-pressed={stageSession.selectedState === state} onClick={() => chooseStage(stageObject, stageKit, state)}><span>{label}</span></button>)}</div></div><InteroperabilityStageBoundaryDiagram state={stageSession.selectedState} /><div className="interoperabilityStagesBody"><InteroperabilityStageProgress state={stageSession.selectedState} /><InteroperabilityBoundaryPanel published={publishedInteroperabilityModel(stageObject, drafts)} exerciseKit={stageKit} session={stageSession} onRepair={() => undefined} onExecutionResult={(state) => chooseStage(stageObject, stageKit, state)} /></div></section></div>, document.body)}
         </>);
       })() : activeExercise === "R" ? (() => {
         const card = (objectId: ObjectId) => {

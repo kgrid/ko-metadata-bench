@@ -590,7 +590,24 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .interoperabilityStagesDialog > header button { width: 42px; height: 42px; margin-left: auto; border: 0; border-radius: 50%; background: #e5e5ea; color: #3a3a3c; font-size: 27px; line-height: 1; cursor: pointer; }
 .interoperabilityStagesToolbar { display: flex; justify-content: center; padding: 12px 24px 0; }
 .interoperabilityStagesToolbar .stateSelector { width: min(720px,100%); }
+.stageBoundaryDiagram { width: min(660px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,190px) minmax(130px,1fr) minmax(0,190px); align-items: stretch; gap: 12px; margin: 12px auto 0; }
+.stageBoundarySystem { min-width: 0; min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 9px; border: 1px solid #8e8e93; border-radius: 4px; background: #f5f5f7; box-shadow: inset 0 3px 0 #d2d2d7, 0 2px 3px #00000012; color: #1d1d1f; text-align: center; }
+.stageBoundarySystem > strong { font-size: 12px; font-weight: 750; }
+.stageBoundaryServerGlyph { flex: none; display: flex; flex-direction: column; gap: 3px; width: 28px; padding: 4px; border: 1px solid #6e6e73; border-radius: 2px; background: #e5e5ea; }
+.stageBoundaryServerGlyph i { display: block; height: 5px; border: 1px solid #8e8e93; border-radius: 1px; background: linear-gradient(90deg,#686870 0 4px,#fafafa 4px); }
+.stageBoundaryContainedKo { flex: none; padding: 3px 5px; border: 1px solid #6e6e73; border-radius: 3px; background: #fff; font-size: 10px; font-weight: 800; }
+.stageBoundaryExchange { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 7px; }
+.stageBoundaryFlow { display: flex; align-items: center; justify-content: center; gap: 6px; color: #3a3a3c; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.stageBoundaryFlow b { color: #6e6e73; font-size: 21px; font-weight: 500; line-height: 1; }
+.stageBoundaryDimensions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 2px 0 0; }
+.stageBoundaryDimension { display: inline-block; padding: 4px 7px; border: 1px dashed #c7c7cc; border-radius: 6px; color: #8e8e93; font-size: 10px; font-weight: 700; line-height: 1.2; }
+.stageBoundaryDimension.revealed { border-style: solid; border-color: #3a3a3c; background: #3a3a3c; color: #fff; }
+@media (max-width: 620px) { .stageBoundaryDiagram { width: calc(100% - 24px); grid-template-columns: minmax(0,1fr) minmax(76px,.85fr) minmax(0,1fr); gap: 4px; margin-top: 10px; } .stageBoundarySystem { min-height: 72px; gap: 3px; padding: 5px 3px; } .stageBoundarySystem > strong { font-size: 10px; line-height: 1.15; } .stageBoundaryServerGlyph { width: 20px; padding: 3px; } .stageBoundaryServerGlyph i { height: 4px; } .stageBoundaryContainedKo { padding: 1px 3px; } .stageBoundaryFlow { flex-direction: column; gap: 0; font-size: 9px; white-space: normal; text-align: center; } .stageBoundaryFlow b { font-size: 16px; } .stageBoundaryFlow:last-child b { order: 2; } .stageBoundaryDimensions { padding-top: 6px; } }
 .interoperabilityStagesBody { flex: 1; min-height: 0; overflow: auto; padding: 14px 24px 32px; }
+.stageProgress { width: min(660px,100%); display: grid; gap: 5px; margin: 0 auto 14px; padding: 10px 12px; border: 1px solid #d2d2d7; border-radius: 8px; background: #fafaf9; color: #3a3a3c; }
+.stageProgress p { display: grid; grid-template-columns: 105px minmax(0,1fr); gap: 8px; margin: 0; font-size: 12px; line-height: 1.4; }
+.stageProgress strong { color: #1d1d1f; font-weight: 700; }
+@media (max-width: 620px) { .stageProgress p { grid-template-columns: 1fr; gap: 1px; } }
 .interoperabilityStagesBody .boundaryPanel { width: min(1180px,100%); margin: 0 auto; }
 .educationalModeBar { display: flex; align-items: center; justify-content: flex-start; gap: 14px; margin: 12px 12px 0; padding: 10px 12px; border: 1px solid #d2d2d7; border-radius: 10px; background: #f5f5f7; }
 .educationalFallback { display: flex; flex-direction: column; gap: 3px; margin: 12px 12px 0; padding: 10px 12px; border: 1px solid #c7c7cc; border-radius: 10px; background: #f5f5f7; color: #3a3a3c; }
@@ -671,12 +688,12 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .executionPanel > header div span { color: #6e6e73; font-size: 8px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
 .executionPanel > header div strong { font-size: 10px; }
 .runsBadge { padding: 5px 8px; border-radius: 999px; background: #eeeeF0; color: #3a3a3c; font-size: 8px; font-weight: 700; white-space: nowrap; }
-.simulationTag { margin: 8px 14px 0; padding: 3px 8px; border-radius: 6px; background: #eeeeF0; color: #3a3a3c; font-size: 8px; font-weight: 700; line-height: 1.2; text-align: center; }
+.simulationTag { margin: 8px 14px 0; padding: 5px 8px; border-radius: 6px; background: #eeeeF0; color: #3a3a3c; font-size: 12px; font-weight: 700; line-height: 1.2; text-align: center; }
 .executionActions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px 6px; }
 .executionActions button { min-height: 32px; padding: 7px 11px; border: 1px solid #3a3a3c; border-radius: 8px; background: #3a3a3c; color: #fff; font-size: 9px; font-weight: 700; cursor: pointer; }
 .stateSelector { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1px; margin: 12px 14px 6px; padding: 1px; overflow: hidden; border: 1px solid #c7c7cc; border-radius: 8px; background: #d2d2d7; }
-.stateSelector button { display: grid; place-items: center; min-height: 38px; padding: 7px 12px; border: 0; border-radius: 0; background: #fff; color: #3a3a3c; }
-.stateSelector button span { overflow-wrap: anywhere; font-size: 9px; font-weight: 700; line-height: 1.2; text-align: center; }
+.stateSelector button { display: grid; place-items: center; min-height: 44px; padding: 7px 12px; border: 0; border-radius: 0; background: #fff; color: #3a3a3c; }
+.stateSelector button span { overflow-wrap: anywhere; font-size: 12px; font-weight: 700; line-height: 1.2; text-align: center; }
 .stateSelector button:hover { border-color: #8e8e93; background: #f5f5f7; }
 .stateSelector button.active { background: #3a3a3c; color: #fff; box-shadow: none; }
 .modeStateSelector { flex: 1 1 520px; margin: 0; }
@@ -685,6 +702,15 @@ main { min-height: 100vh; display: flex; flex-direction: column; }
 .executionActions button:disabled { border-color: #d2d2d7; background: #f2f2f7; color: #8e8e93; cursor: default; }
 .contractHint { margin: 0; padding: 2px 14px 12px; color: #6e6e73; font-size: 8px; }
 .executionResult { margin: 8px 14px 14px; padding: 12px; border-radius: 9px; background: #f2f2f7; }
+.stageExampleOverview { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.stageExampleOverview > div { min-width: 0; display: grid; align-content: start; gap: 5px; padding: 12px; border: 1px solid #d2d2d7; border-radius: 7px; background: #fff; }
+.stageExampleOverview strong { color: #6e6e73; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.stageExampleOverview span { color: #1d1d1f; font-size: 14px; font-weight: 700; }
+.stageExampleOverview small { color: #3a3a3c; font-size: 11px; line-height: 1.4; }
+.stageExampleDetail { margin-top: 10px; border-top: 1px solid #d2d2d7; }
+.stageExampleDetail > summary { padding: 9px 2px 0; color: #3a3a3c; font-size: 11px; font-weight: 700; cursor: pointer; }
+.stageExampleDetail[open] .executionIo { margin-top: 10px; }
+@media (max-width: 620px) { .stageExampleOverview { grid-template-columns: 1fr; } }
 .executionResultHeading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 9px; }
 .executionResultHeading span { font-weight: 750; }
 .state2ProjectionToggle { display: flex; flex: 1 1 auto; width: 100%; margin: 0; padding: 2px; border-radius: 7px; background: #e5e5ea; }
