@@ -280,7 +280,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /function projectInteroperabilityExerciseState\(state\)/);
   assert.match(html, /contractExecutionAvailable:visible\.interface/);
   assert.match(html, /Runs through the declared interoperability contract/);
-  assert.match(html, /Object profiles: \$\{runState>=2\?"✓ Carried by the input and output":"Not used"\}/);
+  assert.match(html, /Data object profiles: \$\{runState>=2\?"✓ Carried by the input and output":"Not used"\}/);
   assert.match(html, />Overview<\/button>/);
   assert.match(html, />Detail<\/button>/);
   assert.match(html, />Reset<\/button>/);
@@ -333,7 +333,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /replaceFirstDivByClass/);
   assert.match(html, /Meaning carried with the value/);
   assert.match(html, /Question meaning not supplied/);
-  assert.match(html, /Meaning described — data objects not yet defined/);
+  assert.match(html, /Semantics described — data object profiles not yet defined/);
   assert.match(html, /No formal data object is defined at State 1/);
   assert.doesNotMatch(html, /RAW · OPAQUE/);
   assert.doesNotMatch(html, /CONTRACT · DECLARED/);
@@ -354,7 +354,8 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /function createInteroperabilitySimulationHost\(\)/);
   assert.match(html, /interoperabilitySimulation:interoperabilitySimulationHost/);
   assert.match(html, /status:"binding-unavailable"/);
-  assert.match(html, /same input and output are progressively annotated/);
+  assert.match(html, /The output fixture changes from a raw value to a structured result/);
+  assert.doesNotMatch(html, /same input and output are progressively annotated/);
   assert.match(html, /Host-supplied simulation binding/);
   assert.match(html, /interoperability-exercise\/examples\/raw-input\.json/);
   assert.match(html, /interoperability-exercise\/examples\/expected-output\.json/);
@@ -473,7 +474,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /function buildHumanRdfProjection\(graph\)\{return graph\.statements\.filter\(statement=>statement\.subject\.termType!=="BlankNode"\)\.map\(statement=>projectRdfStatement\(graph,statement\)\)\}/);
   assert.doesNotMatch(html, /a\.projected\.relationship\.order-b\.projected\.relationship\.order/);
   assert.doesNotMatch(html, /children=graph\.statements[^\n]*\.sort\(/);
-  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\)/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false,uniqueKoMetadataIdOnly=false\)/);
   assert.match(html, /data-rdf-view="human" class="active"/);
   assert.doesNotMatch(html, />Compact RDF<\/button>/);
   assert.match(html, /data-rdf-view="source"/);
@@ -482,7 +483,7 @@ test("ships a self-contained standalone HTML edition", async () => {
   assert.match(html, /Human view unavailable/);
   assert.match(html, /Invalid Turtle source/);
   assert.match(html, /Your source has been preserved/);
-  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false\).*graph\.diagnostics\.length/);
+  assert.match(html, /function renderHumanRdfForFiles\(source,uniqueKoIdOnly=false,uniqueKoMetadataIdOnly=false\).*graph\.diagnostics\.length/);
   assert.match(html, /const updateRdfValidity=/);
   assert.match(html, /graphButton\.disabled=diagnostics\.length>0/);
   assert.match(html, /Authoritative Turtle source/);
@@ -696,7 +697,7 @@ test("keeps published metadata, exercise kit, and simulation session as explicit
   assert.match(source, /selectedState: state/);
   assert.doesNotMatch(source, /State comparison|Move freely among four interoperability states/);
   assert.match(source, /modeStateSelector/);
-  assert.match(source, /\["Opaque", "Meaning", "Data Objects", "Interface"\]\.map/);
+  assert.match(source, /\["Unexpressive", "Semantics", "Data object profiles", "Interface"\]\.map/);
   assert.match(source, /detailSimulationOnly/);
   assert.doesNotMatch(source, /setInteroperabilityRepairs|setInteroperabilitySimulationStates/);
   assert.equal((source.match(/loadInteroperabilityExerciseKit\(/g) ?? []).length, 1, "the strict loader must be called only by the Interoperability View model adapter");
@@ -730,6 +731,84 @@ test("both editions use five interface process stages with outcomes handled by c
   assert.match(standalone, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(standalone, /simulationCase\?\.failurePoint/);
   assert.match(standalone, /prefers-reduced-motion/);
+});
+
+test("both editions name Stages dimensions consistently without renaming Rig filters", async () => {
+  const source = await readServerSource();
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.match(source, /\["Unexpressive", "Semantics", "Data object profiles", "Interface"\]\.map/);
+  assert.ok(standalone.split('["Unexpressive","Semantics","Data object profiles","Interface"]').length - 1 >= 2);
+  assert.doesNotMatch(source, /\["Unexpressive", "Meaning", "Data Objects", "Interface"\]/);
+  assert.doesNotMatch(standalone, /\["Unexpressive","Meaning","Data Objects","Interface"\]/);
+  for (const edition of [source, standalone]) {
+    assert.match(edition, /"Specified Interface",\s*"Object References"/);
+  }
+});
+
+test("Stages controls and Simulation label are readable in both editions", async () => {
+  const serverStyles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.match(serverStyles, /\.stateSelector button span \{[^}]*font-size: 12px/);
+  assert.match(serverStyles, /\.simulationTag \{[^}]*font-size: 12px/);
+  assert.match(standalone, /\.state-selector button span\{[^}]*font-size:12px/);
+  assert.match(standalone, /\.simulation-tag\{[^}]*font-size:12px/);
+});
+
+test("both Stages dialogs show two parties and one shared set of boundary dimensions", async () => {
+  const server = await readServerSource();
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  assert.match(server, /function InteroperabilityStageBoundaryDiagram\(/);
+  assert.match(server, /<InteroperabilityStageBoundaryDiagram state=\{stageSession\.selectedState\}/);
+  assert.match(standalone, /function renderInteroperabilityStageBoundary\(state\)/);
+  assert.match(standalone, /\$\{renderInteroperabilityStageBoundary\(state\)\}/);
+  for (const edition of [server, standalone]) {
+    assert.match(edition, /Interoperability boundary diagram/);
+    assert.match(edition, /Data object profiles/);
+    assert.match(edition, /<strong>Requesting system<\/strong>/);
+    assert.match(edition, /<strong>System hosting the KO<\/strong>/);
+    assert.match(edition, /Input request to the system hosting the KO/);
+    assert.match(edition, /Output response to the requesting system/);
+    assert.match(edition, /Descriptions of the system-to-system exchange/);
+    assert.doesNotMatch(edition, /interoperabilityStageSources|interoperability-stage-sources/);
+  }
+});
+
+test("both Stages dialogs state what the requesting system can do and what remains unknown", async () => {
+  const server = await readServerSource();
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const edition of [server, standalone]) {
+    assert.match(edition, /What this stage reveals to the requesting system/);
+    assert.match(edition, /See supplied example input and response values\./);
+    assert.match(edition, /Use supplied meanings and profiles to prepare or check complete input and output objects\./);
+    assert.match(edition, /Whether real systems can follow that agreement successfully\./);
+    assert.match(edition, /Fixture replay · KO not invoked/);
+    assert.match(edition, /Still unknown/);
+  }
+});
+
+test("Unexpressive and Semantics keep full examples available without making them the default view", async () => {
+  const server = await readServerSource();
+  const standalone = await readFile(new URL("../outputs/Knowledge-Object-Workbench.html", import.meta.url), "utf8");
+  for (const edition of [server, standalone]) {
+    assert.match(edition, /Inspect supplied example details/);
+    assert.match(edition, /Input example/);
+    assert.match(edition, /Response example/);
+  }
+});
+
+test("the Stages lesson follows one request and distinguishes its two response fixtures", async () => {
+  const source = await readServerSource();
+  const fixture = (name) => JSON.parse(embeddedLogicalValue(source, 1, name));
+  const rawInput = fixture("raw-input.json");
+  const profiledInput = fixture("valid-input.json");
+  const rawOutput = fixture("raw-output.json");
+  const profiledOutput = fixture("expected-output.json");
+  assert.deepEqual(rawInput, profiledInput, "the request example is unchanged across all four stages");
+  assert.deepEqual(rawOutput, { output1: "2" });
+  assert.deepEqual(profiledOutput.question_ids, rawInput.question_ids);
+  assert.deepEqual(profiledOutput.responses, rawInput.responses);
+  assert.deepEqual(profiledOutput.wagner_score, [Number(rawOutput.output1)]);
+  assert.notDeepEqual(rawOutput, profiledOutput, "the raw and structured responses are different supplied representations");
 });
 
 function exerciseFixture(overrides = {}) {

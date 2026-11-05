@@ -104,3 +104,62 @@ test("server and standalone editions share complete Term Insight journeys", asyn
   await serverPage.close();
   await standalonePage.close();
 });
+
+test("both editions open Term Details for nested access metadata values", async ({ browser }) => {
+  for (const url of Object.values(editions)) {
+    const page = await browser.newPage();
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+    const panel = await panelFor(page, objectName);
+    await panel.getByRole("button", { name: "Interact", exact: true }).click();
+    const interaction = page.getByRole("dialog", { name: objectName, exact: true });
+    await interaction.locator('.fileButton[title="access.metadata.txt"], .file[data-file="access.metadata.txt"]').click();
+    for (const value of ["HTTPS", "text/turtle"]) {
+      const term = interaction.getByRole("button", { name: `Inspect RDF object: ${value}`, exact: true }).first();
+      await expect(term).toBeVisible();
+      await term.click();
+      const details = page.locator(".rdfTermDetails, .rdf-term-details");
+      await expect(details).toBeVisible();
+      await expect(details.getByRole("heading", { level: 2 })).toHaveText(value);
+      await details.getByRole("button", { name: "Close term details", exact: true }).click();
+    }
+    expect(errors, `${url} produced no uncaught browser errors`).toEqual([]);
+    await page.close();
+  }
+});
+
+test("Term Details close control stays at the upper right with or without Open Source", async ({ browser }) => {
+  for (const url of Object.values(editions)) {
+    for (const width of [1440, 390]) {
+      const page = await browser.newPage({ viewport: { width, height: 900 } });
+      await page.goto(url, { waitUntil: "domcontentloaded" });
+      await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
+      const panel = await panelFor(page, objectName);
+      await panel.getByRole("button", { name: "Interact", exact: true }).click();
+      const interaction = page.getByRole("dialog", { name: objectName, exact: true });
+      await interaction.locator('.fileButton[title="access.metadata.txt"], .file[data-file="access.metadata.txt"]').click();
+      for (const [term, expectSource] of [
+        [interaction.getByRole("button", { name: /^Inspect RDF subject:/ }).first(), true],
+        [interaction.getByRole("button", { name: "Inspect RDF object: text/turtle", exact: true }), false],
+      ]) {
+        await term.click();
+        const details = page.locator(".rdfTermDetails, .rdf-term-details");
+        const source = details.getByRole("link", { name: /Open Source/ });
+        await expect(source).toHaveCount(expectSource ? 1 : 0);
+        const geometry = await details.evaluate((node) => {
+          const header = node.querySelector(":scope > header").getBoundingClientRect();
+          const close = node.querySelector('button[aria-label="Close term details"]').getBoundingClientRect();
+          return { rightInset: header.right - close.right, topInset: close.top - header.top };
+        });
+        expect(geometry.rightInset).toBeGreaterThanOrEqual(15);
+        expect(geometry.rightInset).toBeLessThanOrEqual(25);
+        expect(geometry.topInset).toBeGreaterThanOrEqual(0);
+        expect(geometry.topInset).toBeLessThanOrEqual(20);
+        await details.getByRole("button", { name: "Close term details", exact: true }).click();
+      }
+      await page.close();
+    }
+  }
+});

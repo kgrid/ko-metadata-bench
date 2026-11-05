@@ -30,6 +30,10 @@ import { evidenceCategoryPulseKeys } from "./evidence-subgraph-layout.js";
 import { inspectEvidenceSubgraphNode, inspectEvidenceSubgraphRelationship } from "./evidence-subgraph-inspector.js";
 import { planEvidenceSubgraphActions } from "./evidence-subgraph-actions.js";
 import { evidenceNexusIndicator } from "./evidence-linking-category.js";
+import { ACRONYM_BUBBLE_REGISTRY } from "./acronym-bubble-registry.js";
+import { createAcronymBubbleBehavior } from "./acronym-bubble-behavior.js";
+import { createAcronymBubbleElement, positionAcronymBubble } from "./acronym-bubble-view.js";
+import { installAcronymBannerBubbles } from "./acronym-bubble-attachment.js";
 import { markVerifiedPassage } from "./passage-navigation.js";
 import { OBJECT_FOLDER_NAMES, OBJECT_DISPLAY_NAMES, annotationDestinationOverrides, EMBEDDED_ASSEMBLY, objectFileOverrides, objectBinaryOverrides, objectStaticAssetOverrides, documentProjectionOverrides } from "./generated-ko-data";
 
@@ -545,7 +549,7 @@ function InterfaceSpecificationProjection({ detail, traceStep = 1, motionPhase =
   const animationFailed = animationHasRun && traceOutcome !== "success" && traceStep === failureStep;
   const runningStatus = interfaceMotionFrame(motionPhase, traceStep).status;
   const failureStatus: Record<string, string> = { "input-data-object": "Input data object rejected.", "input-binding": "Input binding rejected.", operation: "Operation failed.", "output-binding": "Output binding rejected.", "output-data-object": "Output data object rejected." };
-  const interfaceStatus = animationRunning ? runningStatus : animationHasRun ? (traceOutcome === "success" ? "Output delivered." : failureStatus[simulationCase?.failurePoint ?? ""] ?? "Interface stopped.") : "Try the interface to follow the declared input-to-output path.";
+  const interfaceStatus = animationRunning ? runningStatus : animationHasRun ? (traceOutcome === "success" ? "Example output delivered." : failureStatus[simulationCase?.failurePoint ?? ""] ?? "Interface stopped.") : "Replay the selected example; the KO is not called.";
   const selectedStepLabel = INTERFACE_STEP_LABELS[INTERFACE_PROCESS_STAGES[Math.max(0, traceStep - 1)]] ?? "Interface step";
   const accessibleProcessSummary = traceOutcome === "success"
     ? "Successful case selected. The input object passes both bindings, the operation transforms it, and the output object is delivered."
@@ -590,6 +594,24 @@ function State2ObjectPreview({ label, detail, profile, value }: { label: "Input"
   return <section className={`state2ObjectPreview ${label === "Input" ? "inputObjectPreview" : "outputObjectPreview"}${expanded ? " expanded" : ""}`}><AnnotatedExecutionReadout label={label} state={2} detail={detail} profile={profile} value={value} />{hiddenRows > 0 && <button type="button" className="state2ExpandButton" aria-expanded={expanded} onClick={() => setExpanded((current) => !current)}>{expanded ? "Show less" : `Show ${hiddenRows} more ${hiddenRows === 1 ? "row" : "rows"}`}</button>}</section>;
 }
 
+function stageExampleValue(value: unknown): string {
+  if (Array.isArray(value)) return `${value.length} values`;
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value);
+    const array = entries.find(([key, item]) => Array.isArray(item) && /responses|answers|values/i.test(key)) ?? entries.find(([, item]) => Array.isArray(item));
+    if (array && Array.isArray(array[1])) return `${array[1].length} ${humanizeBoundaryName(array[0]).toLowerCase()}`;
+    const scalar = entries.find(([, item]) => item === null || ["string", "number", "boolean"].includes(typeof item));
+    if (scalar) return `${scalar[0]}: ${String(scalar[1])}`;
+    return `${entries.length} fields`;
+  }
+  return String(value ?? "No value supplied");
+}
+function StageExampleOverview({ input, output, semantics, meanings }: { input: unknown; output: unknown; semantics: boolean; meanings: InteroperabilityExerciseKit["semanticDetails"] }) {
+  return <div className="stageExampleOverview" aria-label="Supplied input and response examples">
+    <div><strong>Input example</strong><span>{stageExampleValue(input)}</span>{semantics && <small>{meanings.input.meaning}</small>}</div>
+    <div><strong>Response example</strong><span>{stageExampleValue(output)}</span>{semantics && <small>{meanings.output.meaning}</small>}</div>
+  </div>;
+}
 function InteroperabilityExecutionPanel({ exerciseKit, selectedState, result }: { exerciseKit: InteroperabilityExerciseKit; selectedState: number; result: InteroperabilitySimulationSession["executionResult"]; onResult: (state: number) => void }) {
   const execution = exerciseKit.execution;
   const runState = Math.max(0, Math.min(3, selectedState));
@@ -619,9 +641,18 @@ function InteroperabilityExecutionPanel({ exerciseKit, selectedState, result }: 
   };
   if (!execution) return <section className="executionPanel"><header><strong>Execution simulation</strong><span>Not supplied by this knowledge object</span></header></section>;
   return <section className="executionPanel" aria-label="Interoperability execution simulation">
-    <div className="simulationTag">Simulation</div>
+    <div className="simulationTag">Fixture replay · KO not invoked</div>
     {result && result.status !== "completed" && <div className="executionResult simulationFailure"><div className="executionResultHeading"><strong>Simulation unavailable</strong><span>Not run</span></div><p>{result.message}</p></div>}
-    {result?.status === "completed" && result.mode === "raw" && <div className="executionResult">{runState >= 2 && <div className="executionResultHeading">{runState === 2 && <div className="state2ProjectionToggle" role="group" aria-label="State 2 projection"><button type="button" className={state2View === "table" ? "active" : ""} aria-pressed={state2View === "table"} onClick={() => setState2View("table")}>Table</button><button type="button" className={state2View === "source" ? "active" : ""} aria-pressed={state2View === "source"} onClick={() => setState2View("source")}>Source</button></div>}</div>}{runState === 2 && state2View === "source" ? <div className="executionIo state2Source"><JsonReadout label="Input table source" value={state2ProjectionSource(exerciseKit.semanticDetails.input, exerciseKit.profileDetails.input, execution.contractInput)} /><JsonReadout label="Output table source" value={state2ProjectionSource(exerciseKit.semanticDetails.output, exerciseKit.profileDetails.output, result.output)} /></div> : runState === 2 ? <div className="state2ObjectList"><State2ObjectPreview label="Input" detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.contractInput} /><State2ObjectPreview label="Output" detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div> : <div className="executionIo"><AnnotatedExecutionReadout label="Input" state={runState} detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.rawInput} /><AnnotatedExecutionReadout label="Output" state={runState} detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div>}<p>{runState === 1 ? "No formal data object is defined at State 1. The raw values are unchanged; only their human-readable meaning has been supplied." : `No KO implementation was invoked. The same input and output are progressively annotated with the boundary information available at State ${runState}.`}</p></div>}
+    {result?.status === "completed" && result.mode === "raw" && <div className="executionResult">
+      {runState <= 1 ? <>
+        <StageExampleOverview input={execution.rawInput} output={result.output} semantics={runState === 1} meanings={exerciseKit.semanticDetails} />
+        <details className="stageExampleDetail"><summary>Inspect supplied example details</summary><div className="executionIo"><AnnotatedExecutionReadout label="Input" state={runState} detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.rawInput} /><AnnotatedExecutionReadout label="Output" state={runState} detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div></details>
+      </> : <>
+        <div className="executionResultHeading"><div className="state2ProjectionToggle" role="group" aria-label="State 2 projection"><button type="button" className={state2View === "table" ? "active" : ""} aria-pressed={state2View === "table"} onClick={() => setState2View("table")}>Table</button><button type="button" className={state2View === "source" ? "active" : ""} aria-pressed={state2View === "source"} onClick={() => setState2View("source")}>Source</button></div></div>
+        {state2View === "source" ? <div className="executionIo state2Source"><JsonReadout label="Input table source" value={state2ProjectionSource(exerciseKit.semanticDetails.input, exerciseKit.profileDetails.input, execution.contractInput)} /><JsonReadout label="Output table source" value={state2ProjectionSource(exerciseKit.semanticDetails.output, exerciseKit.profileDetails.output, result.output)} /></div> : <div className="state2ObjectList"><State2ObjectPreview label="Input" detail={exerciseKit.semanticDetails.input} profile={exerciseKit.profileDetails.input} value={execution.contractInput} /><State2ObjectPreview label="Output" detail={exerciseKit.semanticDetails.output} profile={exerciseKit.profileDetails.output} value={result.output} /></div>}
+        <p>The input example is unchanged. The output fixture changes from a raw value to a structured result; it is not merely the raw output with annotations. No KO implementation was invoked.</p>
+      </>}
+    </div>}
     {result?.status === "completed" && result.mode === "contract" && <div className="executionResult contractResult"><InterfaceSpecificationProjection detail={exerciseKit.interfaceDetails} traceStep={traceStep || 1} motionPhase={interfaceMotionPhase} traceOutcome={traceOutcome} showCaseDetail={showCaseDetail} animationRunning={interfaceAnimationRunning} animationHasRun={interfaceAnimationHasRun} outcomeOptions={outcomeOptions} inputObject={{ detail: exerciseKit.semanticDetails.input, profile: exerciseKit.profileDetails.input }} outputObject={{ detail: exerciseKit.semanticDetails.output, profile: exerciseKit.profileDetails.output }} inputValue={execution.contractInput} outputValue={result.output} onSelectStep={selectInterfaceStep} onSelectOutcome={selectOutcome} onTryInterface={tryInterface} /></div>}
   </section>;
 }
@@ -669,6 +700,29 @@ function InteroperabilityBoundaryPanel({ published, exerciseKit, session, onExec
     <div className="boundaryQuestions">{boundary.questions.map((item) => <details className={item.answered ? "declaredFacet" : "missingFacet"} key={item.number}><summary><span className="boundaryQuestionNumber">{item.number}</span><span className="boundaryQuestionCopy"><b>{item.facet}</b><strong>{item.question}</strong></span><span className={item.answered ? "answered" : "unanswered"}>{item.answered ? "✓ Complete" : "Not declared"}</span></summary><div className="boundaryAnswer">{item.fields.map((entry) => <div key={entry.label}><strong>{entry.label}</strong><p className={item.answered && entry.value ? "defined" : "undefined"}>{item.answered ? entry.value || "Not defined" : "Unknown"}</p></div>)}{item.number === 3 && item.answered && <code>await knowledgeObject.run(input)</code>}<small>{item.explanation}</small></div></details>)}</div>
     {boundary.complete && <p className="boundaryConclusion">This capability has an explicit interoperability boundary.</p>}
   </section>;
+}
+
+function InteroperabilityStageBoundaryDiagram({ state }: { state: number }) {
+  const dimension = (name: string, revealed: boolean) => <span className={`stageBoundaryDimension${revealed ? " revealed" : ""}`} aria-label={`${name}: ${revealed ? "revealed" : "withheld"}`}>{name}</span>;
+  return <section className="stageBoundaryDiagram" aria-label="Interoperability boundary diagram" data-stage={state}>
+    <article className="stageBoundarySystem"><span className="stageBoundaryServerGlyph" aria-hidden="true"><i/><i/></span><strong>Requesting system</strong></article>
+    <div className="stageBoundaryExchange" role="group" aria-label="Request and response across the system boundary">
+      <div className="stageBoundaryFlow" aria-label="Input request to the system hosting the KO"><span>Input / request</span><b aria-hidden="true">→</b></div>
+      <div className="stageBoundaryFlow" aria-label="Output response to the requesting system"><b aria-hidden="true">←</b><span>Output / response</span></div>
+    </div>
+    <article className="stageBoundarySystem host"><span className="stageBoundaryServerGlyph" aria-hidden="true"><i/><i/></span><strong>System hosting the KO</strong><span className="stageBoundaryContainedKo">KO</span></article>
+    <div className="stageBoundaryDimensions" role="group" aria-label="Descriptions of the system-to-system exchange">{dimension("Semantics", state >= 1)}{dimension("Data object profiles", state >= 2)}{dimension("Interface", state >= 3)}</div>
+  </section>;
+}
+const INTEROPERABILITY_STAGE_PROGRESS = [
+  { can: "See supplied example input and response values.", unknown: "What the values mean, what complete objects are valid, and how to invoke the KO." },
+  { can: "Use supplied meanings to interpret the example input and response values.", unknown: "What complete objects are valid and how to invoke the KO." },
+  { can: "Use supplied meanings and profiles to prepare or check complete input and output objects.", unknown: "How those objects bind to an invocation, including success and failure." },
+  { can: "Use supplied descriptions to interpret objects and follow an invocation and response contract.", unknown: "Whether real systems can follow that agreement successfully." },
+] as const;
+function InteroperabilityStageProgress({ state }: { state: number }) {
+  const progress = INTEROPERABILITY_STAGE_PROGRESS[state] ?? INTEROPERABILITY_STAGE_PROGRESS[0];
+  return <section className="stageProgress" aria-label="What this stage reveals to the requesting system"><p><strong>Can now</strong><span>{progress.can}</span></p><p><strong>Still unknown</strong><span>{progress.unknown}</span></p></section>;
 }
 
 const normalizeText = (value: string) => value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -813,7 +867,7 @@ const predicatePresentationRegistry = new Map<string, PredicatePresentation>([
   ["https://schema.org/keywords", { human: "keywords", compact: "schema:keywords", facet: "findability", order: 80 }],
   ["https://schema.org/additionalType", { human: "knowledge object type", compact: "schema:additionalType", facet: "findability", order: 90 }],
   ["https://schema.org/isPartOf", { human: "catalog", compact: "schema:isPartOf", facet: "findability", order: 100 }],
-  ["https://schema.org/subjectOf", { human: "indexed record", compact: "schema:subjectOf", facet: "findability", order: 110 }],
+  ["https://schema.org/subjectOf", { human: "subject of", compact: "schema:subjectOf", facet: "findability", order: 110 }],
   ["https://schema.org/url", { human: "access route", compact: "schema:url", facet: "accessibility", order: 200 }],
   ["https://schema.org/distribution", { human: "alternate access", compact: "schema:distribution", facet: "accessibility", order: 210 }],
   ["https://schema.org/object", { human: "input", compact: "schema:object", facet: "interoperability", order: 300 }],
@@ -1105,12 +1159,65 @@ function learnerAddedLinks(graph: CanonicalRdfGraph, baselineSource?: string) {
   const existing = new Set(baseline.statements.filter((statement) => statement.object.termType === "NamedNode").map(linkKey));
   return graph.statements.filter((statement) => statement.object.termType === "NamedNode" && LEARNER_LINK_LABELS[statement.predicate.value] && !existing.has(linkKey(statement)));
 }
-function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false }: { source: string; file: FileName; baselineSource?: string; uniqueKoIdOnly?: boolean }) {
+function accessRouteStatementIds(graph: CanonicalRdfGraph, koAccess: boolean, metadataAccess: boolean) {
+  const schema = "https://schema.org/";
+  const rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+  const selected = new Set<string>();
+  const statementsFrom = (subjectId: string) => graph.statements.filter((statement) => statement.subject.id === subjectId);
+  for (const link of graph.statements.filter((statement) => statement.predicate.value === `${schema}potentialAction` && statement.object.termType === "BlankNode")) {
+    const action = statementsFrom(link.object.id);
+    const type = action.find((statement) => statement.predicate.value === rdfType && ["ViewAction", "DownloadAction"].some((name) => statement.object.value === `${schema}${name}`));
+    const target = action.find((statement) => statement.predicate.value === `${schema}target` && statement.object.termType === "BlankNode");
+    if (!type || !target) continue;
+    const targetStatements = statementsFrom(target.object.id);
+    const url = targetStatements.find((statement) => statement.predicate.value === `${schema}urlTemplate` && statement.object.termType === "Literal");
+    const identifier = targetStatements.find((statement) => statement.predicate.value === `${schema}identifier` && statement.object.termType === "Literal");
+    const service = targetStatements.find((statement) => statement.predicate.value === `${schema}name` && statement.object.termType === "Literal" && statement.object.value === "FDO Bench KO Access API 1.0");
+    const isExistenceRecord = type.object.value === `${schema}ViewAction` && Boolean(url && /(?:^|\/)existence\.metadata\.txt(?:[?#]|$)/.test(url.object.value));
+    const isKoDirectory = type.object.value === `${schema}ViewAction` && Boolean(url && !isExistenceRecord && /\/tree\//.test(url.object.value));
+    const isBenchDownload = type.object.value === `${schema}DownloadAction` && Boolean(identifier && service);
+    if ((metadataAccess && isExistenceRecord) || (koAccess && (isKoDirectory || isBenchDownload))) selected.add(link.id);
+  }
+  return selected;
+}
+function interoperabilityStatementIds(graph: CanonicalRdfGraph, specifiedInterface: boolean, objectReferences: boolean) {
+  const schema = "https://schema.org/";
+  const conformsTo = "http://purl.org/dc/terms/conformsTo";
+  const root = graph.statements.find((statement) => statement.subject.termType === "NamedNode")?.subject.id;
+  const selected = new Set<string>();
+  if (!root) return selected;
+  const rootStatements = graph.statements.filter((statement) => statement.subject.id === root);
+  const select = (statement: CanonicalRdfStatement | undefined) => { if (statement) selected.add(statement.id); };
+  if (specifiedInterface) {
+    for (const action of rootStatements.filter((statement) => statement.predicate.value === `${schema}potentialAction` && statement.object.termType === "BlankNode")) {
+      select(action);
+      select(graph.statements.find((statement) => statement.subject.id === action.object.id && statement.predicate.value === `${schema}target`));
+    }
+  }
+  if (objectReferences) {
+    for (const statement of rootStatements.filter((candidate) => [`${schema}object`, `${schema}result`].includes(candidate.predicate.value))) select(statement);
+    for (const binding of rootStatements.filter((statement) => statement.predicate.value === conformsTo && statement.object.termType === "BlankNode")) {
+      select(binding);
+      for (const statement of graph.statements.filter((candidate) => candidate.subject.id === binding.object.id && [`${schema}object`, `${schema}result`].includes(candidate.predicate.value))) select(statement);
+    }
+  }
+  return selected;
+}
+function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false, uniqueKoMetadataIdOnly = false, koAccessOnly = false, koMetadataAccessOnly = false, specifiedInterfaceOnly = false, objectReferencesOnly = false, licenseOnly = false, dependenciesOnly = false }: { source: string; file: FileName; baselineSource?: string; uniqueKoIdOnly?: boolean; uniqueKoMetadataIdOnly?: boolean; koAccessOnly?: boolean; koMetadataAccessOnly?: boolean; specifiedInterfaceOnly?: boolean; objectReferencesOnly?: boolean; licenseOnly?: boolean; dependenciesOnly?: boolean }) {
   const graph = buildCanonicalRdfGraph(source);
   const koSubject = graph.statements.find((statement) => statement.subject.termType === "NamedNode")?.subject.id;
   const identityPredicates = new Set(["https://schema.org/identifier", "https://schema.org/version"]);
   const identityStatements = new Set(graph.statements.filter((statement) => statement.subject.id === koSubject && identityPredicates.has(statement.predicate.value)).map((statement) => statement.id));
-  const projection = buildHumanRdfProjection(graph).filter((statement) => !uniqueKoIdOnly || identityStatements.has(statement.id));
+  const metadataIdentityStatements = new Set(graph.statements.filter((statement) => statement.subject.id === koSubject && statement.predicate.value === "https://schema.org/subjectOf").map((statement) => statement.id));
+  const accessFiltersActive = file === "access.metadata.txt" && (koAccessOnly || koMetadataAccessOnly);
+  const interoperabilityFiltersActive = file === "interoperability.metadata.txt" && (specifiedInterfaceOnly || objectReferencesOnly);
+  const reusabilityFiltersActive = file === "reusability.metadata.txt" && (licenseOnly || dependenciesOnly);
+  const filtersActive = uniqueKoIdOnly || uniqueKoMetadataIdOnly || accessFiltersActive || interoperabilityFiltersActive || reusabilityFiltersActive;
+  const accessStatements = accessFiltersActive ? accessRouteStatementIds(graph, koAccessOnly, koMetadataAccessOnly) : null;
+  const interoperabilityStatements = interoperabilityFiltersActive ? interoperabilityStatementIds(graph, specifiedInterfaceOnly, objectReferencesOnly) : null;
+  const reusabilityStatements = reusabilityFiltersActive ? new Set(graph.statements.filter((statement) => (licenseOnly && statement.subject.id === koSubject && statement.predicate.value === "https://schema.org/license") || (dependenciesOnly && statement.predicate.value === "https://schema.org/softwareRequirements")).map((statement) => statement.id)) : null;
+  const selectedStatements = accessStatements ?? interoperabilityStatements ?? reusabilityStatements;
+  const projection = selectedStatements ? graph.statements.filter((statement) => selectedStatements.has(statement.id)).map((statement) => { const projected = projectRdfStatement(graph, statement); return { ...projected, value: { ...projected.value, children: [] } }; }) : buildHumanRdfProjection(graph).filter((statement) => !filtersActive || (uniqueKoIdOnly && identityStatements.has(statement.id)) || (uniqueKoMetadataIdOnly && metadataIdentityStatements.has(statement.id)));
   const addedLinks = learnerAddedLinks(graph, baselineSource);
   const [selectedTerm, setSelectedTerm] = useState<RdfTermSelection | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<string | null>(null);
@@ -1129,13 +1236,14 @@ function HumanRdfView({ source, file, baselineSource, uniqueKoIdOnly = false }: 
   });
   const issue = graph.diagnostics[0] ?? (unresolved ? `Unresolved IRI ${JSON.stringify(unresolved.value)}; declare a valid @base or use an absolute IRI.` : null);
   if (issue) return <div className="turtleView humanRdfView"><section className="metadataFileError" role="alert"><strong>Unable to display {file}</strong><p>{issue}</p><small>Select another file, inspect Source, or close Metadata Interaction.</small></section></div>;
-  return <div className="turtleView humanRdfView">{selectedTerm && <RdfTermDetails selection={selectedTerm} graph={graph} onClose={() => setSelectedTerm(null)} />}{!uniqueKoIdOnly && addedLinks.length > 0 && <section className="metadataAddedLinks" aria-label="Links added in this session"><header><strong>Links added</strong><span>{addedLinks.length} connected resources</span></header><ul>{addedLinks.map((statement) => <li key={statement.id}><span>{LEARNER_LINK_LABELS[statement.predicate.value]}</span><RdfTermButton term={statement.object} label={statement.object.humanLabel || statement.object.compact} statement={statement} role="object" graph={graph} onSelect={setSelectedTerm} /></li>)}</ul></section>}<div className="tripleTableWrap"><table className="tripleTable humanRdfTable"><thead><tr><th>Subject</th><th>Relationship</th><th>Value</th></tr></thead><tbody>{projection.map((statement) => {
+  return <div className="turtleView humanRdfView">{selectedTerm && <RdfTermDetails selection={selectedTerm} graph={graph} onClose={() => setSelectedTerm(null)} />}{!filtersActive && addedLinks.length > 0 && <section className="metadataAddedLinks" aria-label="Links added in this session"><header><strong>Links added</strong><span>{addedLinks.length} connected resources</span></header><ul>{addedLinks.map((statement) => <li key={statement.id}><span>{LEARNER_LINK_LABELS[statement.predicate.value]}</span><RdfTermButton term={statement.object} label={statement.object.humanLabel || statement.object.compact} statement={statement} role="object" graph={graph} onSelect={setSelectedTerm} /></li>)}</ul></section>}<div className="tripleTableWrap"><table className="tripleTable humanRdfTable"><thead><tr><th>Subject</th><th>Relationship</th><th>Value</th></tr></thead><tbody>{projection.map((statement) => {
     const sourceStatement = graph.statements.find((candidate) => candidate.id === statement.id)!;
     const isAccessInstance = statement.relationship.human === "access instance";
     const subordinateChildren = isAccessInstance ? statement.value.children : statement.value.children.filter((child) => child.predicate.value === "https://schema.org/valueReference");
     const parentValue = isAccessInstance ? { ...statement.value, children: [] } : statement.value;
-    return <Fragment key={statement.id}><tr data-statement-id={statement.id} className={selectedStatement === statement.id ? "rdfStatementSelected" : ""} onClick={() => window.dispatchEvent(new CustomEvent("rdf-statement-select", { detail: { statementId: statement.id } }))}><td><RdfTermButton term={statement.subject.rdfTerm} label={statement.subject.display} statement={sourceStatement} role="subject" graph={graph} onSelect={setSelectedTerm} /></td><td><RdfTermButton term={statement.predicate} label={statement.relationship.human} statement={sourceStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={parentValue} statement={sourceStatement} graph={graph} onSelect={setSelectedTerm} /></td></tr>{subordinateChildren.map((child) => { const childStatement = graph.statements.find((candidate) => candidate.id === child.id); return childStatement ? <tr className="humanRdfSubordinateRow" key={`${statement.id}-${child.id}`}><td aria-label="Subordinate relationship" /><td><RdfTermButton term={child.predicate} label={child.relationship.human} statement={childStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={child.value} statement={childStatement} graph={graph} onSelect={setSelectedTerm} />{child.predicate.value === "https://schema.org/valueReference" && <code>{child.value.rdfTerm.compact}</code>}</td></tr> : null; })}</Fragment>;
-  })}{graph.diagnostics.map((text, index) => <tr className="turtleRaw" key={`diagnostic-${index}`}><td colSpan={3}><span>Rendering Issue</span>{text}</td></tr>)}{!uniqueKoIdOnly && graph.comments.length > 0 && <tr className="turtleComment"><td colSpan={3}><span>Comment</span>{graph.comments.join("\n")}</td></tr>}</tbody></table></div></div>;
+    const cksInterface = interoperabilityFiltersActive && specifiedInterfaceOnly && sourceStatement.predicate.value === "https://schema.org/potentialAction" && sourceStatement.subject.termType === "NamedNode" && sourceStatement.subject.value.startsWith("https://kgrid.org/cks/");
+    return <Fragment key={statement.id}><tr data-statement-id={statement.id} className={[selectedStatement === statement.id && "rdfStatementSelected", cksInterface && "interoperabilityCksSubject"].filter(Boolean).join(" ")} onClick={() => window.dispatchEvent(new CustomEvent("rdf-statement-select", { detail: { statementId: statement.id } }))}><td><RdfTermButton term={statement.subject.rdfTerm} label={statement.subject.display} statement={sourceStatement} role="subject" graph={graph} onSelect={setSelectedTerm} /></td><td><RdfTermButton term={statement.predicate} label={statement.relationship.human} statement={sourceStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={parentValue} statement={sourceStatement} graph={graph} onSelect={setSelectedTerm} /></td></tr>{subordinateChildren.map((child) => { const childStatement = graph.statements.find((candidate) => candidate.id === child.id); return childStatement ? <tr className="humanRdfSubordinateRow" key={`${statement.id}-${child.id}`}><td aria-label="Subordinate relationship" /><td><RdfTermButton term={child.predicate} label={child.relationship.human} statement={childStatement} role="predicate" graph={graph} onSelect={setSelectedTerm} /></td><td><HumanRdfValue value={child.value} statement={childStatement} graph={graph} onSelect={setSelectedTerm} />{child.predicate.value === "https://schema.org/valueReference" && <code>{child.value.rdfTerm.compact}</code>}</td></tr> : null; })}</Fragment>;
+  })}{graph.diagnostics.map((text, index) => <tr className="turtleRaw" key={`diagnostic-${index}`}><td colSpan={3}><span>Rendering Issue</span>{text}</td></tr>)}{!filtersActive && graph.comments.length > 0 && <tr className="turtleComment"><td colSpan={3}><span>Comment</span>{graph.comments.join("\n")}</td></tr>}</tbody></table></div></div>;
 }
 
 
@@ -1196,6 +1304,24 @@ function RelationshipDialog({ source, title, onClose }: { source: string; title:
 function AbstractDialog({ onClose }: { onClose: () => void }) {
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); }; document.addEventListener("keydown", close); return () => document.removeEventListener("keydown", close); }, [onClose]);
   return <div className="abstractBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="abstractDialog" role="dialog" aria-modal="true" aria-labelledby="abstract-title"><header><div><span>Embedded document</span><h2 id="abstract-title">Workshop Abstract</h2></div><button type="button" onClick={onClose} aria-label="Close abstract">×</button></header><iframe title="Representing Computable Biomedical Knowledge abstract" src={embeddedAbstractPdf} /></section></div>;
+}
+
+function AboutDialog({ onClose }: { onClose: () => void }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeButton.current?.focus();
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [onClose]);
+  return <div className="abstractBackdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section className="abstractDialog aboutDialog" role="dialog" aria-modal="true" aria-labelledby="about-title"><header><div><span>FAIR Knowledge Object Bench</span><h2 id="about-title">About this Bench</h2></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Close About this Bench">×</button></header><div className="aboutDialogBody">
+    <p>The FAIR Knowledge Object Bench is a place to explore how knowledge can be packaged so that people and computers can find it, understand it, and use it. It is designed for learning: you can see what an object contains and how information about that object changes what you are able to do with it.</p>
+    <section><h3>What is a Knowledge Object?</h3><p>A Knowledge Object brings computable knowledge together with the materials needed to describe and use it. Those materials may include a specification of what the knowledge does, an implementation that carries it out, supporting documents, and metadata. A Knowledge Assembly is also a Knowledge Object. It coordinates the work of other Knowledge Objects to produce a result.</p></section>
+    <section><h3>Why does metadata matter?</h3><p>Metadata is information <em>about</em> an object. It can tell you what the object is, how to locate and obtain it, what its inputs and outputs mean, what it is based on, and where its use is limited.</p></section>
+    <section><h3>What can you do here?</h3><ul><li>Explore an object’s contents and metadata.</li><li>Try the metadata exercises and see what changes.</li><li>Run compatible objects and examine their results.</li><li>Download an object or your working version.</li></ul></section>
+    <p>The Bench is a general-purpose teaching environment. The objects available in it may change; the questions it helps you ask remain the same. The Knowledge Objects and Assemblies in the Bench are educational examples only and not for real-world use of any kind.</p>
+    <footer><strong>Created by the Knowledge Systems Lab</strong><br />Department of Learning Health Sciences · University of Michigan Medical School<br /><a href="https://github.com/kgrid/ko-metadata-bench" target="_blank" rel="noopener noreferrer">Workbench repository ↗</a></footer>
+  </div></section></div>;
 }
 
 function EmbeddedTestDialog({ objectId, file, source, onClose }: { objectId: ObjectId; file: FileName; source: string; onClose: () => void }) {
@@ -2045,6 +2171,13 @@ function WorkspacePane({
   const [resetConfirmationOpen, setResetConfirmationOpen] = useState(false);
   const [principlesOpen, setPrinciplesOpen] = useState(false);
   const [uniqueKoIdOnly, setUniqueKoIdOnly] = useState(false);
+  const [uniqueKoMetadataIdOnly, setUniqueKoMetadataIdOnly] = useState(false);
+  const [koAccessOnly, setKoAccessOnly] = useState(false);
+  const [koMetadataAccessOnly, setKoMetadataAccessOnly] = useState(false);
+  const [specifiedInterfaceOnly, setSpecifiedInterfaceOnly] = useState(false);
+  const [objectReferencesOnly, setObjectReferencesOnly] = useState(false);
+  const [licenseOnly, setLicenseOnly] = useState(false);
+  const [dependenciesOnly, setDependenciesOnly] = useState(false);
   if (objectId === 0) {
     return (
       <section className="pane" aria-label={`${side} editor pane`}>
@@ -2052,7 +2185,7 @@ function WorkspacePane({
           <div><h2>Select a knowledge object</h2></div>
           <label className="selectWrap">
             <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
-            <select value="" onChange={(event) => { setUniqueKoIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}>
+            <select value="" onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); setLicenseOnly(false); setDependenciesOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}>
               <option value="" disabled>Choose object…</option>
               {OBJECT_IDS.map((id) => (
                 <option key={id} value={id} disabled={id === otherObjectId}>{objectName(id)}{id === otherObjectId ? " · in use" : ""}</option>
@@ -2091,7 +2224,7 @@ function WorkspacePane({
           <span className="srOnly">Choose knowledge object for {side.toLowerCase()} pane</span>
           <select
             value={objectId}
-            onChange={(event) => { setUniqueKoIdOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}
+            onChange={(event) => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); setLicenseOnly(false); setDependenciesOnly(false); onObjectChange(Number(event.target.value) as ObjectId); }}
           >
             {OBJECT_IDS.map((id) => (
               <option key={id} value={id} disabled={id === otherObjectId}>
@@ -2113,7 +2246,7 @@ function WorkspacePane({
               <button
                 key={fileName}
                 className={fileName === file ? "fileButton active" : "fileButton"}
-                onClick={() => { setUniqueKoIdOnly(false); onFileChange(fileName); }}
+                onClick={() => { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); setLicenseOnly(false); setDependenciesOnly(false); onFileChange(fileName); }}
                 title={fileName}
               >
                 <span className="fileIcon" aria-hidden="true">{fileName.endsWith(".json") ? "{}" : "T"}</span>
@@ -2127,14 +2260,14 @@ function WorkspacePane({
           <div className="editorBar">
             {modified && <button className="editorControlButton editorResetButton" type="button" onClick={() => setResetConfirmationOpen(true)}>Reset</button>}
             {file === "metadata.json" && <button className="informationPageButton" type="button" onClick={() => openEmbeddedInformationPage(objectId)}>Information Page</button>}
-            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) setUniqueKoIdOnly(false); return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
+            {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); setLicenseOnly(false); setDependenciesOnly(false); } return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
             <div className="editorControls">
               {isTurtle && !metadataNeedsGuidedEntry && <button className="editorControlButton" type="button" onClick={() => setRelationshipOpen(true)} disabled={turtleDiagnostics.length > 0} title={turtleDiagnostics.length ? "Correct the Turtle source before graphing it" : undefined}>Graph</button>}
               {isTurtle && !metadataNeedsGuidedEntry && <div className="rdfViewControl" role="group" aria-label="RDF presentation">{(["human", "source"] as const).map((mode) => <button type="button" key={mode} className={rdfView === mode ? "active" : ""} aria-pressed={rdfView === mode} onClick={() => setRdfView(mode)}>{mode === "human" ? "Table" : "Source"}</button>)}</div>}
             </div>
           </div>
-          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => label === "Unique KO ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoIdOnly} onClick={() => { setUniqueKoIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
-          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} uniqueKoIdOnly={uniqueKoIdOnly && file === "findability.metadata.txt"} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
+          {PRINCIPLES_LABELS[file] && principlesOpen && <div id="principles-control-row" className="principlesControlRow" role="group" aria-label={`${PRINCIPLES_LABELS[file]} controls`}><div className="principlesTrayButtons">{PRINCIPLES_CONTROLS[file].map((label) => label === "Unique KO ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoIdOnly} onClick={() => { setUniqueKoIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Unique KO Metadata ID" && file === "findability.metadata.txt" ? <button key={label} className={`principlesTrayButton${uniqueKoMetadataIdOnly ? " active" : ""}`} type="button" aria-pressed={uniqueKoMetadataIdOnly} onClick={() => { setUniqueKoMetadataIdOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "KO Access" && file === "access.metadata.txt" ? <button key={label} className={`principlesTrayButton${koAccessOnly ? " active" : ""}`} type="button" aria-pressed={koAccessOnly} onClick={() => { setKoAccessOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "KO Metadata Access" && file === "access.metadata.txt" ? <button key={label} className={`principlesTrayButton${koMetadataAccessOnly ? " active" : ""}`} type="button" aria-pressed={koMetadataAccessOnly} onClick={() => { setKoMetadataAccessOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Specified Interface" && file === "interoperability.metadata.txt" ? <button key={label} className={`principlesTrayButton${specifiedInterfaceOnly ? " active" : ""}`} type="button" aria-pressed={specifiedInterfaceOnly} onClick={() => { setSpecifiedInterfaceOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Object References" && file === "interoperability.metadata.txt" ? <button key={label} className={`principlesTrayButton${objectReferencesOnly ? " active" : ""}`} type="button" aria-pressed={objectReferencesOnly} onClick={() => { setObjectReferencesOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "License" && file === "reusability.metadata.txt" ? <button key={label} className={`principlesTrayButton${licenseOnly ? " active" : ""}`} type="button" aria-pressed={licenseOnly} onClick={() => { setLicenseOnly((active) => !active); setRdfView("human"); }}>{label}</button> : label === "Dependencies" && file === "reusability.metadata.txt" ? <button key={label} className={`principlesTrayButton${dependenciesOnly ? " active" : ""}`} type="button" aria-pressed={dependenciesOnly} onClick={() => { setDependenciesOnly((active) => !active); setRdfView("human"); }}>{label}</button> : <button key={label} className="principlesTrayButton" type="button">{label}</button>)}</div><a className="principlesReference" href="https://zenodo.org/records/6623556#.YqCJTJNBwlw" target="_blank" rel="noreferrer">Based on FAIR Principles<br />for Research Software</a></div>}
+          {findabilityNeedsGuidedEntry && findabilityEnrichment ? <FindabilityGuidedEditor value={value} canonicalSource={findabilityEnrichmentCanonicalSource} state={findabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : reusabilityNeedsGuidedEntry && reusabilityEnrichment ? <ReusabilityGuidedEditor value={value} canonicalSource={reusabilityEnrichmentCanonicalSource} metadataSource={workingFileValue(objectId, "metadata.json", drafts)} state={reusabilityEnrichment} onEdit={(nextValue) => { setRdfView("human"); onEdit(nextValue); }} /> : isTurtle && rdfView === "human" ? <HumanRdfView source={value} file={file} baselineSource={isFindabilityEnrichmentTarget ? findabilityEnrichmentBaseline : isReusabilityEnrichmentTarget ? reusabilityEnrichmentBaseline : undefined} uniqueKoIdOnly={uniqueKoIdOnly && file === "findability.metadata.txt"} uniqueKoMetadataIdOnly={uniqueKoMetadataIdOnly && file === "findability.metadata.txt"} koAccessOnly={koAccessOnly && file === "access.metadata.txt"} koMetadataAccessOnly={koMetadataAccessOnly && file === "access.metadata.txt"} specifiedInterfaceOnly={specifiedInterfaceOnly && file === "interoperability.metadata.txt"} objectReferencesOnly={objectReferencesOnly && file === "interoperability.metadata.txt"} licenseOnly={licenseOnly && file === "reusability.metadata.txt"} dependenciesOnly={dependenciesOnly && file === "reusability.metadata.txt"} /> : <>{isTurtle && turtleDiagnostics.length > 0 && <div className="sourceValidation" role="alert"><strong>Invalid Turtle source</strong><span>{turtleDiagnostics[0]}</span></div>}<textarea
             value={value}
             onChange={(event) => onEdit(event.target.value)}
             spellCheck={false}
@@ -2251,7 +2384,8 @@ function KnowledgeAssemblyCaseView() {
   const exchange = selectedKoRole && selectedCase ? projectAssemblyKoExchange(selectedCase, selectedKoRole) : null;
   return <><section className="knowledgeObjectsExercise assemblyExercise" aria-label="Knowledge Assembly explorer">
     <div className="viewStickyControls">
-      <div className="viewTitle"><h2>Assembly Orchestration</h2></div>
+      <div className="viewTitle"><h2>{puzzleComplete ? "Cases Processed with a Knowledge Assembly" : "Orchestrating KOs in a Knowledge Assembly"}</h2></div>
+      {!puzzleComplete && !loaded.error && <p className="assemblyPuzzleInstruction">Arrange the four Knowledge Objects so the severity score feeds the treatment decision. The treatment decision, regimen burden estimate, and prognostic indicator then contribute to the assembly’s treatment-target classification.</p>}
     </div>
     {loaded.error ? <div className="assemblyWorkspaceError" role="alert">{loaded.error}</div> :
       !puzzleComplete ? <div className="assemblyWorkspace assemblyPuzzleWorkspace">
@@ -2397,6 +2531,8 @@ export default function Home() {
   const [interoperabilitySessions, setInteroperabilitySessions] = useState<Partial<Record<ObjectId, InteroperabilitySimulationSession>>>({});
   const [interoperabilityStagesObject, setInteroperabilityStagesObject] = useState<ObjectId | null>(null);
   const [abstractOpen, setAbstractOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const aboutButtonRef = useRef<HTMLButtonElement>(null);
   const [openTest, setOpenTest] = useState<{ objectId: ObjectId; file: FileName } | null>(null);
   const [openEvidence, setOpenEvidence] = useState<{ objectId: ObjectId; file: FileName } | null>(null);
   const [accessErrors, setAccessErrors] = useState<Partial<Record<ObjectId, string>>>({});
@@ -2405,6 +2541,13 @@ export default function Home() {
   const activeObjectIds: ObjectId[] = useMemo(() => activeObjects.map((object) => object.kind === "knowledge-assembly" ? ASSEMBLY_OBJECT_ID : object.objectId), [activeObjects]);
   const [metadataInteractObject, setMetadataInteractObject] = useState<ObjectId | null>(null);
   const [koPanelReset, setKoPanelReset] = useState(0);
+
+  useEffect(() => installAcronymBannerBubbles(document, {
+    registry: ACRONYM_BUBBLE_REGISTRY,
+    createBehavior: createAcronymBubbleBehavior,
+    createBubble: createAcronymBubbleElement,
+    positionBubble: positionAcronymBubble,
+  }), []);
 
   useEffect(() => {
     const access = createKnowledgeObjectAccessApi({
@@ -2443,6 +2586,7 @@ export default function Home() {
             <h1>FAIR Knowledge Object Bench</h1>
           </div>
           <div className="topActions">
+            <button ref={aboutButtonRef} type="button" className="abstractButton aboutButton" onClick={() => setAboutOpen(true)}>About this Bench</button>
             <button type="button" className="abstractButton" onClick={() => setAbstractOpen(true)}>Workshop Abstract</button>
           </div>
         </header>
@@ -2595,7 +2739,7 @@ export default function Home() {
             <div className="viewStickyControls"><div className="viewTitle"><div className="searchInstrumentMark">I</div><h2>Interoperability</h2></div><p>See how metadata bring greater interoperability</p></div>
             <div className="interoperabilityGrid">{activeObjectIds.map(panel)}</div>
           </section>
-          {stageObject && stageKit && stageSession && createPortal(<div className="interoperabilityStagesBackdrop" role="dialog" aria-modal="true" aria-labelledby="interoperability-stages-title"><section className="interoperabilityStagesDialog"><header><div><span>Interoperability stages</span><h2 id="interoperability-stages-title">{objectName(stageObject)}</h2></div><button type="button" className="modalClose" autoFocus aria-label="Close interoperability stages" onClick={() => setInteroperabilityStagesObject(null)}>×</button></header><div className="interoperabilityStagesToolbar"><div className="stateSelector modeStateSelector" role="group" aria-label="Choose interoperability simulation stage">{["Opaque", "Meaning", "Data Objects", "Interface"].map((label, state) => <button type="button" key={label} className={stageSession.selectedState === state ? "active" : ""} aria-pressed={stageSession.selectedState === state} onClick={() => chooseStage(stageObject, stageKit, state)}><span>{label}</span></button>)}</div></div><div className="interoperabilityStagesBody"><InteroperabilityBoundaryPanel published={publishedInteroperabilityModel(stageObject, drafts)} exerciseKit={stageKit} session={stageSession} onRepair={() => undefined} onExecutionResult={(state) => chooseStage(stageObject, stageKit, state)} /></div></section></div>, document.body)}
+          {stageObject && stageKit && stageSession && createPortal(<div className="interoperabilityStagesBackdrop" role="dialog" aria-modal="true" aria-labelledby="interoperability-stages-title"><section className="interoperabilityStagesDialog"><header><div><span>Interoperability stages</span><h2 id="interoperability-stages-title">{objectName(stageObject)}</h2></div><button type="button" className="modalClose" autoFocus aria-label="Close interoperability stages" onClick={() => setInteroperabilityStagesObject(null)}>×</button></header><div className="interoperabilityStagesToolbar"><div className="stateSelector modeStateSelector" role="group" aria-label="Choose interoperability simulation stage">{["Unexpressive", "Semantics", "Data object profiles", "Interface"].map((label, state) => <button type="button" key={label} className={stageSession.selectedState === state ? "active" : ""} aria-pressed={stageSession.selectedState === state} onClick={() => chooseStage(stageObject, stageKit, state)}><span>{label}</span></button>)}</div></div><InteroperabilityStageBoundaryDiagram state={stageSession.selectedState} /><div className="interoperabilityStagesBody"><InteroperabilityStageProgress state={stageSession.selectedState} /><InteroperabilityBoundaryPanel published={publishedInteroperabilityModel(stageObject, drafts)} exerciseKit={stageKit} session={stageSession} onRepair={() => undefined} onExecutionResult={(state) => chooseStage(stageObject, stageKit, state)} /></div></section></div>, document.body)}
         </>);
       })() : activeExercise === "R" ? (() => {
         const card = (objectId: ObjectId) => {
@@ -2628,8 +2772,14 @@ export default function Home() {
         <span>Instrument set: {activeObjectIds.length} embedded knowledge {activeObjectIds.length === 1 ? "object" : "objects"}</span>
         <span className="footerDivider" />
         <span>Edits remain on this device</span>
+        <span className="footerDivider" />
+        <nav className="footerRepositories" aria-label="Source repositories">
+          <a href="https://github.com/kgrid/ko-metadata-bench" target="_blank" rel="noopener noreferrer">Workbench repository</a>
+          <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop" target="_blank" rel="noopener noreferrer">KO and KA repository</a>
+        </nav>
       </footer>
       {abstractOpen && <AbstractDialog onClose={() => setAbstractOpen(false)} />}
+      {aboutOpen && <AboutDialog onClose={() => { setAboutOpen(false); requestAnimationFrame(() => aboutButtonRef.current?.focus()); }} />}
       {openTest && <EmbeddedTestDialog objectId={openTest.objectId} file={openTest.file} source={workingFileValue(openTest.objectId, openTest.file, drafts)} onClose={() => setOpenTest(null)} />}
       {openEvidence && <EmbeddedEvidenceDialog objectId={openEvidence.objectId} file={openEvidence.file} onClose={() => setOpenEvidence(null)} />}
       {openKnowledgeSubgraph && createPortal(<KnowledgeSubgraphDialog objectId={openKnowledgeSubgraph.objectId} model={openKnowledgeSubgraph.model} metadata={openKnowledgeSubgraph.metadata} onClose={() => setOpenKnowledgeSubgraph(null)} />, document.body)}

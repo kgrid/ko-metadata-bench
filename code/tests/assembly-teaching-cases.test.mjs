@@ -91,8 +91,8 @@ test("both editions keep a compact KA bar and a plain centered Case View title",
   const portableCaseView = standalone.split("function openAssemblyCaseView(trigger){")[1].split("function openKnowledgeAssembly(){")[0];
   assert.match(styles, /\.assemblyObjectBar \{ width: min\(760px,100%\)/);
   assert.match(standalone, /\.assembly-object-bar\{width:min\(760px,100%\)/);
-  assert.match(reactCaseView, /<h2>Assembly Orchestration<\/h2>/);
-  assert.match(portableCaseView, /<h2>Assembly Orchestration<\/h2>/);
+  assert.match(reactCaseView, /puzzleComplete \? "Cases Processed with a Knowledge Assembly" : "Orchestrating KOs in a Knowledge Assembly"/);
+  assert.match(portableCaseView, /puzzleComplete\?"Cases Processed with a Knowledge Assembly":"Orchestrating KOs in a Knowledge Assembly"/);
   assert.doesNotMatch(reactCaseView, /koInstrumentMark|Explore the assembly of Knowledge Objects/);
   assert.doesNotMatch(portableCaseView, /ko-instrument-mark|Explore the assembly of Knowledge Objects/);
 });
