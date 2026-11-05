@@ -5,6 +5,7 @@
   FDO Bench, standalone edition
 </a>
 
+## Introduction
 Metadata is easy to describe and surprisingly hard to understand—until you can see what it does for yourself.
 
 FDO Bench is an interactive teaching workbench for exploring how metadata makes Knowledge Objects carrying computable biomedical knowledge (CBK) **findable, accessible, interoperable, and reusable**. Learners inspect real objects, improve their descriptions, compare perspectives on making objects exhibit the FAIR principles, run supported implementations in the browser, and export the resulting package. Instructors gain a concrete way to move the conversation from abstract principles about metadata to observable consequences from creating and using it.
