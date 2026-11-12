@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
+import { deflateRawSync } from "node:zlib";
 import { Script } from "node:vm";
 import { Parser } from "n3";
 import ts from "typescript";
@@ -13,8 +14,10 @@ import { validatePackageMetadata } from "./validate-package-metadata.mjs";
 import { validateAnnotationDestinations } from "../app/annotation-destination-validator.js";
 import { publishStagedKos } from "./publish-staged-kos.mjs";
 
-const [zipPath, version] = process.argv.slice(2);
-if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version>");
+const [zipPath, version, mode] = process.argv.slice(2);
+const singleObject = mode === "--single-object";
+if (mode && !singleObject) throw new Error("Unknown package mode: " + mode);
+if (!zipPath || !version) throw new Error("Usage: node scripts/update-embedded-kos.mjs <archive.zip> <version> [--single-object]");
 
 const workspace = process.cwd();
 const temp = mkdtempSync(join(tmpdir(), "fdo-bench-kos-"));
@@ -64,6 +67,13 @@ function validateStagedCode(react, standalone) {
 }
 
 function declaredObjectName(object) {
+  if (!object.workshop) {
+    const title = object.metadata?.["dc:title"];
+    if (typeof title !== "string" || !title.trim()) {
+      throw new Error(`${object.folderName}: metadata.json must declare a nonempty dc:title`);
+    }
+    return title.trim();
+  }
   const source = object.readText(object.workshop.findabilityPath);
   const statements = new Parser({ format: "text/turtle" }).parse(source);
   const identifier = `workshop-ko-${object.workshop.number}`;
@@ -77,14 +87,17 @@ try {
   execFileSync("unzip", ["-q", zipPath, "-d", temp]);
   let root = temp;
   const rootEntries = readdirSync(root, { withFileTypes: true }).filter((entry) => !ignored(entry.name));
-  if (rootEntries.length === 1 && rootEntries[0].isDirectory()) root = join(root, rootEntries[0].name);
+  if (!singleObject && rootEntries.length === 1 && rootEntries[0].isDirectory()) root = join(root, rootEntries[0].name);
 
-  const candidates = readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !ignored(entry.name));
+  const candidates = singleObject && existsSync(join(root, "metadata.json"))
+    ? [{ name: "knowledge-object", packageRoot: root }]
+    : readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !ignored(entry.name));
+  if (singleObject && candidates.length !== 1) throw new Error("Expected one knowledge-object package");
   const discovered = candidates.map((entry) => {
-    const folderPath = join(root, entry.name);
+    const folderPath = entry.packageRoot ?? join(root, entry.name);
     const paths = walk(folderPath);
     const files = paths.map((path) => relative(folderPath, path).split("\\").join("/"));
-    return { entry, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
+    return { entry, folderPath, folderName: entry.name, files, readText: (file) => readFileSync(join(folderPath, file), "utf8") };
   });
   const { knowledgeObjects, knowledgeAssembly } = partitionKnowledgePackages(discovered);
   // Reject unresolved identifiers before clearing assets or rewriting either edition.
@@ -94,14 +107,19 @@ try {
     catch (error) { metadataErrors.push(error instanceof Error ? error.message : String(error)); }
   }
   if (metadataErrors.length) throw new Error(`Metadata validation failed:\n${metadataErrors.join("\n")}`);
-  const orderedObjects = orderWorkshopObjects(knowledgeObjects);
+  if (singleObject && knowledgeObjects.length !== 1) throw new Error("Expected one KO and no KA");
+  const orderedObjects = singleObject
+    ? knowledgeObjects.map((object) => ({
+      ...object, metadata: JSON.parse(object.readText("metadata.json")),
+    }))
+    : orderWorkshopObjects(knowledgeObjects);
   const folders = orderedObjects.map((object) => object.entry);
   if (folders.length < 1 || folders.length > 10) throw new Error(`Expected 1–10 KO folders; found ${folders.length}`);
   const folderNames = folders.map((folder) => folder.name);
   const displayNames = orderedObjects.map(declaredObjectName);
   const annotationDestinationRecords = {};
   for (const [index, object] of [...orderedObjects, ...(knowledgeAssembly ? [knowledgeAssembly] : [])].entries()) {
-    const folderPath = join(root, object.folderName);
+    const folderPath = object.folderPath;
     const metadata = JSON.parse(object.readText("metadata.json"));
     const passageTextCache = new Map();
     const results = validateAnnotationDestinations(metadata, {
@@ -139,19 +157,25 @@ try {
   })() : null;
 
   const textFiles = {};
+  const compressedText = {};
   const binaryFiles = {};
   const serverBinaryFiles = {};
   const serverStaticFiles = {};
   const documentProjections = {};
   const serverKoAssetRoot = join(stagingRoot, "ko-assets");
   mkdirSync(serverKoAssetRoot);
-  folders.forEach((folder, index) => {
-    const folderPath = join(root, folder.name);
+  orderedObjects.forEach(({ folderPath, metadata }, index) => {
     for (const path of walk(folderPath).sort()) {
       if (!statSync(path).isFile()) continue;
       const key = `${index + 1}/${relative(folderPath, path).split("\\").join("/")}`;
       const buffer = readFileSync(path);
-      if (looksText(buffer)) textFiles[key] = buffer.toString("utf8");
+      if (looksText(buffer)) {
+        if (buffer.byteLength > 256_000 && singleObject) {
+          compressedText[key] = { base64: deflateRawSync(buffer).toString("base64"), byteLength: buffer.byteLength };
+        } else {
+          textFiles[key] = buffer.toString("utf8");
+        }
+      }
       else {
         binaryFiles[key] = buffer.toString("base64");
         if (/\.pdf$/i.test(path)) {
@@ -169,7 +193,7 @@ try {
         if (/\.docx$/i.test(path)) {
           const projection = convertDocxToProjection({
             docxPath: path,
-            knowledgeObjectId: `workshop-ko-${index + 1}`,
+            knowledgeObjectId: metadata?.["@id"] ?? `workshop-ko-${index + 1}`,
             originalPath: relative(folderPath, path).split("\\").join("/"),
           });
           documentProjections[key] = projection;
@@ -191,6 +215,9 @@ try {
   generated = replaceExactly(generated, /^const EMBEDDED_ASSEMBLY: EmbeddedAssembly \| null = [^\n]+;/m, `const EMBEDDED_ASSEMBLY: EmbeddedAssembly | null = ${serializeForScript(assemblyPayload)};`, "server assembly payload");
   generated = replaceExactly(generated, /^const objectFileOverrides: Record<string, string> = \{[\s\S]*?^\};\n^const objectBinaryOverrides:/m, `const objectFileOverrides: Record<string, string> = ${serializeForScript(textFiles, 2)};\nconst objectBinaryOverrides:`, "server text payload");
   generated = replaceExactly(generated, /^const objectBinaryOverrides: Record<string, string> = \{[\s\S]*?^export \{/m, `const objectBinaryOverrides: Record<string, string> = ${serializeForScript(serverBinaryFiles, 2)};\nconst objectStaticAssetOverrides: Record<string, { url: string; byteLength: number }> = ${serializeForScript(serverStaticFiles, 2)};\nconst documentProjectionOverrides: Record<string, unknown> = ${serializeForScript(packagedDocumentProjections.serverRecords, 2)};\nexport {`, "server binary, static-asset, and document-projection payloads");
+  const compressedData = serializeForScript(compressedText);
+  generated = replaceExactly(generated, /^const compressedTextOverrides = [\s\S]*?;\n(?=const objectFileOverrides:)/m,
+    `const compressedTextOverrides = ${compressedData};\n`, "server compressed text payload");
   const stagedGeneratedPath = join(stagingRoot, "generated-ko-data.ts");
   writeFileSync(stagedGeneratedPath, generated);
 
@@ -200,16 +227,29 @@ try {
   standalone = standalone.replace(/const objectFolderNames=\[[^\n]+\];/, `const objectFolderNames=${JSON.stringify(folderNames)};`);
   standalone = replaceExactly(standalone, /^const objectDisplayNames=\[[^\n]+\];/m, `const objectDisplayNames=${JSON.stringify(displayNames)};`, "standalone metadata display names");
   standalone = replaceExactly(standalone, /^const annotationDestinationOverrides=[^\n]+;$/m, `const annotationDestinationOverrides=${serializeForScript(annotationDestinationRecords)};`, "standalone annotation destinations");
-  standalone = replaceExactly(standalone, /^const embeddedAssembly=[^\n]+;/m, `const embeddedAssembly=${serializeForScript(assemblyPayload).replaceAll("</script", "<\\/script")};`, "standalone assembly payload");
-  standalone = standalone.replace(/const dataVersion="[^"]+"/, `const dataVersion="${version}"`);
-  const safeText = serializeForScript(textFiles).replaceAll("</script", "<\\/script");
+  standalone = replaceExactly(standalone, /^const embeddedAssembly=[^\n]+;/m, `const embeddedAssembly=${serializeForScript(assemblyPayload).replace(/<\/script/gi, (tag) => "<\\" + tag.slice(1))};`, "standalone assembly payload");
+  standalone = standalone.replace(/const dataVersion="[^"]+"/, `const dataVersion=${JSON.stringify(version)}`);
+  const safeText = serializeForScript(textFiles).replace(/<\/script/gi, (tag) => "<\\" + tag.slice(1));
   const safeBinary = serializeForScript(binaryFiles);
   standalone = replaceExactly(
     standalone,
     /^const overrides=\{[\s\S]*?^const base64ToBytes=/m,
-    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst documentProjectionOverrides=${serializeForScript(packagedDocumentProjections.standaloneRecords).replaceAll("</script", "<\\/script")};\nconst base64ToBytes=`,
+    `const overrides=${safeText};\nconst objectBinaryOverrides=${safeBinary};\nconst documentProjectionOverrides=${serializeForScript(packagedDocumentProjections.standaloneRecords).replace(/<\/script/gi, (tag) => "<\\" + tag.slice(1))};\nconst base64ToBytes=`,
     "standalone embedded payloads"
   );
+  const inflater = readFileSync(join(workspace, "node_modules/fflate/umd/index.js"), "utf8");
+  const inflaterLicense = readFileSync(join(workspace, "node_modules/fflate/LICENSE"), "utf8");
+  const embeddedText = readFileSync(join(workspace, "app/embedded-text.js"), "utf8").replace(/^export /gm, "");
+  const compressedBlock = [
+    "/* EMBEDDED_TEXT_START */",
+    ...(Object.keys(compressedText).length ? [`/* fflate 0.7.4\n${inflaterLicense}*/`, inflater] : []),
+    embeddedText,
+    `const compressedTextOverrides = ${compressedData};`,
+    "installEmbeddedText(overrides, compressedTextOverrides, globalThis.fflate?.inflateSync);",
+    "/* EMBEDDED_TEXT_END */",
+  ].join("\n");
+  standalone = replaceExactly(standalone, /\/\* EMBEDDED_TEXT_START \*\/[\s\S]*?\/\* EMBEDDED_TEXT_END \*\//m,
+    compressedBlock, "standalone compressed text payload");
   const stagedStandalonePath = join(stagingRoot, "Knowledge-Object-Workbench.html");
   writeFileSync(stagedStandalonePath, standalone);
 

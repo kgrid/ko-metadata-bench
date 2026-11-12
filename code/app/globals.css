@@ -2118,3 +2118,16 @@ textarea:focus { outline-offset: -3px; }
 }
 :is(.koObjectShade, .metadataRigCard, .resultGroup, .accessibilityCard) > summary :is(.koShadeGraphic, .metadataInteractButton, .knowledgeTabExplore, .findabilityAuditButton, .resultCount, .interoperabilityStagesButton):focus-visible,
 .assemblyObjectBar > button:focus-visible { outline: 2px solid #636366; outline-offset: 2px; }
+
+.koFilePicker {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+}
+.koFilePicker select {
+  width: 100%;
+  min-width: 0;
+}
+.filesReturnButton[hidden] { display: none; }

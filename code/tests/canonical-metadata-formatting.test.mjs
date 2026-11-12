@@ -68,7 +68,7 @@ test("both editions retain the canonical-template formatting implementation", as
   const [renderer, standalone] = await Promise.all([readFile(rendererUrl, "utf8"), readFile(standaloneUrl, "utf8")]);
   assert.match(renderer, /export function renderFindabilityCanonicalTemplate/);
   assert.match(renderer, /export function renderReusabilityCanonicalTemplate/);
-  assert.match(standalone, /findabilityEnrichmentBaseline=assertControlledMetadataEquivalence\("findability",findabilityEnrichmentCanonicalSource,renderFindabilityCanonicalTemplate/);
-  assert.match(standalone, /reusabilityEnrichmentBaseline=assertControlledMetadataEquivalence\("reusability",reusabilityEnrichmentCanonicalSource,renderReusabilityCanonicalTemplate/);
+  assert.match(standalone, /findabilityEnrichmentBaseline=findabilityEnrichmentCanonicalSource\?assertControlledMetadataEquivalence\("findability",findabilityEnrichmentCanonicalSource,renderFindabilityCanonicalTemplate/);
+  assert.match(standalone, /reusabilityEnrichmentBaseline=reusabilityEnrichmentCanonicalSource\?assertControlledMetadataEquivalence\("reusability",reusabilityEnrichmentCanonicalSource,renderReusabilityCanonicalTemplate/);
   assert.match(standalone, /schema:hasDefinedTerm\\n\$\{selectedOutputs\.map/);
 });

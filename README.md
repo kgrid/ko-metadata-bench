@@ -1,6 +1,14 @@
 # FDO Bench: make metadata matter
 
-## Try it out!
+## CMS108 preview on this branch
+
+This branch packages one work-in-progress CMS108 Knowledge Object for educational inspection. Open the local single-file edition at `code/outputs/Knowledge-Object-Workbench.html`, or run the server from `code` with `npm run build` followed by `npm run start -- --port 3112 --hostname 127.0.0.1`.
+
+The file explorer and Metadata Rig expose the packaged sources and core metadata. The KO has no browser Runner, standalone information page, launchable notebooks, graphic abstract, or FAIR facet files. The embedded CLI and test results can be inspected as files. The bench has no assembly in this collection.
+
+The following link opens the existing published bench.
+
+## Published bench
 <a href="https://kgrid.org/ko-metadata-bench/code/outputs/Knowledge-Object-Workbench.html" target="_blank" rel="noopener noreferrer">
   FDO Bench, standalone edition
 </a>
@@ -20,7 +28,7 @@ FDO Bench is an interactive teaching workbench for exploring how metadata makes 
 | Execute | Run compatible JavaScript KOs inside a bounded browser sandbox |
 | Export | Download the embedded object—or your working version—with a checksum-backed receipt |
 
-The bench includes four clinical Knowledge Objects spanning diabetic foot ulcer severity, prognosis, hyperbaric oxygen treatment decisions, and regimen burden. They are substantive examples rather than empty templates: each gives learners something worth finding, interpreting, trusting, and reusing.
+The original workshop collection is available to the regression tests. Tests restore its KO and KA payloads in a temporary fixture and exercise them with the current bench code.
 
 ## Why it matters
 

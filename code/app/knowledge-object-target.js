@@ -23,8 +23,9 @@ export function identifiersFromMetadataJson(source) {
   }
 }
 
-export function resolveObjectIdByIdentifier(objectIds, readMetadataJson, identifier) {
+export function resolveObjectIdByIdentifier(objectIds, readMetadataJson, identifier, { optional = false } = {}) {
   const matches = objectIds.filter((objectId) => identifiersFromMetadataJson(readMetadataJson(objectId)).includes(identifier));
+  if (optional && matches.length === 0) return null;
   if (matches.length !== 1) {
     throw new Error(`Knowledge-object identifier ${JSON.stringify(identifier)} matched ${matches.length} embedded objects; exactly one is required.`);
   }

@@ -139,3 +139,28 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+
+## CMS108 preview on `cms108ko`
+
+The two editions contain the same 1,226 files from `CMS108KOf.zip` after
+excluding macOS archive bookkeeping. The original `metadata.json` is preserved.
+Large text files are compressed in the build and read on demand. The file reader
+shows a bounded preview and the embedded export retains the full file.
+
+To refresh the package from its source ZIP, run from this directory:
+
+```sh
+node scripts/update-embedded-kos.mjs /path/to/CMS108KOf.zip cms108-wip --single-object
+npm run build
+```
+
+Open `outputs/Knowledge-Object-Workbench.html` directly for the standalone
+edition. For the server edition, run `npm run start -- --port 3112 --hostname
+127.0.0.1` and open `http://127.0.0.1:3112/`.
+
+`npm run test:regression` checks CMS108 package integrity and runs the existing
+workshop regression suite in a temporary fixture. The fixture needs the
+original workshop commit in local Git history. `npm run test:parity:cms108:built`
+runs the CMS108 browser checks after a build. The visual parity suite retains
+the original workshop screenshots and uses the workshop fixture.

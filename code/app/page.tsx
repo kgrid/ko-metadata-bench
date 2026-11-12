@@ -6,7 +6,7 @@ import { Parser } from "n3";
 import { createKnowledgeObjectAccessApi } from "./ko-access.js";
 import { constructFindabilityMetadata, createFindabilityEnrichmentBaseline, evaluateFindabilityEnrichment, FINDABILITY_ENRICHMENT_FILE, FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, getCanonicalFindabilityName, getFindabilityEnrichmentInput, getFindabilityOutputTermOptions, getFindabilitySubjectOptions, getFindabilityTextValues, getFindabilityUnlockState, getSelectedFindabilityOutputTerms, getSelectedFindabilitySubjects } from "./findability-enrichment.js";
 import { constructReusabilityMetadata, createReusabilityEnrichmentBaseline, evaluateReusabilityEnrichment, getReusabilityEnrichmentInput, getReusabilityEvidencePresentationOptions, getReusabilityLicenseOptions, getReusabilityScopeText, getReusabilityUnlockState, getSelectedReusabilityEvidence, getSelectedReusabilityLicenses, REUSABILITY_ENRICHMENT_FILE, REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER } from "./reusability-enrichment.js";
-import { resolveObjectIdByIdentifier } from "./knowledge-object-target.js";
+import { identifiersFromMetadataJson, resolveObjectIdByIdentifier } from "./knowledge-object-target.js";
 import { loadInteroperabilityExerciseKit } from "./interoperability-exercise.js";
 import { createInteroperabilitySimulationHost, fixtureReplaySimulationBinding } from "./interoperability-simulation.js";
 import { establishKo4CanonicalTurtleTemplates } from "./metadata-turtle-templates.js";
@@ -35,7 +35,9 @@ import { createAcronymBubbleBehavior } from "./acronym-bubble-behavior.js";
 import { createAcronymBubbleElement, positionAcronymBubble } from "./acronym-bubble-view.js";
 import { installAcronymBannerBubbles } from "./acronym-bubble-attachment.js";
 import { markVerifiedPassage } from "./passage-navigation.js";
-import { OBJECT_FOLDER_NAMES, OBJECT_DISPLAY_NAMES, annotationDestinationOverrides, EMBEDDED_ASSEMBLY, objectFileOverrides, objectBinaryOverrides, objectStaticAssetOverrides, documentProjectionOverrides } from "./generated-ko-data";
+import { inflateSync } from "fflate";
+import { installEmbeddedText, previewEmbeddedText } from "./embedded-text.js";
+import { compressedTextOverrides, OBJECT_FOLDER_NAMES, OBJECT_DISPLAY_NAMES, annotationDestinationOverrides, EMBEDDED_ASSEMBLY, objectFileOverrides, objectBinaryOverrides, objectStaticAssetOverrides, documentProjectionOverrides } from "./generated-ko-data";
 
 const FILTERED_FILES = [
   "findability.metadata.txt",
@@ -93,7 +95,7 @@ const KO_ACCESS_OBJECTS = EMBEDDED_RESOURCE_IDS.map((sourceIndex) => ({
   id: sourceIndex === ASSEMBLY_OBJECT_ID ? EMBEDDED_ASSEMBLY?.generalView?.identifier ?? objectFolderName(sourceIndex) : objectFolderName(sourceIndex),
   name: objectName(sourceIndex),
   sourceIndex,
-  aliases: [sourceIndex, String(sourceIndex), objectFolderName(sourceIndex), objectName(sourceIndex), legacyFolderAlias(objectFolderName(sourceIndex)), ...(sourceIndex === ASSEMBLY_OBJECT_ID ? [EMBEDDED_ASSEMBLY?.generalView?.identifier ?? ""] : [])],
+  aliases: [sourceIndex, String(sourceIndex), objectFolderName(sourceIndex), objectName(sourceIndex), legacyFolderAlias(objectFolderName(sourceIndex)), ...identifiersFromMetadataJson(objectFileOverrides[`${sourceIndex}/metadata.json`] ?? ""), ...(sourceIndex === ASSEMBLY_OBJECT_ID ? [EMBEDDED_ASSEMBLY?.generalView?.identifier ?? ""] : [])],
 }));
 const draftKey = (id: ObjectId, file: FileName) => `${id}/${file}`;
 const openEmbeddedInformationPage = (id: ObjectId) => {
@@ -101,6 +103,8 @@ const openEmbeddedInformationPage = (id: ObjectId) => {
   window.open(pageUrl, "_blank", "noopener,noreferrer");
   window.setTimeout(() => URL.revokeObjectURL(pageUrl), 60_000);
 };
+installEmbeddedText(objectFileOverrides, compressedTextOverrides, inflateSync);
+const compressedSizes: Record<string, { byteLength: number }> = compressedTextOverrides;
 const base64ToBytes = (encoded: string) => Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
 if (EMBEDDED_ASSEMBLY) {
   for (const [file, source] of Object.entries(EMBEDDED_ASSEMBLY.textFiles)) objectFileOverrides[`${ASSEMBLY_OBJECT_ID}/${file}`] = source;
@@ -158,16 +162,16 @@ const findabilityFilesForObject = (id: ObjectId) => resolveObjectResource(id, FI
 const metadataFilesForObject = (id: ObjectId) => FILTERED_FILES.filter((file) => Boolean(resolveObjectResource(id, file)));
 const canonicalSeedValue = (id: ObjectId, file: FileName) => objectFileOverrides[draftKey(id, resolveObjectResource(id, file) ?? file)] ?? "";
 const runnerAvailabilityByObject = discoverKnowledgeObjectRunners(EMBEDDED_RESOURCE_IDS, filesForObject, canonicalSeedValue);
-const findabilityEnrichmentTargetObjectId = resolveObjectIdByIdentifier(OBJECT_IDS, (id: ObjectId) => canonicalSeedValue(id, "metadata.json"), FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER) as ObjectId;
-const reusabilityEnrichmentTargetObjectId = resolveObjectIdByIdentifier(OBJECT_IDS, (id: ObjectId) => canonicalSeedValue(id, "metadata.json"), REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER) as ObjectId;
-const ko4CanonicalTurtleTemplates = establishKo4CanonicalTurtleTemplates({
+const findabilityEnrichmentTargetObjectId = resolveObjectIdByIdentifier(OBJECT_IDS, (id: ObjectId) => canonicalSeedValue(id, "metadata.json"), FINDABILITY_ENRICHMENT_TARGET_IDENTIFIER, { optional: true }) as ObjectId | null;
+const reusabilityEnrichmentTargetObjectId = resolveObjectIdByIdentifier(OBJECT_IDS, (id: ObjectId) => canonicalSeedValue(id, "metadata.json"), REUSABILITY_ENRICHMENT_TARGET_IDENTIFIER, { optional: true }) as ObjectId | null;
+const ko4CanonicalTurtleTemplates = findabilityEnrichmentTargetObjectId !== null && reusabilityEnrichmentTargetObjectId !== null ? establishKo4CanonicalTurtleTemplates({
   findability: canonicalSeedValue(findabilityEnrichmentTargetObjectId, FINDABILITY_ENRICHMENT_FILE),
   reusability: canonicalSeedValue(reusabilityEnrichmentTargetObjectId, REUSABILITY_ENRICHMENT_FILE),
-});
-const findabilityEnrichmentCanonicalSource = ko4CanonicalTurtleTemplates.findability.source;
-const findabilityEnrichmentBaseline = createFindabilityEnrichmentBaseline(findabilityEnrichmentCanonicalSource);
-const reusabilityEnrichmentCanonicalSource = ko4CanonicalTurtleTemplates.reusability.source;
-const reusabilityEnrichmentBaseline = createReusabilityEnrichmentBaseline(reusabilityEnrichmentCanonicalSource);
+}) : null;
+const findabilityEnrichmentCanonicalSource = ko4CanonicalTurtleTemplates?.findability.source ?? "";
+const findabilityEnrichmentBaseline = findabilityEnrichmentCanonicalSource ? createFindabilityEnrichmentBaseline(findabilityEnrichmentCanonicalSource) : "";
+const reusabilityEnrichmentCanonicalSource = ko4CanonicalTurtleTemplates?.reusability.source ?? "";
+const reusabilityEnrichmentBaseline = reusabilityEnrichmentCanonicalSource ? createReusabilityEnrichmentBaseline(reusabilityEnrichmentCanonicalSource) : "";
 const seedValue = (id: ObjectId, file: FileName) => id === findabilityEnrichmentTargetObjectId && file === FINDABILITY_ENRICHMENT_FILE ? findabilityEnrichmentBaseline : id === reusabilityEnrichmentTargetObjectId && file === REUSABILITY_ENRICHMENT_FILE ? reusabilityEnrichmentBaseline : canonicalSeedValue(id, file);
 const workingFileValue = (id: ObjectId, file: FileName, drafts: Drafts) => Object.hasOwn(drafts, draftKey(id, file)) ? String(drafts[draftKey(id, file)]) : seedValue(id, file);
 const completedMetadataFilesForObject = (id: ObjectId, drafts: Drafts) => metadataFilesForObject(id).filter((file) => {
@@ -1709,6 +1713,8 @@ function knowledgeObjectByteSize(objectId: ObjectId) {
   const encoder = new TextEncoder();
   return filesForObject(objectId).reduce((total, file) => {
     const key = draftKey(objectId, file);
+    const compressed = compressedSizes[key];
+    if (compressed) return total + compressed.byteLength;
     const staticAsset = objectStaticAssetOverrides[key];
     if (staticAsset !== undefined) return total + staticAsset.byteLength;
     const binary = objectBinaryOverrides[key];
@@ -1824,7 +1830,7 @@ function cksSummaryFile(files: readonly FileName[]) {
     const leftPriority = /one[-_ ]page/.test(left.toLowerCase()) ? 0 : 1;
     const rightPriority = /one[-_ ]page/.test(right.toLowerCase()) ? 0 : 1;
     return leftPriority - rightPriority || left.localeCompare(right);
-  })[0] ?? files[0] ?? "";
+  })[0] ?? files.find((file) => file === "README.md") ?? files[0] ?? "";
 }
 function fullCksDocumentFile(files: readonly FileName[]) {
   const documents = files.filter((file) => /\.docx$/i.test(file) && /(?:^|[\/_-])cks(?:[\/_-]|$)/i.test(file));
@@ -2030,7 +2036,15 @@ function KnowledgeObjectExplorer({ objectId, drafts, compact = false, showFilesR
       </section>}
       <div className="koFilesFace" aria-hidden={Boolean(graphicAbstract && !showFiles)}>
         <div className="koMap"><div className="koMapCanvas">{focusedLayer && <><button type="button" className="koAllRingsButton" onClick={() => { setFocusedLayerId(null); setHoveredFormat(null); }}>All Rings</button><span className="koFocusedCount" aria-label={`${focusedLayer.files.length} ${focusedLayer.label} files`}>{focusedLayer.files.length}<small>{focusedLayer.label}</small></span></>}<canvas ref={canvasRef} tabIndex={showFiles ? 0 : -1} aria-label={`${objectName(objectId)} four-layer circular file map: Metadata, Docs, Code, and Tests. Select a category label to isolate its ring. Use All Rings, 0, or Escape to restore all rings.`} />{hoveredFormat && <span className="koFormatHover" style={{ left: hoveredFormat.left, top: hoveredFormat.top }}>{hoveredFormat.token}</span>}</div></div>
-        <section className="koReader" aria-label={`Read-only contents of ${selectedFile}`}><header><div className="koReaderTitle"><strong>{selectedFile}</strong><small>{selectedLayer.label} · {fileFormatLabel(selectedFile)}</small></div>{selectedDocumentAvailable ? <div className="koReaderActions"><button type="button" className="koViewFileButton" onClick={() => setDocumentOpen(true)}>View Document</button>{selectedDocumentOriginalAvailable && <button type="button" className="koDownloadFileButton" onClick={() => downloadOriginalDocument(objectId, selectedFile)}>Download Original</button>}</div> : selectedPdfAvailable ? <button type="button" className="koViewPdfButton" onClick={() => setPdfOpen(true)}>View PDF</button> : <span>Read only</span>}</header><pre><code>{content}</code></pre></section>
+        <section className="koReader" aria-label={`Read-only contents of ${selectedFile}`}>
+          {objectFiles.length > 200 && <label className="koFilePicker">Browse files
+            <select value={selectedFile} onChange={(event) => setSelectedFile(event.target.value)}>
+              {layeredFiles.map((layer) => <optgroup key={layer.id} label={layer.label}>
+                {layer.files.map((file) => <option key={file} value={file}>{file}</option>)}
+              </optgroup>)}
+            </select>
+          </label>}
+          <header><div className="koReaderTitle"><strong>{selectedFile}</strong><small>{selectedLayer.label} · {fileFormatLabel(selectedFile)}</small></div>{selectedDocumentAvailable ? <div className="koReaderActions"><button type="button" className="koViewFileButton" onClick={() => setDocumentOpen(true)}>View Document</button>{selectedDocumentOriginalAvailable && <button type="button" className="koDownloadFileButton" onClick={() => downloadOriginalDocument(objectId, selectedFile)}>Download Original</button>}</div> : selectedPdfAvailable ? <button type="button" className="koViewPdfButton" onClick={() => setPdfOpen(true)}>View PDF</button> : <span>Read only</span>}</header><pre><code>{previewEmbeddedText(content || (objectBinaryOverrides[draftKey(objectId, selectedFile)] && !selectedPdfAvailable ? "Binary file. Export the embedded KO to access the original." : ""))}</code></pre></section>
       </div>
     </div>
   </article>{abstractOpen && createPortal(<KnowledgeObjectGraphicView objectId={objectId} source={abstractSource} purpose={purpose} kind="overview" onClose={() => setAbstractOpen(false)} />, document.body)}{pdfOpen && createPortal(<EmbeddedEvidenceDialog objectId={objectId} file={selectedFile} onClose={() => setPdfOpen(false)} />, document.body)}{documentOpen && selectedDocumentProjection && createPortal(<DocumentProjectionDialog objectId={objectId} file={selectedFile} projection={selectedDocumentProjection} onClose={() => setDocumentOpen(false)} />, document.body)}</>;
@@ -2049,7 +2063,7 @@ function KnowledgeObjectShade({ objectId, drafts }: { objectId: ObjectId; drafts
   const fullCksProjection = fullCksFile ? documentProjectionFor(objectId, fullCksFile) : undefined;
   const notebooks = knowledgeObjectNotebooks(objectId, drafts);
   const summaryFacts = [
-    ["Information Page", "A fully metadata-driven overview"],
+    ...(filesForObject(objectId).includes("index.html") ? [["Information Page", "A fully metadata-driven overview"]] : []),
     ["Size", formatKnowledgeObjectSize(knowledgeObjectByteSize(objectId))],
     ["Knowledge Elements", knowledgeElementCount(objectId, drafts)],
     ["Method", knowledgeObjectMethod(objectId, drafts)],
@@ -2259,7 +2273,7 @@ function WorkspacePane({
         <div className="editorColumn">
           <div className="editorBar">
             {modified && <button className="editorControlButton editorResetButton" type="button" onClick={() => setResetConfirmationOpen(true)}>Reset</button>}
-            {file === "metadata.json" && <button className="informationPageButton" type="button" onClick={() => openEmbeddedInformationPage(objectId)}>Information Page</button>}
+            {file === "metadata.json" && filesForObject(objectId).includes("index.html") && <button className="informationPageButton" type="button" onClick={() => openEmbeddedInformationPage(objectId)}>Information Page</button>}
             {PRINCIPLES_LABELS[file] && <button className={principlesOpen ? "informationPageButton active" : "informationPageButton"} type="button" aria-expanded={principlesOpen} aria-controls="principles-control-row" onClick={() => setPrinciplesOpen((open) => { if (open) { setUniqueKoIdOnly(false); setUniqueKoMetadataIdOnly(false); setKoAccessOnly(false); setKoMetadataAccessOnly(false); setSpecifiedInterfaceOnly(false); setObjectReferencesOnly(false); setLicenseOnly(false); setDependenciesOnly(false); } return !open; })}>{PRINCIPLES_LABELS[file]}</button>}
             <div className="editorControls">
               {isTurtle && !metadataNeedsGuidedEntry && <button className="editorControlButton" type="button" onClick={() => setRelationshipOpen(true)} disabled={turtleDiagnostics.length > 0} title={turtleDiagnostics.length ? "Correct the Turtle source before graphing it" : undefined}>Graph</button>}
@@ -2621,8 +2635,8 @@ export default function Home() {
             </div>
               <span className="contextLabel">Metadata Exercises</span>
             </div>
-            <div className="contextDestinations" aria-label="Knowledge assembly controls">
-              <button type="button" className={`filesReturnButton ${workspaceView === "assembly" ? "activeDestination" : ""}`} aria-pressed={workspaceView === "assembly"} disabled={!EMBEDDED_ASSEMBLY} onClick={() => { setActiveExercise(null); setWorkspaceView("assembly"); }}>Knowledge Assembly</button>
+            <div className="contextDestinations" aria-label="Knowledge assembly controls" hidden={!EMBEDDED_ASSEMBLY}>
+              <button type="button" className={`filesReturnButton ${workspaceView === "assembly" ? "activeDestination" : ""}`} aria-pressed={workspaceView === "assembly"} hidden={!EMBEDDED_ASSEMBLY} disabled={!EMBEDDED_ASSEMBLY} onClick={() => { setActiveExercise(null); setWorkspaceView("assembly"); }}>Knowledge Assembly</button>
             </div>
           </div>
         </div>
@@ -2775,7 +2789,8 @@ export default function Home() {
         <span className="footerDivider" />
         <nav className="footerRepositories" aria-label="Source repositories">
           <a href="https://github.com/kgrid/ko-metadata-bench" target="_blank" rel="noopener noreferrer">Workbench repository</a>
-          <a href="https://github.com/kgrid-objects/FAIR-DO-Workshop" target="_blank" rel="noopener noreferrer">KO and KA repository</a>
+          <a href="https://github.com/gauravcb99/CMS108-VTE-Prophylaxis-KO/tree/main" target="_blank" rel="noopener noreferrer">KO repository</a>
+          {!EMBEDDED_ASSEMBLY && <span>Educational use only. No clinical use.</span>}
         </nav>
       </footer>
       {abstractOpen && <AbstractDialog onClose={() => setAbstractOpen(false)} />}
