@@ -9,7 +9,7 @@ import { installEmbeddedText, previewEmbeddedText } from "../app/embedded-text.j
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const server = read("../app/generated-ko-data.ts");
 const standalone = read("../outputs/Knowledge-Object-Workbench.html");
-const attachmentDigest = "ca2c00cbddfadcc995c603e7fd75427fd0fb1cffcb25ba9bae5a96a645a4c6ab";
+const attachmentDigest = "8ef9edf1b262881413bae563f061b7f194f8bdb806d6758ab46b4094bf955980";
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 function literal(source, name) {
@@ -30,7 +30,7 @@ for (const [edition, source, filesName, foldersName, assemblyName] of [
     const binaries = literal(source, "objectBinaryOverrides");
     installEmbeddedText(files, literal(source, "compressedTextOverrides"), inflateSync);
     const paths = [...Object.keys(files), ...Object.keys(binaries)].sort();
-    assert.equal(paths.length, 1226);
+    assert.equal(paths.length, 1227);
     assert.ok(paths.every((path) => path.startsWith("1/")));
     const manifest = paths.map((key) => {
       const bytes = Object.hasOwn(binaries, key) ? Buffer.from(binaries[key], "base64") : files[key];
@@ -39,7 +39,7 @@ for (const [edition, source, filesName, foldersName, assemblyName] of [
     assert.equal(sha256(manifest), attachmentDigest);
     assert.equal(JSON.parse(files["1/metadata.json"])["@type"], "KnowledgeObject");
     assert.ok(!Object.hasOwn(files, "1/runner/runner.manifest.json"));
-    const largePath = paths.find((path) => path.endsWith("dqm_vs_20251117.json"));
+    const largePath = paths.find((path) => path.endsWith("CMS108FHIR-v1.0.000-FHIR.json"));
     assert.match(previewEmbeddedText(files[largePath]), /Preview truncated/);
   });
 }

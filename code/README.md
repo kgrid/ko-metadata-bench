@@ -143,8 +143,10 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 
 ## CMS108 preview on `cms108ko`
 
-The two editions contain the same 1,226 files from `CMS108KOf.zip` after
-excluding macOS archive bookkeeping. The original `metadata.json` is preserved.
+The two editions contain the same 1,227 files from `CMS108KOf.zip` after
+excluding macOS archive bookkeeping. The embedded `metadata.json` is the
+original except that its two `valuesets/vsac-20251117/` entries were removed,
+because licensed VSAC value sets are not embedded.
 Large text files are compressed in the build and read on demand. The file reader
 shows a bounded preview and the embedded export retains the full file.
 
