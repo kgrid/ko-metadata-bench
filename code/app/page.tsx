@@ -832,7 +832,35 @@ const FINDABILITY_AUDIT_DEFINITIONS: FindabilityAuditDefinition[] = [
   { term: "JavaScript", expectedObjects: [1, 2, 3, 4], rationales: { 1: "Can this classification KO be found by its declared JavaScript implementation?", 2: "Can this treatment-decision KO be found by its declared JavaScript implementation?", 3: "Can this treatment-burden KO be found by its declared JavaScript implementation?", 4: "Can this prognostic KO be found by its declared JavaScript implementation?" } },
   { term: "knowledge object", expectedObjects: [1, 2, 3, 4], rationales: { 1: "Can this classification resource be found because its metadata identify it as a knowledge object?", 2: "Can this treatment-decision resource be found because its metadata identify it as a knowledge object?", 3: "Can this treatment-burden resource be found because its metadata identify it as a knowledge object?", 4: "Can this prognostic resource be found because its metadata identify it as a knowledge object?" } },
 ];
+// A KO may supply its own audit as [{ term, expected, rationale }]; otherwise the workshop definitions above apply.
+const FINDABILITY_AUDIT_FILE = "auxiliary/aux-extra-metadata/findability.audit.json";
+function objectFindabilityAudit(objectId: ObjectId): { term: string; expected: boolean; rationale: string }[] | null {
+  const source = objectFileOverrides[draftKey(objectId, FINDABILITY_AUDIT_FILE)];
+  if (source === undefined) return null;
+  try {
+    const entries: unknown = JSON.parse(source);
+    if (!Array.isArray(entries) || !entries.length) throw new Error("expected a non-empty array");
+    const terms = new Set<string>();
+    return entries.map((value: unknown, index) => {
+      const entry = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
+      const { term, expected, rationale } = entry;
+      if (typeof term !== "string" || !term.trim() || typeof expected !== "boolean" || typeof rationale !== "string" || !rationale.trim()) throw new Error(`entry ${index + 1} needs a nonempty term, a boolean expected and a nonempty rationale`);
+      if (terms.has(term)) throw new Error(`duplicate term "${term}"`);
+      terms.add(term);
+      return { term, expected, rationale };
+    });
+  } catch (error) {
+    console.warn(`${objectFolderName(objectId)}/${FINDABILITY_AUDIT_FILE} is malformed (${error instanceof Error ? error.message : String(error)}); using the built-in Findability audit.`);
+    return null;
+  }
+}
 function runFindabilityAudit(objectId: ObjectId, drafts: Drafts): FindabilityAuditRow[] {
+  const ownAudit = objectFindabilityAudit(objectId);
+  if (ownAudit) return ownAudit.map(({ term, expected, rationale }) => {
+    const results = searchKnowledgeObjects(term, drafts, [objectId]).filter((result) => result.objectId === objectId);
+    const status = expected ? results.length ? "expected-found" : "expected-missed" : results.length ? "unexpected-found" : "correctly-absent";
+    return { term, expectedObjects: expected ? [objectId] : [], rationale, expected, results, status };
+  });
   return FINDABILITY_AUDIT_DEFINITIONS.map((definition) => {
     const results = searchKnowledgeObjects(definition.term, drafts, [objectId]).filter((result) => result.objectId === objectId);
     const expected = objectId === ASSEMBLY_OBJECT_ID || definition.expectedObjects.includes(objectId);
