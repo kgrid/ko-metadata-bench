@@ -12,8 +12,8 @@ for (const [edition, url] of [
     await expect(page.getByRole("heading", { name: "Knowledge Objects", exact: true })).toBeVisible();
     await expect(page.getByText("Instrument set: 1 embedded knowledge object", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Knowledge Assembly", exact: true })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: /^Venous Thromboembolism ProphylaxisFHIR DQM KO Runner unavailable$/ })).toBeDisabled();
-    await page.getByRole("button", { name: /^Open Venous Thromboembolism ProphylaxisFHIR DQM KO files$/ }).click();
+    await expect(page.getByRole("button", { name: /^VTE Prophylaxis DQM KO Runner unavailable$/ })).toBeDisabled();
+    await page.getByRole("button", { name: /^Open VTE Prophylaxis DQM KO files$/ }).click();
 
     const picker = page.getByLabel("Browse files");
     await expect(picker.locator("option")).toHaveCount(1232);
@@ -25,7 +25,7 @@ for (const [edition, url] of [
     await page.getByRole("button", { name: "Metadata Rig", exact: true }).click();
     await expect(page.getByRole("button", { name: "Interact", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "K exercise", exact: true }).click();
-    await page.getByRole("button", { name: /^Explore Venous Thromboembolism ProphylaxisFHIR DQM KO/ }).click();
+    await page.getByRole("button", { name: /^Explore VTE Prophylaxis DQM KO/ }).click();
     await expect(page.getByRole("group", { name: "Knowledge element: CMS108FHIR VTE Prophylaxis measure logic" })).toBeVisible();
     expect(pageErrors).toEqual([]);
   });

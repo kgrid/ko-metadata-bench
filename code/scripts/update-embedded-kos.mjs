@@ -72,7 +72,9 @@ function declaredObjectName(object) {
     if (typeof title !== "string" || !title.trim()) {
       throw new Error(`${object.folderName}: metadata.json must declare a nonempty dc:title`);
     }
-    return title.trim();
+    // Cards show the shorter schema:alternateName when metadata.json declares one.
+    const alternateName = object.metadata?.["schema:alternateName"];
+    return typeof alternateName === "string" && alternateName.trim() ? alternateName.trim() : title.trim();
   }
   const source = object.readText(object.workshop.findabilityPath);
   const statements = new Parser({ format: "text/turtle" }).parse(source);
