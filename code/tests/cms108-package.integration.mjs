@@ -9,7 +9,7 @@ import { installEmbeddedText, previewEmbeddedText } from "../app/embedded-text.j
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const server = read("../app/generated-ko-data.ts");
 const standalone = read("../outputs/Knowledge-Object-Workbench.html");
-const attachmentDigest = "716eedbaf5e51dff3405e1eaeec7ebdacc66da3baf818a0bf6d6aa396adf493d";
+const attachmentDigest = "0d82c8638f9d3e5745e93175c24cf66923f759ef00cf5aae60297eec473724b4";
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 function literal(source, name) {
