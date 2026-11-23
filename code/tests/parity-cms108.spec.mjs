@@ -16,7 +16,7 @@ for (const [edition, url] of [
     await page.getByRole("button", { name: /^Open CMS108.* files$/ }).click();
 
     const picker = page.getByLabel("Browse files");
-    await expect(picker.locator("option")).toHaveCount(1230);
+    await expect(picker.locator("option")).toHaveCount(1231);
     await picker.selectOption("specs/CMS108FHIR-v1.0.000-FHIR.html");
     await expect(page.locator(".koReader code, .ko-reader code").last()).toContainText("<!DOCTYPE html>");
     await picker.selectOption("src/cli/run_cms108.js");
