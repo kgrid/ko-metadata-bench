@@ -9,7 +9,7 @@ import { installEmbeddedText, previewEmbeddedText } from "../app/embedded-text.j
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const server = read("../app/generated-ko-data.ts");
 const standalone = read("../outputs/Knowledge-Object-Workbench.html");
-const attachmentDigest = "3fc22b423c3ef6af190bb2106218a8ccd6319a2aeb7937744002dea0ff145204";
+const attachmentDigest = "716eedbaf5e51dff3405e1eaeec7ebdacc66da3baf818a0bf6d6aa396adf493d";
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 function literal(source, name) {
@@ -30,7 +30,7 @@ for (const [edition, source, filesName, foldersName, assemblyName] of [
     const binaries = literal(source, "objectBinaryOverrides");
     installEmbeddedText(files, literal(source, "compressedTextOverrides"), inflateSync);
     const paths = [...Object.keys(files), ...Object.keys(binaries)].sort();
-    assert.equal(paths.length, 1231);
+    assert.equal(paths.length, 1232);
     assert.ok(paths.every((path) => path.startsWith("1/")));
     const manifest = paths.map((key) => {
       const bytes = Object.hasOwn(binaries, key) ? Buffer.from(binaries[key], "base64") : files[key];
